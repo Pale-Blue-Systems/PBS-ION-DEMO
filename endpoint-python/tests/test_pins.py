@@ -100,3 +100,23 @@ def test_ion_libraries_export_the_bound_symbols():
 
 def test_repo_root():
     assert os.path.isfile(os.path.join(REPO_ROOT, "docs", "test-vectors.json"))
+
+
+def test_node_running_check(tmp_path, monkeypatch):
+    """No bp_attach unless the node is listed in ion_nodes with its working memory."""
+    monkeypatch.delenv("ION_NODE_WDNAME", raising=False)
+    monkeypatch.delenv("ION_NODE_LIST_DIR", raising=False)
+    assert ion.node_running()[0] is False
+    node = str(tmp_path / "rover")
+    ok, detail = ion.node_running(node, str(tmp_path))
+    assert not ok and "cannot read" in detail
+    (tmp_path / "ion_nodes").write_text("50 131122 ion50 %s 65330\n" % (tmp_path / "gateway"))
+    ok, detail = ion.node_running(node, str(tmp_path))
+    assert not ok and "not listed" in detail
+    (tmp_path / "ion_nodes").write_text("99 2147483000 ion99 %s 65379\n" % node)
+    ok, detail = ion.node_running(node, str(tmp_path))
+    assert not ok and "working memory" in detail
+    monkeypatch.setenv("ION_NODE_WDNAME", node)
+    monkeypatch.setenv("ION_NODE_LIST_DIR", str(tmp_path))
+    with pytest.raises(ion.IonError, match="ION node not running"):
+        ion.BpEndpoint("ipn:99.1")

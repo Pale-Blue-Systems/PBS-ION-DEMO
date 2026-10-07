@@ -205,7 +205,11 @@ def main(argv=None):
     p.set_defaults(fn=cmd_listen)
 
     args = ap.parse_args(argv)
-    return args.fn(args)
+    try:
+        return args.fn(args)
+    except ion.IonError as ex:
+        print("harness: %s" % ex, file=sys.stderr, flush=True)
+        return 2
 
 
 if __name__ == "__main__":

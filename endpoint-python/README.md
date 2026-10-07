@@ -90,6 +90,17 @@ The process attaches to the node named by `ION_NODE_WDNAME`, and
 `--ion-node-list-dir`. When those options are absent it uses
 `$ION_NODE_WDNAME`, then `$ION_RUN_DIR/rover`, then `build/run/ion/rover`.
 
+Before `bp_attach`, the binding checks that the node is listed in
+`$ION_NODE_LIST_DIR/ion_nodes` and that its working-memory segment (the
+node's `wmKey`) exists. If either check fails, the rover exits with status 2
+and does not call `bp_attach`. The check is needed because, with no node
+running, `bp_attach` in ION 4.2.0 fails only after it has created the
+host-global semaphore table. That left shared memory `0xee08` and
+`/dev/shm/sem.ion:GLOBAL:0` behind in one run on 2026-10-07, and
+`ion/start_nodes.sh` then refuses to start until they are removed
+(`ipcrm -M 0xee08; rm /dev/shm/sem.ion:GLOBAL:0`). With the check in
+place, the same run left nothing behind.
+
 ## Send procedure (telemetry)
 
 For each planned envelope the rover does the following:
@@ -185,8 +196,9 @@ endpoint-python/bin/rover --log a.jsonl --plan endpoint-python/plans/example.jso
 
 The rover prints `rover: READY ...` when it is receiving. On SIGINT or SIGTERM
 it stops sending, interrupts the receiver, writes `run_end`, closes the
-endpoint and detaches from ION. Its exit status is 0, or 1 if `bp_receive`
-failed.
+endpoint and detaches from ION. Exit status: 0 for a normal end, 1 if
+`bp_receive` failed while running, 2 if the endpoint could not be opened
+(node not running, or `ipn:99.1` already held by another process).
 
 Plan format: the docstring of `pbs_endpoint_a/plan.py` and
 `plans/example.json`. Each item gives `at_s`, `count`, `interval_s`,
@@ -254,10 +266,15 @@ Host: 4 vCPU Intel Xeon 2.80 GHz, Ubuntu 24.04, Python 3.13.16, pytest
 9.1.1, cryptography 50.0.1, PBS_LINK 0.1.4 (`d3b81d3`), ION
 `ion-open-source-4.2.0` (`568df88`) built by `ion/build_ion.sh`.
 
-- `endpoint-python/run_tests.sh`: 293 passed, 1 skipped (the live test), in
-  1.15 s. `bin/tool vectors`: 237 checks, 237 passed.
-- `PBS_ION_LIVE=1 ... tests/test_live_ion.py`: 1 passed in 49.0 s (one run;
-  output in `build/run/endpoint-a-livetest-1`, not committed).
+- `endpoint-python/run_tests.sh`: 294 passed, 1 skipped (the live test), in
+  1.13 s. `bin/tool vectors`: 237 checks, 237 passed. From a fresh `git
+  clone` with ION not built, the script fetched PBS_LINK, created
+  `build/venv-endpoint-python`, and gave 291 passed, 3 skipped (the live
+  test and the two ION library tests).
+- `PBS_ION_LIVE=1`: the live test passed in two runs. Run 1 ran the live
+  test alone (49.0 s), before the pre-attach node check was added. Run 2
+  ran the whole suite on the committed code (295 passed in 50.6 s). Output
+  is in `build/run/endpoint-a-livetest-{1,2}`, which is not committed.
 
   Conditions:
   - three ION nodes on one host, LTP over UDP;
@@ -266,18 +283,22 @@ Host: 4 vCPU Intel Xeon 2.80 GHz, Ubuntu 24.04, Python 3.13.16, pytest
   - contact plan `ion/contacts/always_on.ionrc` (125000 B/s, ranges 1 s
     and 2 s).
 
-  Results:
+  Results, the same in both runs except for the latencies:
   - The rover sent 11 envelopes: plan `builtin:nominal:2:2` (two rounds of
     priorities 0 to 4) plus one PING reply.
   - All 11 reached the harness on `ipn:23.1`, and each had the same SHA-256
     and header bytes as sent.
-  - Latency from envelope Timestamp to receipt: minimum 1.5696 s, median
-    1.5728 s, maximum 1.5792 s.
   - For the TTL 0 envelopes, `BpDelivery.timeToLive` read 4294966296. That
     is 2147483647000 mod 2^32, as A30 predicts. These bundles were sent
     with the 2147483647 s lifetime and were delivered.
   - Eight commands were injected from the EARTH node. The rover's
-    dispositions:
+    dispositions are in the table below. Every received command had
+    `eid_match: true` (bundle source `ipn:23.1`).
+
+| Latency (envelope Timestamp to receipt) | Run 1 | Run 2 |
+|---|---|---|
+| Telemetry at Earth, min / median / max | 1.5696 / 1.5728 / 1.5792 s | 1.5683 / 1.5720 / 1.5855 s |
+| Commands at the rover (neither expired nor replayed), min / max | 1.576 / 1.752 s | 1.571 / 1.770 s |
 
 | Injected | Rover result |
 |---|---|
@@ -290,9 +311,15 @@ Host: 4 vCPU Intel Xeon 2.80 GHz, Ubuntu 24.04, Python 3.13.16, pytest
 | `DRIVE 5`, Timestamp 29.5 s in the past, TTL 30, bundle lifetime override 30 s | `REJECT TTL_EXPIRED` |
 | the bytes of the first `PING` again, 1 s later | `REJECT SEC_REPLAY` |
 
-Every received command had `eid_match: true` (bundle source `ipn:23.1`). For
-the commands that were neither expired nor replayed, latency ranged from
-1.576 s to 1.752 s.
+Two more checks were run on the same nodes, delays and plan (2026-10-07):
+
+- The rover ran with `--plan builtin:nominal:100:1` and no `--duration`.
+  It received SIGTERM 3.1 s after its first send, after 17 sends. It wrote
+  `run_end` 17 ms after its last send and exited with status 0.
+  `ion/stop_nodes.sh` then reported a clean stop.
+- A second rover was started on the same node while the first held
+  `ipn:99.1`. It exited with status 2 and the message
+  `bp_open(ipn:99.1) failed`.
 
 ### PBS conformance tests exercised
 

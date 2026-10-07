@@ -239,7 +239,11 @@ def main(argv=None):
     E.source_id_bytes(args.source_id)                  # refuse > 16 bytes before starting
 
     stop = threading.Event()
-    endpoint = ion.BpEndpoint(args.eid)
+    try:
+        endpoint = ion.BpEndpoint(args.eid)
+    except ion.IonError as ex:
+        print("rover: %s" % ex, file=sys.stderr, flush=True)
+        return 2
     log = jsonlog.JsonlLog(args.log, "A", args.eid, args.scenario)
     rover = Rover(endpoint, log, receiver, source_id=args.source_id, dest_eid=args.dest,
                   sequence_start=args.sequence_start, reply_ping=args.reply_ping)
@@ -267,6 +271,10 @@ def main(argv=None):
         endpoint.close()
     return 1 if rover.rx_error else 0
 
+
+# Exit status: 0 normal end; 1 bp_receive failed while running; 2 the
+# endpoint could not be opened (node not running, or ipn:99.1 held by
+# another process).
 
 if __name__ == "__main__":
     sys.exit(main())

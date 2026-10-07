@@ -173,9 +173,13 @@ class BpEndpoint:
     a lock.
     """
 
-    def __init__(self, eid, lib=None, send_only=False):
+    def __init__(self, eid, lib=None, send_only=False, check_node=True):
         self.eid = eid
         self.send_only = send_only
+        if check_node:
+            ok, detail = node_running()
+            if not ok:
+                raise IonError("ION node not running: %s" % detail)
         self.lib = lib or IonLibrary.load()
         self._sdr_lock = threading.Lock()
         if self.lib.bp.bp_attach() < 0:
@@ -300,3 +304,47 @@ def node_environment(node_dir, node_list_dir=None):
     os.environ["ION_NODE_WDNAME"] = node_dir
     os.environ["ION_NODE_LIST_DIR"] = str(node_list_dir)
     return node_dir, str(node_list_dir)
+
+
+def _shm_keys():
+    """SysV shared-memory keys on this host, or None if /proc does not list them."""
+    try:
+        with open("/proc/sysvipc/shm") as fh:
+            rows = fh.read().splitlines()[1:]
+    except OSError:
+        return None
+    return {int(r.split()[0]) for r in rows if r.strip()}
+
+
+def node_running(node_dir=None, node_list_dir=None):
+    """Return ``(ok, detail)``: the node is listed in ``ion_nodes`` and its
+    working-memory segment (wmKey) exists.
+
+    Checked before ``bp_attach``: with no node running, ION 4.2.0's attach
+    creates the host-global semaphore table (shared memory 0xee08 and
+    /dev/shm/sem.ion:GLOBAL:0) before it fails, and leaves both behind;
+    ion/start_nodes.sh then refuses to start.
+    """
+    node_dir = node_dir or os.environ.get("ION_NODE_WDNAME")
+    node_list_dir = node_list_dir or os.environ.get("ION_NODE_LIST_DIR")
+    if not node_dir or not node_list_dir:
+        return False, "ION_NODE_WDNAME and ION_NODE_LIST_DIR must be set"
+    path = os.path.join(node_list_dir, "ion_nodes")
+    try:
+        with open(path) as fh:
+            rows = fh.read().splitlines()
+    except OSError as ex:
+        return False, "cannot read %s (%s)" % (path, ex.strerror)
+    for row in rows:
+        cols = row.split()
+        if len(cols) >= 4 and cols[3] == node_dir:
+            try:
+                wm_key = int(cols[1])
+            except ValueError:
+                return False, "unreadable line in %s: %r" % (path, row)
+            keys = _shm_keys()
+            if keys is not None and wm_key not in keys:
+                return False, ("node %s is listed in %s but its working memory (key 0x%x) "
+                               "does not exist" % (cols[0], path, wm_key))
+            return True, "node %s" % cols[0]
+    return False, "%s is not listed in %s" % (node_dir, path)
