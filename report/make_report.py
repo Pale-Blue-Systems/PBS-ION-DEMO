@@ -280,7 +280,7 @@ def ltpstat_rows(run):
                         st.get("seg_re_xmit", "n/a"), st.get("export_cancel_xmit", "n/a"),
                         st.get("export_complete", "n/a"), st.get("import_complete", "n/a"),
                         st.get("rpt_re_xmit", "n/a"), st.get("in_seg_redundant", "n/a"),
-                        st.get("in_seg_screened", "n/a")])
+                        st.get("in_seg_screened", "n/a"), st.get("in_seg_too_fast", "n/a")])
     return out
 
 
@@ -429,12 +429,14 @@ def scenario_section(run, verdict, chart_paths, results_rel, report_dir):
         lines.append("ION LTP span counters per node and span (`ltpstats -a` after the traffic "
                      "phase; export = blocks this node sent on the span, import = blocks it "
                      "received; screened = segments discarded because they arrived while the "
-                     "contact plan gave the sender no transmission to this node):")
+                     "contact plan gave the sender no transmission to this node; backlog = red "
+                     "segments discarded because the blocks waiting for delivery to BP had "
+                     "reached the `m maxbacklog` limit, counted by ION as in_seg_too_fast):")
         lines.append("")
         lines.append(table(["Node to peer", "Checkpoints sent", "Checkpoints resent",
                             "Data segments resent", "Export cancels", "Exports complete",
                             "Imports complete", "Reports resent", "Redundant segments in",
-                            "Screened segments in"], lrow))
+                            "Screened segments in", "Backlog-discarded segments in"], lrow))
         lines.append("")
     for name in ("timeline", "arrivals", "latency"):
         if name in chart_paths:

@@ -10,7 +10,15 @@
 # hop. Bundles not yet dequeued wait in the BP egress plan's queues (bulk,
 # standard, urgent). At most 32 blocks (export sessions) per span are open
 # at a time.
+# Delivery backlog: while this many received blocks wait for delivery to BP,
+# ION discards every further red segment, checkpoints included (ltprc(5)
+# 'm maxbacklog', default 10; counted as in_seg_too_fast), and each discarded
+# checkpoint costs the sender a checkpoint timeout. The limit is set to the
+# blocks the peers can have open towards this node at once (32 import
+# sessions per span, one span = 32), so a full window of blocks completing
+# together, as after a scheduled outage, stays below the limit.
 1 64
 a span 50 32 32 1024 1 1 'udplso 127.0.0.1:29950' 1
 a seat 'udplsi 127.0.0.1:19913'
+m maxbacklog 32
 s
