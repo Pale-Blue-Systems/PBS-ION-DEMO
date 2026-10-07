@@ -43,6 +43,8 @@ Checks:
   ion_expired       final bpstats of "node": expired bundles >= min_count
   link_counter      emulator counter "counter" on links "links": sum >= min,
                     sum <= max, each link >= each_min
+  ltp_counter       ION ltpstats counter "stat" of "node" on its span to
+                    "peer" >= min (and <= max)
   overtakes         every selected row was received before at least min
                     rows of "other" that were sent before it
   no_overtake       no selected row was received before a row of "other" that
@@ -320,6 +322,14 @@ class Evaluator:
             ok &= total <= c["max"]
         total_txt = ("%.3f" % total) if isinstance(total, float) else str(total)
         return ok, "%s total %s (%s)" % (c["counter"], total_txt, ", ".join(parts)), []
+
+    def c_ltp_counter(self, c):
+        names = {"rover": 99, "gateway": 50, "earth": 23}
+        st = self.d.ltp_stats().get(c["node"], {}).get(names[c["peer"]], {})
+        v = st.get(c["stat"])
+        ok = v is not None and v >= c.get("min", 0) and ("max" not in c or v <= c["max"])
+        return ok, "%s node, span to %s: %s = %s (ltpstats -a)" % (
+            c["node"], c["peer"], c["stat"], v), []
 
     def c_overtakes(self, c):
         rows = [r for r in select(self.rows, c.get("select")) if r["delivered"]]

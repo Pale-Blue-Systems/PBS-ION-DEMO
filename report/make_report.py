@@ -94,9 +94,37 @@ def outage_rows(run):
             got = [r for r in d if r["delivered"]]
             held = [r["latency_s"] - PROPAGATION_S[direction] for r in got]
             after = [r["recv_t_s"] - o["end_s"] for r in got]
+            topo = collect_topology()
+            leg_links = [n for n, l in topo["links"].items() if l["leg"] == o["leg"]]
+            first = run.first_rx_after(leg_links, o["end_s"])
             out.append(["%s %g-%g s (%s)" % (o["leg"], o["start_s"], o["end_s"], o["kind"]),
                         direction, len(d), len(got), fs(q(held, 0.0)), fs(q(held, 0.5)),
-                        fs(q(held, 1.0)), fs(q(after, 0.0)), fs(q(after, 1.0))])
+                        fs(q(held, 1.0)), fs(None if first is None else first - o["end_s"]),
+                        fs(q(after, 0.0)), fs(q(after, 1.0))])
+    return out
+
+
+def resume_rows(run):
+    """LTP blocks started in the 3 s after a leg resumed (emulator view)."""
+    topo = collect_topology()
+    out = []
+    for o in run.scn.get("outages", []):
+        leg_links = [n for n, l in topo["links"].items() if l["leg"] == o["leg"]]
+        first = run.first_rx_after(leg_links, o["end_s"])
+        if first is None:
+            continue
+        for data_link in leg_links:
+            spec = topo["links"][data_link]
+            report_link = [n for n, l in topo["links"].items()
+                           if l["from"] == spec["to"] and l["to"] == spec["from"]][0]
+            blocks = run.ltp_after_resume(data_link, report_link, first, first + 3.0)
+            if not blocks:
+                continue
+            resent = sum(1 for b in blocks if b["cp_resent_before_report"])
+            rep = [b["report_after_s"] for b in blocks if b["report_after_s"] is not None]
+            out.append(["%s %g-%g s (%s)" % (o["leg"], o["start_s"], o["end_s"], o["kind"]),
+                        data_link, fs(first - o["end_s"]), len(blocks), resent,
+                        fs(q(rep, 0.0)), fs(q(rep, 0.5)), fs(q(rep, 1.0))])
     return out
 
 
@@ -132,6 +160,11 @@ def conditions(run):
         legs.append("%s: one-way delay %s s (emulator), contact-plan range %s s, contact rate "
                     "%s bytes/s" % (name, leg["one_way_delay_s"], leg["range_s"], rate))
     lines.append("- Legs: " + "; ".join(legs) + ".")
+    late = run.emulator_timing()["lateness_ms"]
+    if late:
+        lines.append("- Emulator forwarding accuracy: %d datagrams forwarded; send time minus "
+                     "scheduled time median %.3f ms, p99 %.3f ms, max %.3f ms." % (
+                         len(late), q(late, 0.5), q(late, 0.99), late[-1]))
     links = scn.get("links", {})
     if links:
         lines.append("- Emulator settings beyond the delays: " + "; ".join(
@@ -230,6 +263,20 @@ def ionstat_rows(run):
     return out
 
 
+def ltpstat_rows(run):
+    names = {99: "rover", 50: "gateway", 23: "earth"}
+    out = []
+    for node, spans in run.ltp_stats().items():
+        for peer, st in sorted(spans.items()):
+            out.append(["%s to %s" % (node, names.get(peer, peer)),
+                        st.get("ckpt_xmit", "n/a"), st.get("ckpt_re_xmit", "n/a"),
+                        st.get("seg_re_xmit", "n/a"), st.get("export_cancel_xmit", "n/a"),
+                        st.get("export_complete", "n/a"), st.get("import_complete", "n/a"),
+                        st.get("rpt_re_xmit", "n/a"), st.get("in_seg_redundant", "n/a"),
+                        st.get("in_seg_screened", "n/a")])
+    return out
+
+
 def scenario_section(run, verdict, chart_paths, results_rel, report_dir):
     scn = run.scn
     sid = run.id
@@ -282,11 +329,25 @@ def scenario_section(run, verdict, chart_paths, results_rel, report_dir):
     orow = outage_rows(run)
     if orow:
         lines.append("Envelopes sent during an outage. Time held = latency minus the 1.55 s "
-                     "one-way propagation of the path; delivered after = receive time minus the "
-                     "end of the outage:")
+                     "one-way propagation of the path. Leg resumed = first datagram the emulator "
+                     "received on either direction of the leg after the outage ended, minus the "
+                     "end time. Delivered after = receive time minus the end of the outage:")
         lines.append("")
         lines.append(table(["Outage", "Direction", "Sent", "Received", "Time held min (s)",
-                            "median (s)", "max (s)", "Delivered after, first (s)", "last (s)"], orow))
+                            "median (s)", "max (s)", "Leg resumed after (s)",
+                            "Delivered after, first (s)", "last (s)"], orow))
+        lines.append("")
+    rrow = resume_rows(run)
+    if rrow:
+        lines.append("LTP blocks whose first checkpoint segment the emulator forwarded in the "
+                     "3 s after the leg resumed; a block counts as resent when the sender "
+                     "transmitted its checkpoint again before any report segment for it came "
+                     "back; report delay = first report minus first checkpoint (emulator "
+                     "receive times):")
+        lines.append("")
+        lines.append(table(["Outage", "Data direction", "Leg resumed after (s)", "Blocks",
+                            "Checkpoint resent before a report", "Report delay min (s)",
+                            "median (s)", "max (s)"], rrow))
         lines.append("")
     prow = probe_rows(run)
     if prow:
@@ -350,6 +411,18 @@ def scenario_section(run, verdict, chart_paths, results_rel, report_dir):
                      "delivered, reforwarded, deleted at lifetime expiry):")
         lines.append("")
         lines.append(table(["Node", "src", "fwd", "xmt", "rcv", "dlv", "rfw", "exp"], srow))
+        lines.append("")
+    lrow = ltpstat_rows(run)
+    if lrow:
+        lines.append("ION LTP span counters per node and span (`ltpstats -a` after the traffic "
+                     "phase; export = blocks this node sent on the span, import = blocks it "
+                     "received; screened = segments discarded because they arrived while the "
+                     "contact plan gave the sender no transmission to this node):")
+        lines.append("")
+        lines.append(table(["Node to peer", "Checkpoints sent", "Checkpoints resent",
+                            "Data segments resent", "Export cancels", "Exports complete",
+                            "Imports complete", "Reports resent", "Redundant segments in",
+                            "Screened segments in"], lrow))
         lines.append("")
     for name in ("timeline", "arrivals", "latency"):
         if name in chart_paths:

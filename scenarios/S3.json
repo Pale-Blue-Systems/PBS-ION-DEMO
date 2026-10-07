@@ -38,7 +38,10 @@
    {"id": "S3-7", "check": "link_counter", "links": ["rover-gateway", "gateway-rover", "gateway-earth", "earth-gateway"], "counter": "ltp_data_retransmissions", "min": 1, "text": "LTP retransmitted data segments (same session, offset and length seen again by the emulator)"},
    {"id": "S3-8", "check": "no_unmatched", "text": "No duplicate or unknown envelope is received"},
    {"id": "S3-9", "check": "ttl_respected", "text": "No receiver accepts an envelope older than its TTL"},
-   {"id": "S3-10", "check": "latency", "informative": true, "text": "Latency of all envelopes (informative)"}
+   {"id": "S3-10", "check": "latency", "informative": true, "text": "Latency of all envelopes (informative)"},
+   {"id": "S3-11", "check": "ltp_counter", "node": "gateway", "peer": "earth", "stat": "ckpt_re_xmit", "informative": true, "text": "Checkpoints the Gateway resent to Earth (informative)"},
+   {"id": "S3-12", "check": "ltp_counter", "node": "rover", "peer": "gateway", "stat": "ckpt_re_xmit", "informative": true, "text": "Checkpoints the rover resent to the Gateway (informative)"},
+   {"id": "S3-13", "check": "ltp_counter", "node": "gateway", "peer": "earth", "stat": "export_cancel_xmit", "informative": true, "text": "LTP blocks the Gateway cancelled towards Earth (informative)"}
   ],
  "conformance": [
    {"ref": "PBS-CONFORMANCE-02 T011", "how": "delivery through unscheduled outages and random loss (S3-1, S3-2)"},

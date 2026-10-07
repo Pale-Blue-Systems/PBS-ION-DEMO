@@ -95,6 +95,24 @@ def parse_bpstats(text):
     return out
 
 
+LTP_STATS = ["ckpt_xmit", "ckpt_re_xmit", "seg_re_xmit", "pos_rpt_recv", "neg_rpt_recv",
+             "export_cancel_xmit", "export_cancel_recv", "export_complete", "ckpt_recv",
+             "rpt_re_xmit", "import_complete", "in_seg_recv_red", "in_seg_redundant",
+             "in_seg_screened", "in_seg_ses_closed", "in_seg_too_fast"]
+
+
+def parse_ltpstats(text):
+    """Last 'ltpstats -a' report per span in an ion.log:
+    {peer engine: {stat name: count}}."""
+    out = {}
+    pat = re.compile(r"\[x\] span (\d+) (\w+) from .* to .*: (\d+) (\d+)")
+    for line in text.splitlines():
+        m = pat.search(line)
+        if m:
+            out.setdefault(int(m.group(1)), {})[m.group(2)] = int(m.group(3))
+    return out
+
+
 def parse_bplist_count(text):
     m = re.findall(r"Report count is (\d+)", text)
     if m:
@@ -271,6 +289,63 @@ class RunData:
             "matched_label": r.get("_matched_label"),
         }
 
+    def emulator_timing(self):
+        """Emulator event-log summary: forwarding lateness (tx time minus the
+        scheduled delivery time, ms) and, per link, the receive times of all
+        datagrams in scenario seconds."""
+        if hasattr(self, "_emu_timing"):
+            return self._emu_timing
+        late = []
+        rx = {}
+        segs = {}
+        path = os.path.join(self.dir, "emulator.jsonl")
+        if os.path.exists(path):
+            with open(path) as fh:
+                for line in fh:
+                    try:
+                        e = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if e.get("ev") == "tx" and "due_us" in e:
+                        late.append((e["t_us"] - e["due_us"]) / 1000.0)
+                    elif e.get("ev") == "rx" and self.origin is not None:
+                        t = e["t_us"] / 1e6 - self.origin
+                        rx.setdefault(e["link"], []).append(t)
+                        lt = e.get("ltp")
+                        if lt:
+                            segs.setdefault(e["link"], []).append(
+                                (t, lt["kind"], lt["eng"], lt["ses"]))
+        self._emu_timing = {"lateness_ms": sorted(late), "rx": rx, "ltp": segs}
+        return self._emu_timing
+
+    def ltp_after_resume(self, data_link, report_link, t_from, t_to):
+        """LTP blocks whose first checkpoint the emulator saw on data_link in
+        [t_from, t_to): how many, how many were answered by a report on
+        report_link before the checkpoint was sent again, and the time from
+        the first checkpoint to the first report."""
+        segs = self.emulator_timing()["ltp"]
+        first_cp, cp_times = {}, {}
+        for t, kind, eng, ses in segs.get(data_link, []):
+            if kind == "CP":
+                cp_times.setdefault((eng, ses), []).append(t)
+        first_rs = {}
+        for t, kind, eng, ses in segs.get(report_link, []):
+            if kind == "RS" and (eng, ses) not in first_rs:
+                first_rs[(eng, ses)] = t
+        blocks = []
+        for key, times in cp_times.items():
+            if t_from <= times[0] < t_to:
+                rs = first_rs.get(key)
+                again = [x for x in times[1:] if rs is None or x < rs]
+                blocks.append({"session": key, "first_cp": times[0], "first_rs": rs,
+                               "cp_resent_before_report": len(again) > 0,
+                               "report_after_s": None if rs is None else rs - times[0]})
+        return blocks
+
+    def first_rx_after(self, links, t_s):
+        times = [t for l in links for t in self.emulator_timing()["rx"].get(l, []) if t >= t_s]
+        return min(times) if times else None
+
     def link_rows(self):
         rows = []
         for name, st in sorted((self.emu.get("links") or {}).items()):
@@ -300,6 +375,16 @@ class RunData:
             p = os.path.join(self.dir, "ion", "%s.ion.log" % node)
             if os.path.exists(p):
                 out[node] = parse_bpstats(open(p, errors="replace").read())
+        return out
+
+    def ltp_stats(self):
+        out = {}
+        for node in ("rover", "gateway", "earth"):
+            p = os.path.join(self.dir, "ion", "%s.ion.log" % node)
+            if os.path.exists(p):
+                st = parse_ltpstats(open(p, errors="replace").read())
+                if st:
+                    out[node] = st
         return out
 
     def ion_stat_rows(self):

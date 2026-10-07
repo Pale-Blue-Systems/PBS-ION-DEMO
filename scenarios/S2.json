@@ -48,7 +48,10 @@
    {"id": "S2-12", "check": "delivered_after", "select": {"dir": "B->A", "sent_between": [65.5, 85]}, "t_s": 86.55, "min_count": 3, "text": "Earth commands sent during the Gateway-Earth outage arrive no earlier than its end plus 1.55 s"},
    {"id": "S2-13", "check": "no_unmatched", "text": "No duplicate or unknown envelope is received"},
    {"id": "S2-14", "check": "ttl_respected", "text": "No receiver accepts an envelope older than its TTL"},
-   {"id": "S2-15", "check": "link_counter", "links": ["rover-gateway", "gateway-rover", "gateway-earth", "earth-gateway"], "counter": "drop_blackout", "max": 0, "text": "No node transmits into a scheduled outage (emulator blackout drops = 0)"}
+   {"id": "S2-15", "check": "link_counter", "links": ["rover-gateway", "gateway-rover", "gateway-earth", "earth-gateway"], "counter": "drop_blackout", "max": 0, "text": "No node transmits into a scheduled outage (emulator blackout drops = 0)"},
+   {"id": "S2-16", "check": "ltp_counter", "node": "earth", "peer": "gateway", "stat": "in_seg_screened", "informative": true, "text": "LTP segments from the Gateway discarded by Earth's LTP screening (informative)"},
+   {"id": "S2-17", "check": "ltp_counter", "node": "gateway", "peer": "rover", "stat": "in_seg_screened", "informative": true, "text": "LTP segments from the rover discarded by the Gateway's LTP screening (informative)"},
+   {"id": "S2-18", "check": "ltp_counter", "node": "gateway", "peer": "earth", "stat": "ckpt_re_xmit", "informative": true, "text": "Checkpoints the Gateway resent to Earth (informative)"}
   ],
  "conformance": [
    {"ref": "PBS-CONFORMANCE-02 T011", "how": "store-and-forward delivery across complete scheduled outages (S2-1, S2-2, S2-5 to S2-12)"},

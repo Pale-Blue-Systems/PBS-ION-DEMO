@@ -13,8 +13,8 @@ Sequence (scenario time 0 = traffic origin O; T0 = O - lead_s):
      its plan starts at about O, then Endpoint B (pbs_earth run) on the EARTH
      node with its plan origin --t0-us exactly O;
   5. runs the probes (bplist / bpstats on a node) at their scenario times;
-  6. at O + duration_s stops both endpoints (SIGTERM), runs bpstats on every
-     node, copies each node's ion.log, stops the nodes (ion/stop_nodes.sh)
+  6. at O + duration_s stops both endpoints (SIGTERM), runs bpstats and
+     ltpstats -a on every node, copies each node's ion.log, stops the nodes (ion/stop_nodes.sh)
      and then the emulator;
   7. runs the scenario's post-run commands (offline cross-checks);
   8. writes run.json (times, versions, exit statuses).
@@ -349,9 +349,10 @@ class Run:
         self.step("endpoints_stopped", a=self.info["exit"].get("endpoint-a"),
                   b=self.info["exit"].get("endpoint-b"))
         for node in ("rover", "gateway", "earth"):
-            rec = self.ion_tool(node, ["bpstats"], "final-%s-bpstats.txt" % node)
-            rec["final"] = True
-            self.info["probes"].append(rec)
+            for tool in (["bpstats"], ["ltpstats", "-a"]):
+                rec = self.ion_tool(node, tool, "final-%s-%s.txt" % (node, tool[0]))
+                rec["final"] = True
+                self.info["probes"].append(rec)
         time.sleep(1.0)
         self.collect_ion_logs()
 
