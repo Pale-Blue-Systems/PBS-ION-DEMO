@@ -1,0 +1,150 @@
+{
+ "generated_utc": "2026-10-07T04:21:44.520146+00:00",
+ "git": {
+  "commit": "88747a82b61e121ea4d3a83d9599c86938555e12",
+  "worktree_modified": false
+ },
+ "ion": {
+  "commit": "568df887cb9f18aa8ec013b1a566d83215e499ae",
+  "tag": "ion-open-source-4.2.0"
+ },
+ "host": {
+  "clock_source": "tsc",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "nproc": 4,
+  "ntp_synchronized": null,
+  "platform": "Linux-6.18.44-fc-v77-x86_64-with-glibc2.39",
+  "python": "3.13.16"
+ },
+ "test_vectors_sha256": "789ac1b4a02f38e8adf3d9bc1eeabe4d0bb7abc74a95b3dd8439633bcb3885ff",
+ "scenarios": [
+  {
+   "scenario": "S1",
+   "title": "Nominal telemetry and commands both ways",
+   "passed": true,
+   "criteria_passed": 13,
+   "criteria_total": 13,
+   "envelopes_built": 46,
+   "envelopes_sent": 46,
+   "envelopes_received": 46,
+   "byte_identical": 46,
+   "latency_median_s": 1.578561,
+   "latency_max_s": 1.600979,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S2",
+   "title": "Scheduled outages in the contact plan: storage at rover, relay and Earth",
+   "passed": true,
+   "criteria_passed": 15,
+   "criteria_total": 15,
+   "envelopes_built": 127,
+   "envelopes_sent": 127,
+   "envelopes_received": 127,
+   "byte_identical": 127,
+   "latency_median_s": 1.615618,
+   "latency_max_s": 28.309152,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S3",
+   "title": "Unscheduled blackouts and random loss: LTP recovery",
+   "passed": true,
+   "criteria_passed": 9,
+   "criteria_total": 9,
+   "envelopes_built": 119,
+   "envelopes_sent": 119,
+   "envelopes_received": 119,
+   "byte_identical": 119,
+   "latency_median_s": 1.58225,
+   "latency_max_s": 24.153817,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S4",
+   "title": "Priority under a rate-limited link",
+   "passed": true,
+   "criteria_passed": 12,
+   "criteria_total": 12,
+   "envelopes_built": 64,
+   "envelopes_sent": 64,
+   "envelopes_received": 64,
+   "byte_identical": 64,
+   "latency_median_s": 11.710854,
+   "latency_max_s": 31.704234,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S5",
+   "title": "Expiry: bundle lifetime during an outage, and receivers rejecting expired envelopes",
+   "passed": true,
+   "criteria_passed": 20,
+   "criteria_total": 20,
+   "envelopes_built": 37,
+   "envelopes_sent": 33,
+   "envelopes_received": 19,
+   "byte_identical": 19,
+   "latency_median_s": 1.587821,
+   "latency_max_s": 29.894593,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S6",
+   "title": "Authenticated commands: tamper, replay, wrong key, expiry, authorization",
+   "passed": true,
+   "criteria_passed": 7,
+   "criteria_total": 7,
+   "envelopes_built": 30,
+   "envelopes_sent": 30,
+   "envelopes_received": 30,
+   "byte_identical": 30,
+   "latency_median_s": 1.582849,
+   "latency_max_s": 13.58188,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S7",
+   "title": "Cross-implementation: each endpoint parses the other's envelopes; identical inputs give identical bytes",
+   "passed": true,
+   "criteria_passed": 9,
+   "criteria_total": 9,
+   "envelopes_built": 14,
+   "envelopes_sent": 14,
+   "envelopes_received": 14,
+   "byte_identical": 14,
+   "latency_median_s": 1.583032,
+   "latency_max_s": 1.675682,
+   "stop_clean_without_fallback": true
+  }
+ ],
+ "selfchecks": [
+  {
+   "name": "emulator-tests",
+   "exit": 0,
+   "duration_s": 0.791,
+   "command": "/home/user/PBS-ION-DEMO-run/build/venv-demo/bin/python emulator/test_linkemu.py",
+   "last_line": "OK"
+  },
+  {
+   "name": "scenario-tests",
+   "exit": 0,
+   "duration_s": 0.215,
+   "command": "/home/user/PBS-ION-DEMO-run/build/venv-demo/bin/python scenarios/test_scenarios.py",
+   "last_line": "OK"
+  },
+  {
+   "name": "endpoint-b-tests",
+   "exit": 0,
+   "duration_s": 1.338,
+   "command": "make -s -C endpoint-c BUILD=/home/user/PBS-ION-DEMO-run/build/endpoint-c test",
+   "last_line": "  pbs_tool plan s6_auth.jsonl: 16 items"
+  },
+  {
+   "name": "endpoint-a-tests",
+   "exit": 0,
+   "duration_s": 2.166,
+   "command": "endpoint-python/run_tests.sh",
+   "last_line": "294 passed, 1 skipped in 1.37s"
+  }
+ ]
+}

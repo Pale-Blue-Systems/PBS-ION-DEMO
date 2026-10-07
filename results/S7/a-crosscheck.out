@@ -1,0 +1,12 @@
+{
+ "peer_log": "/home/user/PBS-ION-DEMO-run/results/S7/endpoint-b.jsonl",
+ "decoded": 6,
+ "decode_mismatch": [],
+ "no_hex": 1,
+ "own_sent": 7,
+ "delivered": 7,
+ "byte_identical": 7,
+ "byte_mismatch": [],
+ "peer_duplicates": 0,
+ "ok": true
+}

@@ -1,0 +1,47 @@
+{
+ "items": [
+  {
+   "at_s": 2.0,
+   "count": 17,
+   "interval_s": 5.0,
+   "priority": 0,
+   "frame": "event",
+   "text": "EVT HAZARD-CAM",
+   "label": "S3-CRITICAL"
+  },
+  {
+   "at_s": 3.0,
+   "count": 17,
+   "interval_s": 5.0,
+   "priority": 1,
+   "text": "TLM POWER",
+   "label": "S3-HIGH"
+  },
+  {
+   "at_s": 4.0,
+   "count": 17,
+   "interval_s": 5.0,
+   "priority": 2,
+   "text": "TLM THERMAL",
+   "label": "S3-NORMAL"
+  },
+  {
+   "at_s": 5.0,
+   "count": 17,
+   "interval_s": 5.0,
+   "priority": 3,
+   "text": "TLM ENV",
+   "label": "S3-LOW"
+  },
+  {
+   "at_s": 6.0,
+   "count": 17,
+   "interval_s": 5.0,
+   "priority": 4,
+   "text": "TLM IMAGE-CHUNK",
+   "payload_bytes": 3000,
+   "label": "S3-BULK"
+  }
+ ],
+ "description": "Endpoint A plan for scenario S3"
+}

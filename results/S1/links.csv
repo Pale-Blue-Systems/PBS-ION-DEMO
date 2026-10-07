@@ -1,0 +1,5 @@
+scenario,link,delay_s,loss,rate_Bps,queue_bytes,blackouts,rx,tx,rx_bytes,tx_bytes,drop_loss,drop_blackout,drop_queue_full,send_error,pending_at_stop,max_queue_delay_s,ltp_DS,ltp_CP,ltp_RS,ltp_RA,ltp_cancel,ltp_data_retransmissions
+S1,earth-gateway,1.3,0.0,,,,56,56,3126,3126,0,0,0,0,0,0.0,0,10,36,10,0,0
+S1,gateway-earth,1.3,0.0,,,,101,101,26614,26614,0,0,0,0,0,0.0,19,36,10,36,0,0
+S1,gateway-rover,0.25,0.0,,,,56,56,3155,3155,0,0,0,0,0,0.0,0,10,36,10,0,0
+S1,rover-gateway,0.25,0.0,,,,101,101,26542,26542,0,0,0,0,0,0.0,19,36,10,36,0,0

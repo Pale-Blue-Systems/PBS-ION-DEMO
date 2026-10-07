@@ -1,0 +1,218 @@
+{
+ "scenario": "S5",
+ "title": "Expiry: bundle lifetime during an outage, and receivers rejecting expired envelopes",
+ "run_completed": true,
+ "run_error": null,
+ "stop_clean_without_fallback": true,
+ "passed": true,
+ "criteria_passed": 20,
+ "criteria_total": 20,
+ "criteria": [
+  {
+   "id": "S5-1",
+   "text": "Both endpoints refuse to send a TTL 1 envelope (lifetime bound below 1 ms after the 1 s margin)",
+   "check": "send_result",
+   "passed": true,
+   "measured": "2 of 2: NOT_SENT GW_EXPIRED",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-2",
+   "text": "Both endpoints refuse to send a TTL 2 envelope (lifetime bound below the 1 s ION minimum)",
+   "check": "send_result",
+   "passed": true,
+   "measured": "2 of 2: NOT_SENT GW_LIFETIME_UNDER_1S",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-3",
+   "text": "Receivers reject expired envelopes delivered by ION (PBS-ENV-01 12.2), including an expired command before authentication",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "3 of 3: REJECT TTL_EXPIRED",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-4",
+   "text": "No TTL 10 or TTL 20 envelope sent during the outage is delivered (bundle lifetime ended in storage)",
+   "check": "not_delivered",
+   "passed": true,
+   "measured": "0 of 11 delivered",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-5",
+   "text": "TTL 60, TTL 0 and TTL 30 envelopes sent during the outage are delivered and accepted",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "9 of 9: ACCEPT OK",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-6",
+   "text": "Rover control envelopes arrive after the contact resumes (50 s + 1.55 s)",
+   "check": "delivered_after",
+   "passed": true,
+   "measured": "6 received; earliest receipt at 52.961 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-7",
+   "text": "Earth control envelopes arrive after the contact resumes (50 s + 0.25 s)",
+   "check": "delivered_after",
+   "passed": true,
+   "measured": "3 received; earliest receipt at 51.479 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-8",
+   "text": "At 26 s the rover node holds the 8 short-TTL rover envelopes",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "rover node held 8 matching bundles at 26.000 s (all bundles: 13)",
+   "details": [
+    "S5-TTL10-IN-OUTAGE x4",
+    "S5-TTL20-IN-OUTAGE x4"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S5-9",
+   "text": "At 36 s the TTL 10 envelopes (bundle lifetime 8 s) are gone from the rover node",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "rover node held 0 matching bundles at 36.000 s (all bundles: 10)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-10",
+   "text": "At 36 s the TTL 20 envelopes (bundle lifetime 18 s) are still held",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "rover node held 4 matching bundles at 36.000 s (all bundles: 10)",
+   "details": [
+    "S5-TTL20-IN-OUTAGE x4"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S5-11",
+   "text": "At 46 s no short-TTL envelope is left at the rover node",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "rover node held 0 matching bundles at 46.000 s (all bundles: 6)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-12",
+   "text": "At 46 s the TTL 60 and TTL 0 envelopes are still held at the rover node",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "rover node held 6 matching bundles at 46.000 s (all bundles: 6)",
+   "details": [
+    "S5-TTL0-IN-OUTAGE x2",
+    "S5-TTL60-IN-OUTAGE x4"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S5-13",
+   "text": "At 26.4 s the Earth node holds the three TTL 10 Earth envelopes (not forwarded: no route arrives before their lifetime ends)",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "earth node held 3 matching bundles at 26.400 s (all bundles: 5)",
+   "details": [
+    "S5-TTL10-IN-OUTAGE x3"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S5-14",
+   "text": "At 36.4 s they are gone from the Earth node",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "earth node held 0 matching bundles at 36.400 s (all bundles: 0)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-15",
+   "text": "The rover node's bpstats count the short-TTL bundles as deleted at lifetime expiry",
+   "check": "ion_expired",
+   "passed": true,
+   "measured": "rover node bpstats: 9 bundles deleted at lifetime expiry",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-16",
+   "text": "The Earth node's bpstats count the Earth short-TTL bundles as deleted at lifetime expiry",
+   "check": "ion_expired",
+   "passed": true,
+   "measured": "earth node bpstats: 5 bundles deleted at lifetime expiry",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-17",
+   "text": "Envelopes before and after the outage are delivered and accepted",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "4 of 4: ACCEPT OK",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-18",
+   "text": "No receiver accepts an envelope older than its TTL",
+   "check": "ttl_respected",
+   "passed": true,
+   "measured": "14 accepted envelopes with TTL > 0; 0 older than their TTL",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-19",
+   "text": "No duplicate or unknown envelope is received",
+   "check": "no_unmatched",
+   "passed": true,
+   "measured": "19 recv records, 0 without a matching send record",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S5-20",
+   "text": "At 26.8 s the Gateway node holds the Earth TTL 60 envelopes and the command, waiting for the rover contact",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "gateway node held 3 matching bundles at 26.800 s (all bundles: 3)",
+   "details": [
+    "S5-CMD-IN-OUTAGE x1",
+    "S5-TTL60-IN-OUTAGE x2"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S5-21",
+   "text": "Observed: TTL 3 envelopes (bundle lifetime 1 s at A, 2 s at B) and B's TTL 2 envelope handed over at its Timestamp (lifetime 1 s); the contact-plan ranges on the path sum to 3 s (informative)",
+   "check": "observe",
+   "passed": true,
+   "measured": "B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: not delivered; A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered; B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered",
+   "details": [
+    "B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: not delivered",
+    "A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered",
+    "B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered"
+   ],
+   "informative": true
+  }
+ ]
+}

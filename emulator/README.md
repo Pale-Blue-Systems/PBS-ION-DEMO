@@ -83,6 +83,15 @@ once at start, so a step of the system clock during a run does not move
 scheduled deliveries. The endpoints read `CLOCK_REALTIME`; on the demo host
 the two differ only by the drift of the realtime clock during a run.
 
+## Measured forwarding accuracy
+
+In the recorded run (`scenarios/README.md`, commit `88747a8`, S1 to S7) the
+emulator forwarded 3368 datagrams. The time each was sent minus its
+scheduled delivery time was 0.810 ms median, 2.298 ms at the 99th
+percentile and 8.081 ms at most. The one-way delays it adds are therefore
+0.25 s and 1.3 s plus up to about 8 ms in that run. REPORT.md lists the same
+figures per scenario.
+
 ## Event log (`--log`)
 
 JSON Lines, one object per event, schema `pbs-ion-demo-linkemu/1`:

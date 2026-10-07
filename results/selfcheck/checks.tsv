@@ -1,0 +1,4 @@
+emulator-tests	0	791	/home/user/PBS-ION-DEMO-run/build/venv-demo/bin/python emulator/test_linkemu.py
+scenario-tests	0	215	/home/user/PBS-ION-DEMO-run/build/venv-demo/bin/python scenarios/test_scenarios.py
+endpoint-b-tests	0	1338	make -s -C endpoint-c BUILD=/home/user/PBS-ION-DEMO-run/build/endpoint-c test
+endpoint-a-tests	0	2166	endpoint-python/run_tests.sh

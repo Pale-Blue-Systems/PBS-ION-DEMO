@@ -1,0 +1,130 @@
+{
+ "links": {
+  "earth-gateway": {
+   "blackouts": [],
+   "delay_s": 1.3,
+   "dest": 15013,
+   "drop_blackout": 0,
+   "drop_loss": 0,
+   "drop_queue_full": 0,
+   "jitter_s": 0.0,
+   "listen": 22350,
+   "loss": 0.0,
+   "ltp_data_retransmissions": 0,
+   "ltp_segments": {
+    "CP": 7,
+    "RA": 7,
+    "RS": 12
+   },
+   "max_queue_bytes": 0,
+   "max_queue_delay_s": 0.0,
+   "pending_at_stop": 0,
+   "queue_bytes": null,
+   "rate_Bps": null,
+   "rx": 26,
+   "rx_bytes": 1812,
+   "send_error": 0,
+   "tx": 26,
+   "tx_bytes": 1812
+  },
+  "gateway-earth": {
+   "blackouts": [],
+   "delay_s": 1.3,
+   "dest": 12313,
+   "drop_blackout": 0,
+   "drop_loss": 0,
+   "drop_queue_full": 0,
+   "jitter_s": 0.0,
+   "listen": 25023,
+   "loss": 0.0,
+   "ltp_data_retransmissions": 0,
+   "ltp_segments": {
+    "CP": 12,
+    "RA": 12,
+    "RS": 7
+   },
+   "max_queue_bytes": 0,
+   "max_queue_delay_s": 0.0,
+   "pending_at_stop": 0,
+   "queue_bytes": null,
+   "rate_Bps": null,
+   "rx": 31,
+   "rx_bytes": 2114,
+   "send_error": 0,
+   "tx": 31,
+   "tx_bytes": 2114
+  },
+  "gateway-rover": {
+   "blackouts": [
+    {
+     "end_s": 50.0,
+     "kind": "scheduled",
+     "label": "rover out of view of the Gateway (planned)",
+     "start_s": 20.0
+    }
+   ],
+   "delay_s": 0.25,
+   "dest": 19913,
+   "drop_blackout": 0,
+   "drop_loss": 0,
+   "drop_queue_full": 0,
+   "jitter_s": 0.0,
+   "listen": 25099,
+   "loss": 0.0,
+   "ltp_data_retransmissions": 0,
+   "ltp_segments": {
+    "CP": 7,
+    "RA": 7,
+    "RS": 12
+   },
+   "max_queue_bytes": 0,
+   "max_queue_delay_s": 0.0,
+   "pending_at_stop": 0,
+   "queue_bytes": null,
+   "rate_Bps": null,
+   "rx": 26,
+   "rx_bytes": 1834,
+   "send_error": 0,
+   "tx": 26,
+   "tx_bytes": 1834
+  },
+  "rover-gateway": {
+   "blackouts": [
+    {
+     "end_s": 50.0,
+     "kind": "scheduled",
+     "label": "rover out of view of the Gateway (planned)",
+     "start_s": 20.0
+    }
+   ],
+   "delay_s": 0.25,
+   "dest": 15013,
+   "drop_blackout": 0,
+   "drop_loss": 0,
+   "drop_queue_full": 0,
+   "jitter_s": 0.0,
+   "listen": 29950,
+   "loss": 0.0,
+   "ltp_data_retransmissions": 0,
+   "ltp_segments": {
+    "CP": 12,
+    "RA": 12,
+    "RS": 7
+   },
+   "max_queue_bytes": 0,
+   "max_queue_delay_s": 0.0,
+   "pending_at_stop": 0,
+   "queue_bytes": null,
+   "rate_Bps": null,
+   "rx": 31,
+   "rx_bytes": 2103,
+   "send_error": 0,
+   "tx": 31,
+   "tx_bytes": 2103
+  }
+ },
+ "schema": "pbs-ion-demo-linkemu/1",
+ "seed": 5,
+ "stopped_us": 1791346750366986,
+ "t0": 1791346652.0
+}

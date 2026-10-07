@@ -1,0 +1,14 @@
+...../home/user/PBS-ION-DEMO-run/scenarios/test_scenarios.py:38: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/user/PBS-ION-DEMO-run/ion/nodes/rover/node.ltprc' mode='r' encoding='utf-8'>
+  text = "\n".join(l for l in open(os.path.join(ROOT, "ion", "nodes", name, "node.ltprc"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/PBS-ION-DEMO-run/scenarios/test_scenarios.py:38: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/user/PBS-ION-DEMO-run/ion/nodes/gateway/node.ltprc' mode='r' encoding='utf-8'>
+  text = "\n".join(l for l in open(os.path.join(ROOT, "ion", "nodes", name, "node.ltprc"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/PBS-ION-DEMO-run/scenarios/test_scenarios.py:38: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/user/PBS-ION-DEMO-run/ion/nodes/earth/node.ltprc' mode='r' encoding='utf-8'>
+  text = "\n".join(l for l in open(os.path.join(ROOT, "ion", "nodes", name, "node.ltprc"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..
+----------------------------------------------------------------------
+Ran 7 tests in 0.079s
+
+OK

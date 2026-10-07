@@ -1,0 +1,11 @@
+.............../home/user/PBS-ION-DEMO-run/emulator/test_linkemu.py:209: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/linkemu-test-0f3iw06w/stats.json' mode='r' encoding='utf-8'>
+  stats = json.load(open(os.path.join(tmp, "stats.json")))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/PBS-ION-DEMO-run/emulator/test_linkemu.py:213: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/linkemu-test-0f3iw06w/events.jsonl' mode='r' encoding='utf-8'>
+  events = [json.loads(l) for l in open(os.path.join(tmp, "events.jsonl"))]
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.
+----------------------------------------------------------------------
+Ran 16 tests in 0.681s
+
+OK

@@ -1,0 +1,138 @@
+{
+ "scenario": "S3",
+ "title": "Unscheduled blackouts and random loss: LTP recovery",
+ "run_completed": true,
+ "run_error": null,
+ "stop_clean_without_fallback": true,
+ "passed": true,
+ "criteria_passed": 9,
+ "criteria_total": 9,
+ "criteria": [
+  {
+   "id": "S3-1",
+   "text": "Every rover envelope handed to ION is received at Earth",
+   "check": "delivery",
+   "passed": true,
+   "measured": "102 of 102 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-2",
+   "text": "Every Earth command handed to ION is received at the rover",
+   "check": "delivery",
+   "passed": true,
+   "measured": "17 of 17 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-3",
+   "text": "Every received envelope is byte-identical to the envelope handed to ION",
+   "check": "byte_identical",
+   "passed": true,
+   "measured": "119 of 119 received envelopes byte-identical (SHA-256 and header)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-4",
+   "text": "Every received envelope is accepted",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "119 of 119: ACCEPT OK",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-5",
+   "text": "The emulator dropped datagrams at random on every link direction",
+   "check": "link_counter",
+   "passed": true,
+   "measured": "drop_loss total 52 (rover-gateway=16, gateway-rover=8, gateway-earth=23, earth-gateway=5)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-6",
+   "text": "The emulator dropped datagrams in the unscheduled blackouts on every link direction",
+   "check": "link_counter",
+   "passed": true,
+   "measured": "drop_blackout total 91 (gateway-earth=50, earth-gateway=22, rover-gateway=15, gateway-rover=4)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-7",
+   "text": "LTP retransmitted data segments (same session, offset and length seen again by the emulator)",
+   "check": "link_counter",
+   "passed": true,
+   "measured": "ltp_data_retransmissions total 88 (rover-gateway=24, gateway-rover=2, gateway-earth=55, earth-gateway=7)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-8",
+   "text": "Every recv record is a delivery of an envelope that was sent (byte-identical); a bundle that BP delivers twice is counted, not failed",
+   "check": "no_unknown",
+   "passed": true,
+   "measured": "119 recv records; 0 further deliveries of an envelope already received; 0 unknown",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-9",
+   "text": "No receiver accepts an envelope older than its TTL",
+   "check": "ttl_respected",
+   "passed": true,
+   "measured": "102 accepted envelopes with TTL > 0; 0 older than their TTL",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-10",
+   "text": "Latency of all envelopes (informative)",
+   "check": "latency",
+   "passed": true,
+   "measured": "n=119 min 1.571 s median 1.582 s max 24.154 s",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-11",
+   "text": "Checkpoints the Gateway resent to Earth (informative)",
+   "check": "ltp_counter",
+   "passed": true,
+   "measured": "gateway node, span to earth: ckpt_re_xmit = 49 (ltpstats -a)",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-12",
+   "text": "Checkpoints the rover resent to the Gateway (informative)",
+   "check": "ltp_counter",
+   "passed": true,
+   "measured": "rover node, span to gateway: ckpt_re_xmit = 22 (ltpstats -a)",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-13",
+   "text": "LTP blocks the Gateway cancelled towards Earth (informative)",
+   "check": "ltp_counter",
+   "passed": true,
+   "measured": "gateway node, span to earth: export_cancel_xmit = 1 (ltpstats -a)",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-14",
+   "text": "Bundles the Gateway forwarded again after an LTP transmission failed (informative)",
+   "check": "ion_counter",
+   "passed": true,
+   "measured": "gateway node bpstats rfw: 1 bundles",
+   "details": [],
+   "informative": true
+  }
+ ]
+}

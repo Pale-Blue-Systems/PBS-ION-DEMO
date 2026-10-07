@@ -1,0 +1,191 @@
+{
+ "scenario": "S2",
+ "title": "Scheduled outages in the contact plan: storage at rover, relay and Earth",
+ "run_completed": true,
+ "run_error": null,
+ "stop_clean_without_fallback": true,
+ "passed": true,
+ "criteria_passed": 15,
+ "criteria_total": 15,
+ "criteria": [
+  {
+   "id": "S2-1",
+   "text": "Every rover envelope handed to ION is received at Earth",
+   "check": "delivery",
+   "passed": true,
+   "measured": "111 of 111 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-2",
+   "text": "Every Earth command handed to ION is received at the rover",
+   "check": "delivery",
+   "passed": true,
+   "measured": "16 of 16 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-3",
+   "text": "Every received envelope is byte-identical to the envelope handed to ION",
+   "check": "byte_identical",
+   "passed": true,
+   "measured": "127 of 127 received envelopes byte-identical (SHA-256 and header)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-4",
+   "text": "Every received envelope is accepted (no TTL expired in storage)",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "127 of 127: ACCEPT OK",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-5",
+   "text": "At 45 s the rover node holds rover envelopes sent since the rover-Gateway outage began",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "rover node held 20 matching bundles at 45.000 s (all bundles: 21)",
+   "details": [
+    "S2-BULK x4",
+    "S2-CRITICAL x4",
+    "S2-HIGH x4",
+    "S2-LOW x4",
+    "S2-NORMAL x4"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S2-6",
+   "text": "At 45.5 s the Gateway node holds Earth commands waiting for the rover contact",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "gateway node held 3 matching bundles at 45.500 s (all bundles: 3)",
+   "details": [
+    "S2-PING x3"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S2-7",
+   "text": "At 80 s the Gateway node holds rover envelopes sent since 63 s, waiting for the Earth contact",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "gateway node held 18 matching bundles at 80.000 s (all bundles: 18)",
+   "details": [
+    "PING-REPLY x1",
+    "S2-BULK x3",
+    "S2-CRITICAL x3",
+    "S2-HIGH x4",
+    "S2-LOW x3",
+    "S2-NORMAL x4"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S2-8",
+   "text": "At 80.5 s the Earth node holds commands waiting for the Gateway contact",
+   "check": "probe_holds",
+   "passed": true,
+   "measured": "earth node held 2 matching bundles at 80.500 s (all bundles: 3)",
+   "details": [
+    "S2-PING x2"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S2-9",
+   "text": "Rover envelopes sent during the rover-Gateway outage arrive no earlier than its end (50 s) plus 1.55 s propagation",
+   "check": "delivered_after",
+   "passed": true,
+   "measured": "24 received; earliest receipt at 53.191 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-10",
+   "text": "Earth commands sent during the rover-Gateway outage arrive no earlier than its end plus 0.25 s",
+   "check": "delivered_after",
+   "passed": true,
+   "measured": "4 received; earliest receipt at 51.569 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-11",
+   "text": "Rover envelopes sent during the Gateway-Earth outage arrive no earlier than its end (85 s) plus 1.3 s",
+   "check": "delivered_after",
+   "passed": true,
+   "measured": "19 received; earliest receipt at 87.684 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-12",
+   "text": "Earth commands sent during the Gateway-Earth outage arrive no earlier than its end plus 1.55 s",
+   "check": "delivered_after",
+   "passed": true,
+   "measured": "3 received; earliest receipt at 87.718 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-13",
+   "text": "No duplicate or unknown envelope is received",
+   "check": "no_unmatched",
+   "passed": true,
+   "measured": "127 recv records, 0 without a matching send record",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-14",
+   "text": "No receiver accepts an envelope older than its TTL",
+   "check": "ttl_respected",
+   "passed": true,
+   "measured": "108 accepted envelopes with TTL > 0; 0 older than their TTL",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-15",
+   "text": "No node transmits into a scheduled outage (emulator blackout drops = 0)",
+   "check": "link_counter",
+   "passed": true,
+   "measured": "drop_blackout total 0 (rover-gateway=0, gateway-rover=0, gateway-earth=0, earth-gateway=0)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S2-16",
+   "text": "LTP segments from the Gateway discarded by Earth's LTP screening (informative)",
+   "check": "ltp_counter",
+   "passed": true,
+   "measured": "earth node, span to gateway: in_seg_screened = 0 (ltpstats -a)",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S2-17",
+   "text": "LTP segments from the rover discarded by the Gateway's LTP screening (informative)",
+   "check": "ltp_counter",
+   "passed": true,
+   "measured": "gateway node, span to rover: in_seg_screened = 0 (ltpstats -a)",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S2-18",
+   "text": "Checkpoints the Gateway resent to Earth (informative)",
+   "check": "ltp_counter",
+   "passed": true,
+   "measured": "gateway node, span to earth: ckpt_re_xmit = 0 (ltpstats -a)",
+   "details": [],
+   "informative": true
+  }
+ ]
+}

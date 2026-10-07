@@ -77,8 +77,15 @@ make python3 python3-venv libssl-dev procps`, and network access to GitHub
 | S6 | authenticated commands: tampered, replayed, wrong-key, unknown-key, expired, unauthorized commands rejected |
 | S7 | cross-implementation: identical bytes for identical inputs, each endpoint parses the other's envelopes |
 
+`results/` and `REPORT.md` in this repository are one recorded run: a fresh
+clone of commit `88747a8` on 2026-10-07, 861 s including the ION build, all
+seven scenarios passed. `scenarios/README.md` gives the headline numbers and
+what was observed about ION across six runs.
+
 Container and CI: `Dockerfile` (`docker build -t pbs-ion-demo . && docker
 run --rm --shm-size=256m -v "$PWD/docker-results:/demo/results"
 pbs-ion-demo`) and `.github/workflows/demo.yml` run the same script and keep
-`results/`. Details: `scenarios/README.md`, `emulator/README.md`,
-`report/README.md`.
+`results/`. Neither has been run yet: no Docker daemon was available on the
+host of the recorded run, and the GitHub repository does not exist yet.
+Both call the same `./run_demo.sh` that produced the recorded run. Details:
+`scenarios/README.md`, `emulator/README.md`, `report/README.md`.

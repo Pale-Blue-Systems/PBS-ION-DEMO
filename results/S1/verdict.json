@@ -1,0 +1,129 @@
+{
+ "scenario": "S1",
+ "title": "Nominal telemetry and commands both ways",
+ "run_completed": true,
+ "run_error": null,
+ "stop_clean_without_fallback": true,
+ "passed": true,
+ "criteria_passed": 13,
+ "criteria_total": 13,
+ "criteria": [
+  {
+   "id": "S1-1",
+   "text": "Every rover envelope handed to ION is received at Earth",
+   "check": "delivery",
+   "passed": true,
+   "measured": "36 of 36 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-2",
+   "text": "Every Earth envelope handed to ION is received at the rover",
+   "check": "delivery",
+   "passed": true,
+   "measured": "10 of 10 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-3",
+   "text": "Every received envelope is byte-identical to the envelope handed to ION (SHA-256 of all bytes, 44 header bytes)",
+   "check": "byte_identical",
+   "passed": true,
+   "measured": "46 of 46 received envelopes byte-identical (SHA-256 and header)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-4",
+   "text": "Every received envelope is accepted",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "46 of 46: ACCEPT OK",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-5",
+   "text": "The rover executes (logs) each authenticated command once, in order",
+   "check": "exec",
+   "passed": true,
+   "measured": "executed: PING, SET_HEATER, DRIVE, CAPTURE_IMAGE, SET_MODE, PING, PING, PING",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-6",
+   "text": "Each PING is answered and the answer reaches Earth",
+   "check": "delivery",
+   "passed": true,
+   "measured": "4 of 4 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-7",
+   "text": "End-to-end latency between the 1.55 s propagation floor and 3.0 s",
+   "check": "latency",
+   "passed": true,
+   "measured": "n=46 min 1.571 s median 1.579 s max 1.601 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-8",
+   "text": "TTL 0 envelopes are sent with the 2147483647 s no-expiry bundle lifetime",
+   "check": "lifespan",
+   "passed": true,
+   "measured": "7 of 7 sent with lifetime 2147483647 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-9",
+   "text": "TTL 0 envelopes sent with that lifetime are delivered",
+   "check": "delivery",
+   "passed": true,
+   "measured": "7 of 7 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-10",
+   "text": "Every send uses the class of service of SPEC-DIGEST 7.5 for its priority",
+   "check": "cos_table",
+   "passed": true,
+   "measured": "46 of 46 sends used the 7.5 class of service",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-11",
+   "text": "Every bundle source EID matches the Source ID mapping (Rover-Alpha ipn:99.1, Earth-MCC ipn:23.1)",
+   "check": "eid_match",
+   "passed": true,
+   "measured": "46 of 46 with the expected bundle source EID",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-12",
+   "text": "No duplicate or unknown envelope is received",
+   "check": "no_unmatched",
+   "passed": true,
+   "measured": "46 recv records, 0 without a matching send record",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S1-13",
+   "text": "No receiver accepts an envelope older than its TTL",
+   "check": "ttl_respected",
+   "passed": true,
+   "measured": "39 accepted envelopes with TTL > 0; 0 older than their TTL",
+   "details": [],
+   "informative": false
+  }
+ ]
+}

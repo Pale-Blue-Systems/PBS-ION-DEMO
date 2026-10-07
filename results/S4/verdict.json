@@ -1,0 +1,147 @@
+{
+ "scenario": "S4",
+ "title": "Priority under a rate-limited link",
+ "run_completed": true,
+ "run_error": null,
+ "stop_clean_without_fallback": true,
+ "passed": true,
+ "criteria_passed": 12,
+ "criteria_total": 12,
+ "criteria": [
+  {
+   "id": "S4-1",
+   "text": "Every rover envelope handed to ION is received at Earth",
+   "check": "delivery",
+   "passed": true,
+   "measured": "62 of 62 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-2",
+   "text": "Every Earth command handed to ION is received at the rover",
+   "check": "delivery",
+   "passed": true,
+   "measured": "2 of 2 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-3",
+   "text": "Every received envelope is byte-identical to the envelope handed to ION",
+   "check": "byte_identical",
+   "passed": true,
+   "measured": "64 of 64 received envelopes byte-identical (SHA-256 and header)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-4",
+   "text": "Every received envelope is accepted",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "64 of 64: ACCEPT OK",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-5",
+   "text": "CRITICAL and HIGH envelopes (PING replies included) arrive within 4.0 s despite the BULK backlog",
+   "check": "latency",
+   "passed": true,
+   "measured": "n=12 min 1.947 s median 2.472 s max 2.920 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-6",
+   "text": "NORMAL envelopes arrive within 4.0 s despite the BULK backlog",
+   "check": "latency",
+   "passed": true,
+   "measured": "n=5 min 1.979 s median 2.031 s max 2.463 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-7",
+   "text": "Every CRITICAL, HIGH and NORMAL envelope arrives before at least one BULK envelope that was sent before it",
+   "check": "overtakes",
+   "passed": true,
+   "measured": "17 envelopes; each overtook min 18 / max 33 earlier-sent envelopes of the other group",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-8",
+   "text": "The slowest CRITICAL or HIGH envelope is faster than the median BULK envelope",
+   "check": "latency_compare",
+   "passed": true,
+   "measured": "CRITICAL+HIGH max = 2.920 s; BULK median = 16.824 s",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-9",
+   "text": "LOW envelopes (ION bulk class, same as BULK) do not overtake BULK envelopes sent before them",
+   "check": "no_overtake",
+   "passed": true,
+   "measured": "5 envelopes; 0 overtook an earlier-sent envelope of the other group",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-10",
+   "text": "The emulator queue never overflowed (the backlog was held in ION)",
+   "check": "link_counter",
+   "passed": true,
+   "measured": "drop_queue_full total 0 (rover-gateway=0)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-11",
+   "text": "Every send uses the class of service of SPEC-DIGEST 7.5 for its priority",
+   "check": "cos_table",
+   "passed": true,
+   "measured": "64 of 64 sends used the 7.5 class of service",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-12",
+   "text": "No duplicate or unknown envelope is received",
+   "check": "no_unmatched",
+   "passed": true,
+   "measured": "64 recv records, 0 without a matching send record",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S4-13",
+   "text": "BULK latency (informative)",
+   "check": "latency",
+   "passed": true,
+   "measured": "n=40 min 2.299 s median 16.824 s max 31.704 s",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S4-14",
+   "text": "LOW latency (informative)",
+   "check": "latency",
+   "passed": true,
+   "measured": "n=5 min 16.616 s median 22.544 s max 28.475 s",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S4-15",
+   "text": "Largest wait in the emulator queue, rover-gateway (informative)",
+   "check": "link_counter",
+   "passed": true,
+   "measured": "max_queue_delay_s total 1.819 (rover-gateway=1.819)",
+   "details": [],
+   "informative": true
+  }
+ ]
+}

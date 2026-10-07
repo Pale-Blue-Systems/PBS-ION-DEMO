@@ -1,0 +1,186 @@
+{
+ "duration_s": 42,
+ "endpoint_a": {
+  "argv": [
+   "/home/user/PBS-ION-DEMO-run/endpoint-python/bin/rover",
+   "--log",
+   "/home/user/PBS-ION-DEMO-run/results/S6/endpoint-a.jsonl",
+   "--scenario",
+   "S6",
+   "--plan",
+   "/home/user/PBS-ION-DEMO-run/results/S6/rover-plan.json",
+   "--duration",
+   "62",
+   "--ion-node-dir",
+   "/home/user/PBS-ION-DEMO-run/build/run/ion/rover",
+   "--ion-node-list-dir",
+   "/home/user/PBS-ION-DEMO-run/build/run/ion",
+   "--ready-file",
+   "/home/user/PBS-ION-DEMO-run/results/S6/rover.ready",
+   "--reply-ping"
+  ],
+  "launch_unix_s": 1791346761.9002187,
+  "plan_origin_offset_s": 0.044571,
+  "plan_origin_unix_s": 1791346762.0445712,
+  "startup_s": 0.144352
+ },
+ "endpoint_b": {
+  "argv": [
+   "/home/user/PBS-ION-DEMO-run/build/endpoint-c/pbs_earth",
+   "run",
+   "--plan",
+   "/home/user/PBS-ION-DEMO-run/results/S6/earth-plan.jsonl",
+   "--log",
+   "/home/user/PBS-ION-DEMO-run/results/S6/endpoint-b.jsonl",
+   "--scenario",
+   "S6",
+   "--t0-us",
+   "1791346762000000",
+   "--duration",
+   "62",
+   "--node-dir",
+   "/home/user/PBS-ION-DEMO-run/build/run/ion/earth"
+  ],
+  "launch_unix_s": 1791346762.0651824,
+  "plan_origin_unix_s": 1791346762.0
+ },
+ "exit": {
+  "emulator": 0,
+  "endpoint-a": 0,
+  "endpoint-b": 0,
+  "stop_nodes": 0
+ },
+ "finished_utc": "2026-10-07T04:20:32.679037+00:00",
+ "git": {
+  "commit": "88747a82b61e121ea4d3a83d9599c86938555e12",
+  "worktree_modified": false
+ },
+ "host": {
+  "clock_source": "tsc",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "nproc": 4,
+  "ntp_synchronized": null,
+  "platform": "Linux-6.18.44-fc-v77-x86_64-with-glibc2.39",
+  "python": "3.13.16"
+ },
+ "ion": {
+  "commit": "568df887cb9f18aa8ec013b1a566d83215e499ae",
+  "tag": "ion-open-source-4.2.0"
+ },
+ "lead_s": 10,
+ "origin_unix_s": 1791346762.0,
+ "origin_us": 1791346762000000,
+ "post": [],
+ "probes": [
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-bpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791346804036090
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-ltpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791346804040372
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-bpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791346804044813
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-ltpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791346804049330
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-bpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791346804053820
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-ltpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791346804058320
+  }
+ ],
+ "scenario": "S6",
+ "scenario_file": "scenarios/S6.json",
+ "started_utc": "2026-10-07T04:19:10.528830+00:00",
+ "steps": [
+  {
+   "step": "emulator_ready",
+   "t_us": 1791346750626940
+  },
+  {
+   "step": "nodes_started",
+   "t0_utc": "2026/10/07-04:19:12",
+   "t_us": 1791346755882620
+  },
+  {
+   "plan_origin_offset_s": 0.045,
+   "step": "endpoint_a_ready",
+   "t_us": 1791346762063991
+  },
+  {
+   "step": "endpoint_b_started",
+   "t_us": 1791346762065186
+  },
+  {
+   "step": "traffic_phase_end",
+   "t_us": 1791346804000234
+  },
+  {
+   "a": 0,
+   "b": 0,
+   "step": "endpoints_stopped",
+   "t_us": 1791346804035995
+  },
+  {
+   "status": 0,
+   "step": "nodes_stopped",
+   "t_us": 1791346832646079
+  },
+  {
+   "step": "emulator_stopped",
+   "t_us": 1791346832678238
+  }
+ ],
+ "stop_clean_without_fallback": true,
+ "stop_nodes_s": 27.6,
+ "t0_unix_s": 1791346752.0,
+ "t0_utc": "2026/10/07-04:19:12",
+ "title": "Authenticated commands: tamper, replay, wrong key, expiry, authorization"
+}
