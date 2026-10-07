@@ -45,3 +45,40 @@ ION_NODE_WDNAME="$ION_RUN_DIR/earth" endpoint-c/build/pbs_earth run \
 ```
 
 Details, plan format, options and measured results: `endpoint-c/README.md`.
+
+## Running the demo
+
+```sh
+./run_demo.sh            # build, self-checks, scenarios S1 to S7, results/ and REPORT.md
+./run_demo.sh S4         # one scenario; other results/<S>/ directories are kept
+```
+
+`run_demo.sh` builds ION at the pinned commit into `build/ion` (skipped when
+already built), creates `build/venv-demo` (cryptography, pytest, matplotlib),
+fetches PBS_LINK, builds Endpoint B into `build/endpoint-c`, runs the
+emulator, scenario-definition and endpoint unit tests, then runs each
+scenario: the link emulator (`emulator/`), the three ION nodes (`ion/`),
+Endpoint A on the rover node and Endpoint B on the Earth node, stopped
+cleanly after the traffic phase. `scenarios/evaluate.py` applies each
+scenario's pass/fail criteria and `report/make_report.py` writes
+`REPORT.md`, `results/summary.json`, `results/all-envelopes.csv` and charts
+in `results/charts/`. Exit status 0 means every self-check and every
+scenario passed. Prerequisites (Ubuntu): `git autoconf automake libtool gcc
+make python3 python3-venv libssl-dev procps`, and network access to GitHub
+(ION, PBS_LINK) and PyPI on the first run.
+
+| Scenario | Shows |
+|---|---|
+| S1 | nominal telemetry (5 priorities) and signed commands both ways |
+| S2 | scheduled outages in the contact plan: envelopes held at the rover, the Gateway and Earth, delivered after the contact resumes |
+| S3 | 5 % random loss and unscheduled blackouts: LTP retransmission delivers every envelope |
+| S4 | rate-limited rover link: CRITICAL, HIGH and NORMAL overtake a BULK backlog |
+| S5 | expiry: short-TTL envelopes lost to bundle lifetime during an outage, expired envelopes rejected by receivers |
+| S6 | authenticated commands: tampered, replayed, wrong-key, unknown-key, expired, unauthorized commands rejected |
+| S7 | cross-implementation: identical bytes for identical inputs, each endpoint parses the other's envelopes |
+
+Container and CI: `Dockerfile` (`docker build -t pbs-ion-demo . && docker
+run --rm --shm-size=256m -v "$PWD/docker-results:/demo/results"
+pbs-ion-demo`) and `.github/workflows/demo.yml` run the same script and keep
+`results/`. Details: `scenarios/README.md`, `emulator/README.md`,
+`report/README.md`.

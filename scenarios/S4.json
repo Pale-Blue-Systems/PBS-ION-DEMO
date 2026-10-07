@@ -1,0 +1,56 @@
+{
+ "id": "S4",
+ "title": "Priority under a rate-limited link",
+ "summary": "The rover-Gateway leg is limited to 4000 bytes/s in the contact plan (so ION meters bundles onto the link at that rate) and to 4400 bytes/s with a 65536-byte drop-tail queue in the emulator (10 % above the contact rate for LTP and UDP header overhead). At 2 s the rover queues 40 BULK envelopes of 3000 bytes (about 30 s of link time); from 6 s it sends five small envelopes each of CRITICAL, HIGH, NORMAL and LOW, 3 s apart. ION's strict-priority egress queues are expected to send CRITICAL and HIGH (ION expedited class) and NORMAL (standard class) ahead of the BULK backlog, while LOW shares ION's bulk class with BULK and waits behind it.",
+ "duration_s": 60,
+ "seed": 4,
+ "links": {
+  "rover-gateway": {"rate_Bps": 4400, "queue_bytes": 65536},
+  "gateway-rover": {"rate_Bps": 4400, "queue_bytes": 65536}
+ },
+ "contacts": {"rate_Bps": {"rover-gateway": 4000}},
+ "outages": [],
+ "rover": {
+  "args": ["--reply-ping"],
+  "plan": {
+   "items": [
+     {"at_s": 2.0, "count": 40, "interval_s": 0.05, "priority": 4, "text": "TLM IMAGE-CHUNK", "payload_bytes": 3000, "label": "S4-BULK"},
+     {"at_s": 6.0, "count": 5, "interval_s": 3.0, "priority": 0, "frame": "event", "text": "EVT HAZARD STOP", "label": "S4-CRITICAL"},
+     {"at_s": 6.5, "count": 5, "interval_s": 3.0, "priority": 1, "text": "TLM POWER", "label": "S4-HIGH"},
+     {"at_s": 7.0, "count": 5, "interval_s": 3.0, "priority": 2, "text": "TLM THERMAL", "label": "S4-NORMAL"},
+     {"at_s": 7.5, "count": 5, "interval_s": 3.0, "priority": 3, "text": "TLM ENV", "label": "S4-LOW"}
+    ]
+  }
+ },
+ "earth": {
+  "plan": [
+    {"at_s": 10.0, "kind": "command", "command": "PING S4", "count": 2, "interval_s": 6.0, "label": "S4-PING"}
+   ]
+ },
+ "probes": [],
+ "criteria": [
+   {"id": "S4-1", "check": "delivery", "select": {"dir": "A->B"}, "min_count": 60, "text": "Every rover envelope handed to ION is received at Earth"},
+   {"id": "S4-2", "check": "delivery", "select": {"dir": "B->A"}, "min_count": 2, "text": "Every Earth command handed to ION is received at the rover"},
+   {"id": "S4-3", "check": "byte_identical", "text": "Every received envelope is byte-identical to the envelope handed to ION"},
+   {"id": "S4-4", "check": "recv_result", "expect": "ACCEPT OK", "min_count": 60, "text": "Every received envelope is accepted"},
+   {"id": "S4-5", "check": "latency", "select": {"dir": "A->B", "priority": [0, 1]}, "max_s": 4.0, "text": "CRITICAL and HIGH envelopes (PING replies included) arrive within 4.0 s despite the BULK backlog"},
+   {"id": "S4-6", "check": "latency", "select": {"dir": "A->B", "priority": 2}, "max_s": 4.0, "text": "NORMAL envelopes arrive within 4.0 s despite the BULK backlog"},
+   {"id": "S4-7", "check": "overtakes", "select": {"dir": "A->B", "priority": [0, 1, 2]}, "other": {"label": "S4-BULK"}, "min": 1, "text": "Every CRITICAL, HIGH and NORMAL envelope arrives before at least one BULK envelope that was sent before it"},
+   {"id": "S4-8", "check": "latency_compare", "select": {"dir": "A->B", "priority": [0, 1]}, "stat_a": "max", "name_a": "CRITICAL+HIGH", "other": {"label": "S4-BULK"}, "stat_b": "median", "name_b": "BULK", "text": "The slowest CRITICAL or HIGH envelope is faster than the median BULK envelope"},
+   {"id": "S4-9", "check": "no_overtake", "select": {"label": "S4-LOW"}, "other": {"label": "S4-BULK"}, "text": "LOW envelopes (ION bulk class, same as BULK) do not overtake BULK envelopes sent before them"},
+   {"id": "S4-10", "check": "link_counter", "links": ["rover-gateway"], "counter": "drop_queue_full", "max": 0, "text": "The emulator queue never overflowed (the backlog was held in ION)"},
+   {"id": "S4-11", "check": "cos_table", "text": "Every send uses the class of service of SPEC-DIGEST 7.5 for its priority"},
+   {"id": "S4-12", "check": "no_unmatched", "text": "No duplicate or unknown envelope is received"},
+   {"id": "S4-13", "check": "latency", "select": {"label": "S4-BULK"}, "informative": true, "text": "BULK latency (informative)"},
+   {"id": "S4-14", "check": "latency", "select": {"label": "S4-LOW"}, "informative": true, "text": "LOW latency (informative)"},
+   {"id": "S4-15", "check": "link_counter", "links": ["rover-gateway"], "counter": "max_queue_delay_s", "min": 0, "informative": true, "text": "Largest wait in the emulator queue, rover-gateway (informative)"}
+  ],
+ "conformance": [
+   {"ref": "PBS-CONFORMANCE-02 T012", "how": "higher-priority envelopes forwarded ahead of a lower-priority backlog under constrained throughput (S4-5 to S4-8)"},
+   {"ref": "PBS-CONFORMANCE-02 T010", "how": "one ION class of service per priority per SPEC-DIGEST 7.5 (S4-11); LOW and BULK share the bulk class (S4-9)"},
+   {"ref": "PBS-CONFORMANCE-01 6", "how": "priority handling observed end to end"},
+   {"ref": "PBS-PRIO-01 4, 6; PBS-DTN-MAP-01 6.3; PBS-DTN-MAP-02 5, 10 (priority semantic preservation)", "how": "priority byte unchanged (S4-3) and mapped to ION class of service"},
+   {"ref": "PBS-CONFORMANCE-02 Section 4 (constrained throughput)", "how": "4000 bytes/s contact rate, 4400 bytes/s emulated link"}
+  ],
+ "charts": ["arrivals"]
+}

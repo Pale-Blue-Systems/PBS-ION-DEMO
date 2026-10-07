@@ -1,0 +1,5 @@
+build/
+results/
+docker-results/
+endpoint-c/build/
+**/__pycache__/

@@ -21,6 +21,7 @@ routed by contact graph routing (CGR) over the contact plan.
 | `lib.sh` | Shell helpers: ION process / shared-memory / semaphore checks, readiness wait, last-resort cleanup. |
 | `nodes/<node>/node.*` | Per-node config: `node.ionconfig`, `node.ionrc`, `node.ionsecrc`, `node.ltprc`, `node.bprc`, `node.ipnrc`. |
 | `contacts/always_on.ionrc` | Contact plan with every link up for 24 h (used by `selftest.sh`). |
+| `topology.json` | Nodes, legs (one-way delay, contact-plan range and rate) and the four emulator link ports. Read by `scenarios/scenario.py`, which writes each scenario's contact plan and emulator configuration from it; `scenarios/test_scenarios.py` checks it against `nodes/*/node.ltprc`. |
 | `start_nodes.sh [PLAN]` | Creates fresh working directories and starts the three nodes. |
 | `stop_nodes.sh` | Stops the three nodes and verifies nothing is left behind. |
 | `udp_forward.py` | Fixed-delay UDP forwarder. Stands in for the link emulator in `selftest.sh`. |

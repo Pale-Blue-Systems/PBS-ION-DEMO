@@ -1,0 +1,58 @@
+{
+ "id": "S7",
+ "title": "Cross-implementation: each endpoint parses the other's envelopes; identical inputs give identical bytes",
+ "summary": "Offline, both endpoints build every vector of docs/test-vectors.json that has inputs and run every receiver case; the bytes and the dispositions are compared with each other and with the vector file. Live, both endpoints exchange envelopes of all five priorities, header-only envelopes, envelopes with ACK_REQ, envelopes of 30000 and 65536 bytes (Endpoint A) and 65000 bytes (Endpoint B), an unprotected envelope with an unknown frame type and a protected command with an unknown frame type; each endpoint's offline tool then decodes the other endpoint's logged envelopes and compares every header field, the length and the SHA-256 with the sender's own record.",
+ "duration_s": 25,
+ "seed": 7,
+ "links": {},
+ "contacts": {},
+ "outages": [],
+ "rover": {
+  "args": ["--reply-ping"],
+  "plan": {
+   "items": [
+     {"at_s": 2.0, "priority": 0, "frame": "event", "ttl_s": 0, "text": "EVT S7 CRITICAL", "label": "S7-P0"},
+     {"at_s": 2.5, "priority": 1, "frame": "status", "text": "STS S7 HIGH", "ack_req": true, "label": "S7-P1-ACK"},
+     {"at_s": 3.0, "priority": 2, "payload_bytes": 0, "label": "S7-P2-HEADER-ONLY"},
+     {"at_s": 3.5, "priority": 3, "text": "TLM S7 LOW", "payload_bytes": 1000, "label": "S7-P3-1000"},
+     {"at_s": 4.0, "priority": 4, "text": "TLM S7 BULK", "payload_bytes": 30000, "label": "S7-P4-30000"},
+     {"at_s": 6.0, "priority": 4, "text": "TLM S7 BULK MAX", "payload_bytes": 65536, "label": "S7-P4-65536"}
+    ]
+  }
+ },
+ "earth": {
+  "plan": [
+    {"at_s": 2.0, "kind": "event", "text": "EVT MCC S7", "priority": 0, "ttl": 0, "label": "S7-P0"},
+    {"at_s": 2.5, "kind": "status", "text": "STS MCC S7", "priority": 1, "flags": 1, "label": "S7-P1-ACK"},
+    {"at_s": 3.0, "kind": "heartbeat", "priority": 2, "ttl": 60, "label": "S7-P2-HEADER-ONLY"},
+    {"at_s": 3.5, "kind": "telemetry", "text": "TLM MCC S7 LOW", "priority": 3, "ttl": 3600, "pad_to": 1000, "label": "S7-P3-1000"},
+    {"at_s": 4.0, "kind": "telemetry", "text": "TLM MCC S7 BULK", "priority": 4, "ttl": 86400, "pad_to": 65000, "label": "S7-P4-65000"},
+    {"at_s": 6.0, "kind": "frames", "priority": 2, "ttl": 60, "frames": [{"type": "0x01", "text": "TLM WITH UNKNOWN FRAME"}, {"type": "0x80", "hex": "00ff00ff"}], "label": "S7-UNKNOWN-FRAME"},
+    {"at_s": 7.0, "kind": "command", "command": "PING S7", "extra_frames": [{"type": "0x81", "text": "OPAQUE"}], "label": "S7-PROTECTED-UNKNOWN-FRAME"}
+   ]
+ },
+ "probes": [],
+ "post": [
+   {"name": "a-vectors", "argv": ["{rover_tool}", "vectors", "--out", "{out}/a-vectors.json"]},
+   {"name": "vector-comparison", "argv": ["{python}", "{root}/scenarios/s7_compare.py", "--vectors", "{root}/docs/test-vectors.json", "--a-vectors", "{out}/a-vectors.json", "--earth-tool", "{earth_tool}", "--out", "{out}/vector-comparison.json"]},
+   {"name": "a-crosscheck", "argv": ["{rover_tool}", "crosscheck", "{out}/endpoint-b.jsonl", "--own-log", "{out}/endpoint-a.jsonl"]},
+   {"name": "b-crosscheck", "argv": ["{earth_tool}", "crosscheck", "{out}/endpoint-a.jsonl", "--own-log", "{out}/endpoint-b.jsonl", "--out", "{out}/b-crosscheck.jsonl"]}
+  ],
+ "criteria": [
+   {"id": "S7-1", "check": "vectors_identical", "text": "For every vector with inputs, Endpoint A and Endpoint B build the same bytes, equal to the vector file; for every receiver and SEC-B case both give the expected result and reason"},
+   {"id": "S7-2", "check": "post_exit", "name": "a-vectors", "text": "Endpoint A's vector run passes every check"},
+   {"id": "S7-3", "check": "post_exit", "name": "vector-comparison", "text": "The comparison program finds no difference"},
+   {"id": "S7-4", "check": "post_exit", "name": "a-crosscheck", "text": "Endpoint A decodes every envelope Endpoint B logged as sent with the same field values, and Endpoint B received every envelope A sent byte-identically"},
+   {"id": "S7-5", "check": "post_exit", "name": "b-crosscheck", "text": "Endpoint B decodes every envelope Endpoint A logged as sent with the same field values, and Endpoint A received every envelope B sent byte-identically"},
+   {"id": "S7-6", "check": "delivery", "min_count": 13, "text": "Every envelope handed to ION is received by the other endpoint"},
+   {"id": "S7-7", "check": "byte_identical", "text": "Every received envelope is byte-identical to the envelope handed to ION"},
+   {"id": "S7-8", "check": "recv_result", "expect": "ACCEPT OK", "min_count": 13, "text": "Each endpoint accepts every envelope of the other implementation"},
+   {"id": "S7-9", "check": "exec", "endpoint": "A", "operations": ["PING"], "text": "The protected command with an unknown frame type is executed"}
+  ],
+ "conformance": [
+   {"ref": "PBS-CONFORMANCE-02 T014", "how": "unknown frame types skipped by both receivers, in an unprotected envelope and inside a protected command (live), and vectors RX-21 and CMD-16 (offline)"},
+   {"ref": "PBS-CONFORMANCE-02 T002", "how": "S7-7"},
+   {"ref": "PBS-CONFORMANCE-01 4.1, 4.3, 5.1, 7, 10", "how": "header layout, CRC-32, Sequence and envelope vectors built and parsed identically by both implementations (S7-1, S7-4, S7-5)"},
+   {"ref": "PBS-ENV-01 12.5, 13.2", "how": "vectors ENV-01 to ENV-03 and RX-01 to RX-06 (S7-1)"}
+  ]
+}

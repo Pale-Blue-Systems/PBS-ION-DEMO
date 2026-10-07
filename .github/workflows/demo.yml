@@ -1,0 +1,50 @@
+# Runs the PBS ION demo (./run_demo.sh) on a GitHub-hosted runner and uploads
+# results/ and REPORT.md. The same script runs locally and in the Dockerfile.
+name: demo
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  demo:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            autoconf automake libtool gcc make pkg-config \
+            python3 python3-venv python3-pip libssl-dev procps
+
+      - name: Restore the ION build
+        uses: actions/cache@v4
+        with:
+          # build/ion carries absolute RUNPATHs; the checkout path is the
+          # same on every run of this workflow, so a cached build stays valid.
+          # build_ion.sh rebuilds when the pinned commit changes.
+          path: build/ion
+          key: ion-${{ runner.os }}-${{ hashFiles('ion/build_ion.sh') }}
+
+      - name: Run the demo
+        run: ./run_demo.sh
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pbs-ion-demo-results
+          path: |
+            results/
+            REPORT.md
+          if-no-files-found: warn
+          retention-days: 30

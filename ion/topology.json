@@ -1,0 +1,18 @@
+{
+ "description": "Three ION nodes behind the link emulator. Ports must match ion/nodes/*/node.ltprc (checked by scenarios/test_scenarios.py). Each node's LTP link service output (udplso) sends to the emulator port of its direction; the emulator forwards to the peer's LTP link service input (udplsi). one_way_delay_s is applied by the emulator; range_s is the contact-plan range ION uses for its LTP timers and CGR, in whole seconds (ION accepts integers only), rounded up from one_way_delay_s.",
+ "nodes": {
+  "rover":   {"node": 99, "eid": "ipn:99.1", "udplsi_port": 19913, "role": "ROVER (Endpoint A, Python)",        "source_id": "Rover-Alpha"},
+  "gateway": {"node": 50, "eid": "ipn:50.1", "udplsi_port": 15013, "role": "LUNAR GATEWAY (store-and-forward relay)", "source_id": null},
+  "earth":   {"node": 23, "eid": "ipn:23.1", "udplsi_port": 12313, "role": "EARTH Mission Control (Endpoint B, C)", "source_id": "Earth-MCC"}
+ },
+ "legs": {
+  "rover-gateway": {"a": "rover",   "b": "gateway", "one_way_delay_s": 0.25, "range_s": 1, "rate_Bps": 125000},
+  "gateway-earth": {"a": "gateway", "b": "earth",   "one_way_delay_s": 1.3,  "range_s": 2, "rate_Bps": 125000}
+ },
+ "links": {
+  "rover-gateway": {"leg": "rover-gateway", "from": "rover",   "to": "gateway", "listen": 29950, "dest": 15013},
+  "gateway-rover": {"leg": "rover-gateway", "from": "gateway", "to": "rover",   "listen": 25099, "dest": 19913},
+  "gateway-earth": {"leg": "gateway-earth", "from": "gateway", "to": "earth",   "listen": 25023, "dest": 12313},
+  "earth-gateway": {"leg": "gateway-earth", "from": "earth",   "to": "gateway", "listen": 22350, "dest": 15013}
+ }
+}
