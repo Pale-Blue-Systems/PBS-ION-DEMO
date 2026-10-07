@@ -281,14 +281,33 @@ class Evaluator:
     def c_no_unknown(self, c):
         """Every recv record is a delivery of an envelope that was sent (same
         identity and SHA-256); further deliveries of one envelope are counted
-        as duplicates and listed, not failed."""
+        as duplicates and listed, not failed.
+
+        With "repeat_is_bp_reforward": true a further delivery passes only
+        when it is the same bundle as the first delivery of that envelope
+        (same bundle source EID, creation time and creation count, so the
+        sender did not hand it to ION twice) and the number of further
+        deliveries does not exceed the bundles ION re-forwarded (sum of the
+        final bpstats "rfw" totals of all nodes)."""
         sent = {}
         for ep in ("A", "B"):
             for r in self.d.records(ep, "send"):
                 if r.get("result") == "SENT":
                     sent.setdefault((collect.PEER[ep], collect.identity(r)), set()).add(
                         r.get("envelope_sha256"))
-        unknown, dups = [], []
+        strict = bool(c.get("repeat_is_bp_reforward"))
+        unmatched = {ep: set(id(r) for r in self.d.unmatched[ep]) for ep in ("A", "B")}
+        first = {}
+        for ep in ("A", "B"):
+            for r in sorted(self.d.records(ep, "recv"), key=lambda r: r["t_us"]):
+                if id(r) not in unmatched[ep]:
+                    first.setdefault((ep, collect.identity(r)), r)
+
+        def bundle(r):
+            return (r.get("bundle_source_eid"), r.get("bundle_creation_ms"),
+                    r.get("bundle_creation_count"))
+
+        unknown, dups, bad = [], [], []
         for ep in ("A", "B"):
             for r in self.d.unmatched[ep]:
                 desc = "receiver %s: %s seq %s %s %s, bundle created %s count %s, at %s" % (
@@ -297,11 +316,28 @@ class Evaluator:
                     fmt_s(self.d.t_s(r.get("t_us"))))
                 if r.get("envelope_sha256") in sent.get((ep, collect.identity(r)), set()):
                     dups.append("duplicate delivery: " + desc)
+                    f = first.get((ep, collect.identity(r)))
+                    if strict and (f is None or None in bundle(r) or bundle(f) != bundle(r)):
+                        bad.append("not the bundle of the first delivery (%s): %s" % (
+                            "no first delivery" if f is None else
+                            "first created %s count %s" % bundle(f)[1:], desc))
                 else:
                     unknown.append("unknown: " + desc)
         n = sum(len(self.d.records(ep, "recv")) for ep in ("A", "B"))
-        return not unknown, "%d recv records; %d further deliveries of an envelope already " \
-            "received; %d unknown" % (n, len(dups), len(unknown)), unknown + dups
+        measured = "%d recv records; %d further deliveries of an envelope already received; " \
+            "%d unknown" % (n, len(dups), len(unknown))
+        ok = not unknown
+        if strict:
+            rfw = 0
+            for node, st in self.d.ion_stats().items():
+                rfw += (st.get("rfw") or {}).get("+") or 0
+            measured += "; ION re-forwarded %d bundles (bpstats rfw, all nodes); %d further " \
+                "deliveries not the same bundle" % (rfw, len(bad))
+            if len(dups) > rfw:
+                bad.append("%d further deliveries but only %d bundles re-forwarded by ION" % (
+                    len(dups), rfw))
+            ok = ok and not bad
+        return ok, measured, unknown + bad + dups
 
     def c_ttl_respected(self, c):
         bad = []

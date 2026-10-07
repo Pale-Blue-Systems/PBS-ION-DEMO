@@ -5,6 +5,7 @@
 | `collect.py` | joins the endpoint logs of one run and writes CSV tables |
 | `make_report.py` | writes REPORT.md, `results/summary.json`, `results/all-envelopes.csv` and charts |
 | `charts.py` | PNG charts (matplotlib; skipped when it cannot be imported) |
+| `compare_runs.py` | sets two or more complete runs side by side (repeatability) |
 
 Both read only files written during a run: the endpoint logs
 (`docs/LOG-SCHEMA.md`), `emulator-stats.json` (`emulator/README.md`),
@@ -15,7 +16,19 @@ Both read only files written during a run: the endpoint logs
 python3 report/collect.py results/S2              # results/S2/*.csv
 python3 report/make_report.py                     # REPORT.md from results/
 python3 report/make_report.py --results results --out results/REPORT.md
+python3 report/compare_runs.py --run "run 1=results/repeat/run-1" --run "run 2=results"
+python3 report/make_report.py --name "run 2" --compare "run 1=results/repeat/run-1"
 ```
+
+`compare_runs.py` reads complete results directories of `./run_demo.sh`
+(`<S>/run.json`, `<S>/verdict.json`, the logs and `run_demo.log`) and lists,
+in the order the runs were made: verdicts and wall time per scenario; the
+measured value of every criterion in each run, marked where the text
+differs; latency min, median and max per direction and priority with the
+range across runs; and the emulator, `bpstats` and `ltpstats` counters
+whose values differ. `make_report.py --compare` puts the same text into
+REPORT.md as a Repeatability section. `run_demo.sh` does not call either
+option; a new run replaces `results/` and REPORT.md without it.
 
 ## Joining send and receive records
 

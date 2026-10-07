@@ -11,7 +11,9 @@
 - every Endpoint B plan passes Endpoint B's dry run (pbs_tool plan), when
   the tool is built (build/endpoint-c/pbs_tool or $PBS_EARTH_TOOL);
 - scheduled outages produce contact-plan gaps, unscheduled ones do not;
-- every traffic phase stays under 180 s.
+- every traffic phase stays under 180 s;
+- the no_unknown check with repeat_is_bp_reforward (S3-8) passes a repeated
+  delivery only when it is the same bundle and ION re-forwarded a bundle.
 """
 import glob
 import json
@@ -115,6 +117,57 @@ class Scenarios(unittest.TestCase):
             for i in scn["earth"]["plan"]:
                 self.assertLess(i["at_s"] + (i.get("count", 1) - 1) * i.get("interval_s", 1),
                                 scn["duration_s"], path)
+
+
+class RepeatedDelivery(unittest.TestCase):
+    """no_unknown with repeat_is_bp_reforward on a synthetic run directory."""
+
+    SRC = "526f7665722d416c7068610000000000"
+
+    def make_run(self, d, recvs, rfw):
+        os.makedirs(os.path.join(d, "ion"))
+        crit = {"id": "X-1", "check": "no_unknown", "repeat_is_bp_reforward": True, "text": "t"}
+        json.dump({"id": "X", "criteria": [crit]}, open(os.path.join(d, "scenario.json"), "w"))
+        json.dump({"scenario": "X", "origin_unix_s": 1000.0}, open(os.path.join(d, "run.json"), "w"))
+        send = {"event": "send", "t_us": 1000000000, "endpoint": "A", "source_id_hex": self.SRC,
+                "sequence": 1, "timestamp_us": 1000000000, "result": "SENT", "reason": "OK",
+                "envelope_sha256": "aa", "header_hex": "h", "priority": 4}
+        with open(os.path.join(d, "endpoint-a.jsonl"), "w") as fh:
+            fh.write(json.dumps(send) + "\n")
+        with open(os.path.join(d, "endpoint-b.jsonl"), "w") as fh:
+            for i, (sha, created) in enumerate(recvs):
+                fh.write(json.dumps({
+                    "event": "recv", "t_us": 1001600000 + i * 600000, "endpoint": "B",
+                    "source_id_hex": self.SRC, "sequence": 1, "timestamp_us": 1000000000,
+                    "result": "ACCEPT", "reason": "OK", "envelope_sha256": sha, "header_hex": "h",
+                    "bundle_source_eid": "ipn:99.1", "bundle_creation_ms": created,
+                    "bundle_creation_count": 0}) + "\n")
+        with open(os.path.join(d, "ion", "gateway.ion.log"), "w") as fh:
+            fh.write("[2026/10/07-04:25:05] [x] rfw from 1970/01/01-00:00:00 to "
+                     "2026/10/07-04:25:05: (0) %d 0 (1) 0 0 (2) 0 0 (+) %d 0\n" % (rfw, rfw))
+        return evaluate.Evaluator(d).evaluate()["criteria"][0]
+
+    def check(self, recvs, rfw):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            return self.make_run(os.path.join(d, "X"), recvs, rfw)
+
+    def test_single_delivery_passes(self):
+        self.assertTrue(self.check([("aa", 5)], 0)["passed"])
+
+    def test_same_bundle_reforwarded_passes(self):
+        r = self.check([("aa", 5), ("aa", 5)], 1)
+        self.assertTrue(r["passed"], r)
+        self.assertIn("1 further deliveries", r["measured"])
+
+    def test_repeat_without_reforward_fails(self):
+        self.assertFalse(self.check([("aa", 5), ("aa", 5)], 0)["passed"])
+
+    def test_repeat_of_another_bundle_fails(self):
+        self.assertFalse(self.check([("aa", 5), ("aa", 9)], 1)["passed"])
+
+    def test_unknown_envelope_fails(self):
+        self.assertFalse(self.check([("aa", 5), ("bb", 5)], 1)["passed"])
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 """Write REPORT.md from the scenario results.
 
   report/make_report.py [--results results] [--out REPORT.md]
+                        [--name NAME --compare NAME=DIR ...]
 
 For every results/<S>/ directory with a run.json, reads the logs through
 report/collect.py and the verdict written by scenarios/evaluate.py (it runs
@@ -11,6 +12,10 @@ the evaluation if verdict.json is missing), then writes
   results/summary.json         verdicts and headline numbers per scenario
   results/all-envelopes.csv    envelopes.csv of every scenario
   results/charts/*.png         charts (only when matplotlib can be imported)
+
+With --compare, REPORT.md also gets a Repeatability section
+(report/compare_runs.py) that sets the run in --results (called --name)
+beside each other complete run given as NAME=DIR.
 
 Every number in REPORT.md is computed from the files of the run it describes.
 """
@@ -302,6 +307,10 @@ def scenario_section(run, verdict, chart_paths, results_rel, report_dir):
                      "info" if c["informative"] else ("PASS" if c["passed"] else "FAIL")])
     lines.append(table(["ID", "Criterion", "Measured", "Result"], rows))
     lines.append("")
+    for c in scn.get("criteria", []):
+        if c.get("note"):
+            lines.append("Note on %s: %s" % (c["id"], c["note"]))
+            lines.append("")
     details = [c for c in verdict["criteria"] if c["details"] and c["passed"] and
                c["check"] in ("expect_by_label", "no_unknown")]
     for c in details:
@@ -463,6 +472,10 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--results", default=os.path.join(ROOT, "results"))
     ap.add_argument("--out", default=os.path.join(ROOT, "REPORT.md"))
+    ap.add_argument("--name", default="this run",
+                    help="name of the --results run in the Repeatability section")
+    ap.add_argument("--compare", action="append", default=[], metavar="NAME=DIR",
+                    help="another complete results directory to compare with (repeatable)")
     args = ap.parse_args(argv)
     res = os.path.abspath(args.results)
     dirs = sorted(d for d in os.listdir(res) if os.path.exists(os.path.join(res, d, "run.json")))
@@ -586,6 +599,11 @@ def main(argv=None):
     for run, v in runs:
         L.append(scenario_section(run, v, chart_map.get(run.id, {}), results_rel,
                                   os.path.dirname(os.path.abspath(args.out))))
+    if args.compare:
+        import compare_runs
+        others = [compare_runs.Run(*compare_runs.parse_run_arg(c)) for c in args.compare]
+        L.append(compare_runs.render([compare_runs.Run(args.name, res)] + others))
+        L.append("")
     L.append("## Not exercised")
     L.append("")
     L.append("PBS-CONFORMANCE-02 T001 (IP carriage), T003 (provider or path transition), T005 "
