@@ -1,0 +1,4 @@
+stop_nodes: rover: ionexit n
+stop_nodes: gateway: ionexit n
+stop_nodes: earth: ionexit 
+stop_nodes: clean (no ION processes, no ION shared memory, no ION semaphores)

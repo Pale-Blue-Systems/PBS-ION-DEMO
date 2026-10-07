@@ -1,0 +1,4 @@
+build     36 items: A == B  36, A == expected  36, B == expected  36
+receive   23 items: A == B  23, A == expected  23, B == expected  23
+sec_b     34 items: A == B  34, A == expected  34, B == expected  34
+all identical

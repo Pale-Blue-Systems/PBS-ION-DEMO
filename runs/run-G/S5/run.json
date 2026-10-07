@@ -1,0 +1,314 @@
+{
+ "drain": {
+  "complete": true,
+  "duration_s": 0.0,
+  "end_scenario_s": 70.0,
+  "end_unix_s": 1791359188.0004182,
+  "max_s": 30,
+  "pending": []
+ },
+ "duration_s": 70,
+ "endpoint_a": {
+  "argv": [
+   "/home/user/pbs-ion-demo-runs/run-G/endpoint-python/bin/rover",
+   "--log",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S5/endpoint-a.jsonl",
+   "--scenario",
+   "S5",
+   "--plan",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S5/rover-plan.json",
+   "--duration",
+   "120",
+   "--ion-node-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion/rover",
+   "--ion-node-list-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion",
+   "--ready-file",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S5/rover.ready",
+   "--reply-ping"
+  ],
+  "launch_unix_s": 1791359117.9001675,
+  "plan_origin_offset_s": -0.000996,
+  "plan_origin_unix_s": 1791359117.9990044,
+  "startup_s": 0.098837
+ },
+ "endpoint_b": {
+  "argv": [
+   "/home/user/pbs-ion-demo-runs/run-G/build/endpoint-c/pbs_earth",
+   "run",
+   "--plan",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S5/earth-plan.jsonl",
+   "--log",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S5/endpoint-b.jsonl",
+   "--scenario",
+   "S5",
+   "--t0-us",
+   "1791359118000000",
+   "--duration",
+   "120",
+   "--node-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion/earth"
+  ],
+  "launch_unix_s": 1791359118.0039666,
+  "plan_origin_unix_s": 1791359118.0
+ },
+ "exit": {
+  "emulator": 0,
+  "endpoint-a": 0,
+  "endpoint-b": 0,
+  "stop_nodes": 0
+ },
+ "finished_utc": "2026-10-07T07:46:56.342725+00:00",
+ "git": {
+  "commit": "25ffe97aa464007464b889685b500191c2e49f7e",
+  "worktree_modified": false
+ },
+ "host": {
+  "clock_source": "tsc",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "nproc": 4,
+  "ntp_synchronized": null,
+  "platform": "Linux-6.18.44-fc-v77-x86_64-with-glibc2.39",
+  "python": "3.13.16"
+ },
+ "ion": {
+  "commit": "568df887cb9f18aa8ec013b1a566d83215e499ae",
+  "tag": "ion-open-source-4.2.0"
+ },
+ "lead_s": 10,
+ "origin_unix_s": 1791359118.0,
+ "origin_us": 1791359118000000,
+ "post": [],
+ "probes": [
+  {
+   "argv": [
+    "bplist"
+   ],
+   "at_s": 26.0,
+   "exit": 0,
+   "file": "probes/00-rover-bplist_detail.txt",
+   "label": "rover at 26 s",
+   "node": "rover",
+   "scenario_t_s": 26.0,
+   "t_us": 1791359144000247
+  },
+  {
+   "argv": [
+    "bplist"
+   ],
+   "at_s": 26.4,
+   "exit": 0,
+   "file": "probes/01-earth-bplist_detail.txt",
+   "label": "Earth at 26.4 s",
+   "node": "earth",
+   "scenario_t_s": 26.4,
+   "t_us": 1791359144400258
+  },
+  {
+   "argv": [
+    "bplist"
+   ],
+   "at_s": 26.8,
+   "exit": 0,
+   "file": "probes/02-gateway-bplist_detail.txt",
+   "label": "Gateway at 26.8 s",
+   "node": "gateway",
+   "scenario_t_s": 26.8,
+   "t_us": 1791359144800274
+  },
+  {
+   "argv": [
+    "bplist"
+   ],
+   "at_s": 36.0,
+   "exit": 0,
+   "file": "probes/03-rover-bplist_detail.txt",
+   "label": "rover at 36 s",
+   "node": "rover",
+   "scenario_t_s": 36.0,
+   "t_us": 1791359154000272
+  },
+  {
+   "argv": [
+    "bplist"
+   ],
+   "at_s": 36.4,
+   "exit": 0,
+   "file": "probes/04-earth-bplist_detail.txt",
+   "label": "Earth at 36.4 s",
+   "node": "earth",
+   "scenario_t_s": 36.403,
+   "t_us": 1791359154402562
+  },
+  {
+   "argv": [
+    "bplist"
+   ],
+   "at_s": 46.0,
+   "exit": 0,
+   "file": "probes/05-rover-bplist_detail.txt",
+   "label": "rover at 46 s",
+   "node": "rover",
+   "scenario_t_s": 46.0,
+   "t_us": 1791359164000497
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-bpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791359188038963
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-ltpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791359188046733
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-bpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791359188057536
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-ltpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791359188067689
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-bpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791359188072871
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-ltpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791359188082515
+  }
+ ],
+ "scenario": "S5",
+ "scenario_file": "scenarios/S5.json",
+ "started_utc": "2026-10-07T07:45:06.042977+00:00",
+ "steps": [
+  {
+   "step": "emulator_ready",
+   "t_us": 1791359106109447
+  },
+  {
+   "step": "nodes_started",
+   "t0_utc": "2026/10/07-07:45:08",
+   "t_us": 1791359111854767
+  },
+  {
+   "plan_origin_offset_s": -0.001,
+   "step": "endpoint_a_ready",
+   "t_us": 1791359118002923
+  },
+  {
+   "step": "endpoint_b_started",
+   "t_us": 1791359118003968
+  },
+  {
+   "at_s": 26.0,
+   "node": "rover",
+   "step": "probe",
+   "t_us": 1791359144004868,
+   "tool": "bplist_detail"
+  },
+  {
+   "at_s": 26.4,
+   "node": "earth",
+   "step": "probe",
+   "t_us": 1791359144404929,
+   "tool": "bplist_detail"
+  },
+  {
+   "at_s": 26.8,
+   "node": "gateway",
+   "step": "probe",
+   "t_us": 1791359144804841,
+   "tool": "bplist_detail"
+  },
+  {
+   "at_s": 36.0,
+   "node": "rover",
+   "step": "probe",
+   "t_us": 1791359154004768,
+   "tool": "bplist_detail"
+  },
+  {
+   "at_s": 36.4,
+   "node": "earth",
+   "step": "probe",
+   "t_us": 1791359154406996,
+   "tool": "bplist_detail"
+  },
+  {
+   "at_s": 46.0,
+   "node": "rover",
+   "step": "probe",
+   "t_us": 1791359164004933,
+   "tool": "bplist_detail"
+  },
+  {
+   "step": "traffic_phase_end",
+   "t_us": 1791359188000295
+  },
+  {
+   "duration_s": 0.0,
+   "pending": 0,
+   "step": "drain_end",
+   "t_us": 1791359188001669
+  },
+  {
+   "a": 0,
+   "b": 0,
+   "step": "endpoints_stopped",
+   "t_us": 1791359188038624
+  },
+  {
+   "status": 0,
+   "step": "nodes_stopped",
+   "t_us": 1791359216308684
+  },
+  {
+   "step": "emulator_stopped",
+   "t_us": 1791359216341809
+  }
+ ],
+ "stop_clean_without_fallback": true,
+ "stop_nodes_s": 27.2,
+ "t0_unix_s": 1791359108.0,
+ "t0_utc": "2026/10/07-07:45:08",
+ "title": "Expiry: bundle lifetime during an outage, and receivers rejecting expired envelopes"
+}

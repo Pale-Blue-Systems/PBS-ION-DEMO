@@ -1,0 +1,62 @@
+{
+ "id": "S1",
+ "title": "Nominal traffic: rover telemetry at five priorities; signed commands, signed telemetry and a heartbeat from Earth; PING replies",
+ "summary": "All links up, fixed one-way delays only. Rover to Earth: telemetry at all five priorities, a 20000-byte BULK image chunk, a header-only envelope with ACK_REQ, and a Status envelope answering each PING; none of these is signed. Earth to rover: signed commands (Ed25519, and HMAC-SHA-256 for SET_HEATER), signed MCC telemetry (the rover requires a Security frame on every Earth-MCC envelope that has a payload, SPEC-DIGEST A38) and a header-only TTL 0 heartbeat. Signed envelopes travel only from Earth to the rover, so Endpoint B verifies no live signed envelope; it verifies SEC-B-01 only in the offline S7 vectors.",
+ "duration_s": 40,
+ "seed": 1,
+ "links": {},
+ "contacts": {},
+ "outages": [],
+ "rover": {
+  "args": ["--reply-ping"],
+  "plan": {
+   "items": [
+     {"at_s": 2.0, "count": 6, "interval_s": 5.0, "priority": 0, "frame": "event", "text": "EVT MOTOR_STALL WHEEL=3", "label": "S1-CRITICAL"},
+     {"at_s": 2.1, "count": 6, "interval_s": 5.0, "priority": 1, "text": "TLM POWER BATT=27.9V SOC=81%", "label": "S1-HIGH"},
+     {"at_s": 2.2, "count": 6, "interval_s": 5.0, "priority": 2, "text": "TLM THERMAL CPU=-12.5C", "label": "S1-NORMAL"},
+     {"at_s": 2.3, "count": 6, "interval_s": 5.0, "priority": 3, "text": "TLM ENV DUST=0.02", "label": "S1-LOW"},
+     {"at_s": 2.4, "count": 6, "interval_s": 5.0, "priority": 4, "text": "TLM IMAGE-CHUNK", "label": "S1-BULK"},
+     {"at_s": 15.0, "priority": 4, "text": "TLM IMAGE-CHUNK NAVCAM-0001", "payload_bytes": 20000, "label": "S1-BULK-20000"},
+     {"at_s": 20.0, "priority": 2, "payload_bytes": 0, "ack_req": true, "label": "S1-HEADER-ONLY"}
+    ]
+  }
+ },
+ "earth": {
+  "plan": [
+    {"at_s": 3.0, "kind": "command", "command": "PING S1-1", "label": "S1-PING-1"},
+    {"at_s": 6.0, "kind": "command", "command": "SET_HEATER ON", "suite": "hmac", "label": "S1-SET_HEATER"},
+    {"at_s": 9.0, "kind": "command", "command": "DRIVE 10", "label": "S1-DRIVE"},
+    {"at_s": 12.0, "kind": "command", "command": "CAPTURE_IMAGE NAVCAM", "role": "SCIENCE-OPS", "label": "S1-CAPTURE_IMAGE"},
+    {"at_s": 15.0, "kind": "command", "command": "SET_MODE SCIENCE", "label": "S1-SET_MODE"},
+    {"at_s": 18.0, "kind": "telemetry", "text": "TLM MCC CLOCK SYNC", "priority": 2, "ttl": 60, "label": "S1-MCC-TLM", "sign": true},
+    {"at_s": 21.0, "kind": "heartbeat", "priority": 0, "ttl": 0, "label": "S1-MCC-HEARTBEAT"},
+    {"at_s": 24.0, "kind": "command", "command": "PING S1-2", "count": 3, "interval_s": 1.0, "label": "S1-PING-2"}
+   ]
+ },
+ "probes": [],
+ "criteria": [
+   {"id": "S1-1", "check": "delivery", "select": {"dir": "A->B"}, "min_count": 30, "text": "Every rover envelope handed to ION is received at Earth"},
+   {"id": "S1-2", "check": "delivery", "select": {"dir": "B->A"}, "min_count": 10, "text": "Every Earth envelope handed to ION is received at the rover"},
+   {"id": "S1-3", "check": "byte_identical", "text": "Every received envelope is byte-identical to the envelope handed to ION (SHA-256 of all bytes, 44 header bytes)"},
+   {"id": "S1-4", "check": "recv_result", "expect": "ACCEPT OK", "min_count": 40, "text": "Every received envelope is accepted"},
+   {"id": "S1-5", "check": "exec", "endpoint": "A", "operations": ["PING", "SET_HEATER", "DRIVE", "CAPTURE_IMAGE", "SET_MODE", "PING", "PING", "PING"], "text": "The rover executes (logs) each authenticated command once, in order"},
+   {"id": "S1-6", "check": "delivery", "select": {"dir": "A->B", "label": "PING-REPLY"}, "min_count": 4, "text": "Each PING is answered and the answer reaches Earth"},
+   {"id": "S1-7", "check": "latency", "min_s": 1.55, "max_s": 3.0, "text": "End-to-end latency between the 1.55 s propagation floor and 3.0 s"},
+   {"id": "S1-8", "check": "lifespan", "select": {"ttl_s": 0}, "value": 2147483647, "text": "TTL 0 envelopes are sent with the 2147483647 s no-expiry bundle lifetime"},
+   {"id": "S1-9", "check": "delivery", "select": {"ttl_s": 0}, "min_count": 7, "text": "TTL 0 envelopes sent with that lifetime are delivered"},
+   {"id": "S1-10", "check": "cos_table", "text": "Every send uses the class of service of SPEC-DIGEST 7.5 for its priority"},
+   {"id": "S1-11", "check": "eid_match", "text": "Every bundle source EID matches the Source ID mapping (Rover-Alpha ipn:99.1, Earth-MCC ipn:23.1)"},
+   {"id": "S1-12", "check": "no_unmatched", "text": "No duplicate or unknown envelope is received"},
+   {"id": "S1-13", "check": "ttl_respected", "text": "No receiver accepts an envelope older than its TTL"}
+  ],
+ "conformance": [
+   {"ref": "PBS-C02-T002", "how": "S1-3: header bytes and SHA-256 equal after BPv7 carriage over LTP through the relay"},
+   {"ref": "PBS-C02-T010", "how": "partial: S1-10 shows one ION class of service per priority (SPEC-DIGEST 7.5, docs/MAPPING-PROFILE.md); the demo has one static mapping, with no network state input and no policy version, so a mapping per defined network state is not exercised"},
+   {"ref": "PBS-C02-T015", "how": "one recv record per delivered bundle and one exec record per executed command (S1-4, S1-5)"},
+   {"ref": "PBS-C02-T016", "how": "S1-8, S1-9: TTL 0 envelopes carried with the no-expiry lifetime of the mapping profile (docs/MAPPING-PROFILE.md) and delivered"},
+   {"ref": "PBS-CONFORMANCE-01 4.1, 4.2, 4.3, 5.1", "how": "both receivers parse and CRC-check every envelope of the other implementation (S1-4)"},
+   {"ref": "PBS-CONFORMANCE-01 6", "how": "all five priorities sent and received (S1-1, S1-10)"},
+   {"ref": "PBS-CONFORMANCE-01 7", "how": "Sequence starts at 1 and increments per envelope at each sender (send records)"},
+   {"ref": "PBS-DTN-MAP-01 5.1, 6.1, 6.1.1, 6.2, 7.2, 8", "how": "one envelope per bundle payload, lifetime from TTL, verbatim extraction, Source ID to EID mapping (S1-3, S1-8, S1-11)"}
+  ]
+}

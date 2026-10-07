@@ -355,8 +355,8 @@ waits about 2 s for `rfxclock` to end (both visible in `stop.log` and
     failed). With the limit raised to the peers' open blocks (the change
     committed as `de92b9c`), an S2 run with the same screening (33
     segments) discarded no segment, and Earth sent 24 reports between
-    92.58 and 92.78 s in the corresponding checkpoint round. None of the five S2 runs with the
-    raised limit discarded a segment for backlog; two S2 runs with the
+    92.58 and 92.78 s in the corresponding checkpoint round. None of the seven S2 runs with the
+    raised limit (up to runs F and G of `25ffe97`) discarded a segment for backlog; two S2 runs with the
     `m maxbacklog` lines removed (`runs/control/`) discarded 1 and 5
     (`scenarios/README.md`, observation 6). Run A's files are not in the
     repository; the figures above were read from them.

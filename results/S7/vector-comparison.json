@@ -1,24 +1,24 @@
 {
- "vectors": "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/docs/test-vectors.json",
- "vectors_sha256": "789ac1b4a02f38e8adf3d9bc1eeabe4d0bb7abc74a95b3dd8439633bcb3885ff",
+ "vectors": "/home/user/pbs-ion-demo-runs/run-F/docs/test-vectors.json",
+ "vectors_sha256": "51e09856fa3c59130aa01f9c5d0e661a26cd19bda2aec74c45f8084bffd69b25",
  "summary": {
   "build": {
+   "items": 36,
+   "a_eq_b": 36,
+   "a_ok": 36,
+   "b_ok": 36
+  },
+  "receive": {
+   "items": 23,
+   "a_eq_b": 23,
+   "a_ok": 23,
+   "b_ok": 23
+  },
+  "sec_b": {
    "items": 34,
    "a_eq_b": 34,
    "a_ok": 34,
    "b_ok": 34
-  },
-  "receive": {
-   "items": 22,
-   "a_eq_b": 22,
-   "a_ok": 22,
-   "b_ok": 22
-  },
-  "sec_b": {
-   "items": 30,
-   "a_eq_b": 30,
-   "a_ok": 30,
-   "b_ok": 30
   }
  },
  "all_identical": true,
@@ -162,6 +162,28 @@
    "length": 188,
    "a": "0c9c296fd7aff59f67da5ebaec341aca05132fed6d34fc6017dd7bc3463ef471",
    "b": "0c9c296fd7aff59f67da5ebaec341aca05132fed6d34fc6017dd7bc3463ef471",
+   "a_eq_b": true,
+   "a_ok": true,
+   "b_ok": true
+  },
+  {
+   "id": "CMD-21",
+   "kind": "build",
+   "expected_sha256": "19ff5c4b557c91c105e3c871be25f09a9b5e82fa938ad06e5b9a3d106ffc7602",
+   "length": 67,
+   "a": "19ff5c4b557c91c105e3c871be25f09a9b5e82fa938ad06e5b9a3d106ffc7602",
+   "b": "19ff5c4b557c91c105e3c871be25f09a9b5e82fa938ad06e5b9a3d106ffc7602",
+   "a_eq_b": true,
+   "a_ok": true,
+   "b_ok": true
+  },
+  {
+   "id": "CMD-22",
+   "kind": "build",
+   "expected_sha256": "641a83578e8f7268f54ce238d575e94d5d222a26bdf044b2f3aad781a17e001b",
+   "length": 165,
+   "a": "641a83578e8f7268f54ce238d575e94d5d222a26bdf044b2f3aad781a17e001b",
+   "b": "641a83578e8f7268f54ce238d575e94d5d222a26bdf044b2f3aad781a17e001b",
    "a_eq_b": true,
    "a_ok": true,
    "b_ok": true
@@ -590,9 +612,9 @@
   {
    "id": "RX-20",
    "kind": "receive",
-   "expected": "ACCEPT/OK",
-   "a": "ACCEPT/OK",
-   "b": "ACCEPT/OK",
+   "expected": "REJECT/SEC_MISSING",
+   "a": "REJECT/SEC_MISSING",
+   "b": "REJECT/SEC_MISSING",
    "a_eq_b": true,
    "a_ok": true,
    "b_ok": true
@@ -613,6 +635,16 @@
    "expected": "ACCEPT/OK",
    "a": "ACCEPT/OK",
    "b": "ACCEPT/OK",
+   "a_eq_b": true,
+   "a_ok": true,
+   "b_ok": true
+  },
+  {
+   "id": "RX-23",
+   "kind": "receive",
+   "expected": "REJECT/SEC_MISSING",
+   "a": "REJECT/SEC_MISSING",
+   "b": "REJECT/SEC_MISSING",
    "a_eq_b": true,
    "a_ok": true,
    "b_ok": true
@@ -833,6 +865,46 @@
    "expected": "REJECT/SEC_MALFORMED",
    "a": "REJECT/SEC_MALFORMED",
    "b": "REJECT/SEC_MALFORMED",
+   "a_eq_b": true,
+   "a_ok": true,
+   "b_ok": true
+  },
+  {
+   "id": "SB-22/CMD-19#1",
+   "kind": "sec_b",
+   "expected": "REJECT/SEC_MISSING",
+   "a": "REJECT/SEC_MISSING",
+   "b": "REJECT/SEC_MISSING",
+   "a_eq_b": true,
+   "a_ok": true,
+   "b_ok": true
+  },
+  {
+   "id": "SB-23/CMD-20#1",
+   "kind": "sec_b",
+   "expected": "REJECT/SEC_MISSING",
+   "a": "REJECT/SEC_MISSING",
+   "b": "REJECT/SEC_MISSING",
+   "a_eq_b": true,
+   "a_ok": true,
+   "b_ok": true
+  },
+  {
+   "id": "SB-24/CMD-21#1",
+   "kind": "sec_b",
+   "expected": "REJECT/SEC_MISSING",
+   "a": "REJECT/SEC_MISSING",
+   "b": "REJECT/SEC_MISSING",
+   "a_eq_b": true,
+   "a_ok": true,
+   "b_ok": true
+  },
+  {
+   "id": "SB-25/CMD-22#1",
+   "kind": "sec_b",
+   "expected": "ACCEPT/OK",
+   "a": "ACCEPT/OK",
+   "b": "ACCEPT/OK",
    "a_eq_b": true,
    "a_ok": true,
    "b_ok": true

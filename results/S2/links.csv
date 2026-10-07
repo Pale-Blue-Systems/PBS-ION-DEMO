@@ -1,5 +1,5 @@
 scenario,link,delay_s,loss,rate_Bps,queue_bytes,blackouts,rx,tx,rx_bytes,tx_bytes,drop_loss,drop_blackout,drop_queue_full,send_error,pending_at_stop,max_queue_delay_s,ltp_DS,ltp_CP,ltp_RS,ltp_RA,ltp_cancel,ltp_data_retransmissions
-S2,earth-gateway,1.3,0.0,,,65-85 scheduled,151,151,6597,6597,0,0,0,0,0,0.0,0,17,118,16,0,1
-S2,gateway-earth,1.3,0.0,,,65-85 scheduled,328,328,71416,71416,0,0,0,0,0,0.0,48,145,17,118,0,34
-S2,gateway-rover,0.25,0.0,,,25-50 scheduled,144,144,6270,6270,0,0,0,0,0,0.0,0,16,112,16,0,0
-S2,rover-gateway,0.25,0.0,,,25-50 scheduled,277,277,56851,56851,0,0,0,0,0,0.0,38,112,16,111,0,1
+S2,earth-gateway,1.3,0.0,,,65-85 scheduled,151,151,6598,6598,0,0,0,0,0,0.0,0,17,118,16,0,1
+S2,gateway-earth,1.3,0.0,,,65-85 scheduled,328,328,71417,71417,0,0,0,0,0,0.0,48,145,17,118,0,34
+S2,gateway-rover,0.25,0.0,,,25-50 scheduled,143,143,6256,6256,0,0,0,0,0,0.0,0,16,111,16,0,0
+S2,rover-gateway,0.25,0.0,,,25-50 scheduled,276,276,56694,56694,0,0,0,0,0,0.0,38,111,16,111,0,0

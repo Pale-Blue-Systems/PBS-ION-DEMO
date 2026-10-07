@@ -29,10 +29,10 @@
    "queue_bytes": null,
    "rate_Bps": null,
    "rx": 151,
-   "rx_bytes": 6597,
+   "rx_bytes": 6598,
    "send_error": 0,
    "tx": 151,
-   "tx_bytes": 6597
+   "tx_bytes": 6598
   },
   "gateway-earth": {
    "blackouts": [
@@ -64,10 +64,10 @@
    "queue_bytes": null,
    "rate_Bps": null,
    "rx": 328,
-   "rx_bytes": 71416,
+   "rx_bytes": 71417,
    "send_error": 0,
    "tx": 328,
-   "tx_bytes": 71416
+   "tx_bytes": 71417
   },
   "gateway-rover": {
    "blackouts": [
@@ -90,18 +90,18 @@
    "ltp_segments": {
     "CP": 16,
     "RA": 16,
-    "RS": 112
+    "RS": 111
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 144,
-   "rx_bytes": 6270,
+   "rx": 143,
+   "rx_bytes": 6256,
    "send_error": 0,
-   "tx": 144,
-   "tx_bytes": 6270
+   "tx": 143,
+   "tx_bytes": 6256
   },
   "rover-gateway": {
    "blackouts": [
@@ -120,9 +120,9 @@
    "jitter_s": 0.0,
    "listen": 29950,
    "loss": 0.0,
-   "ltp_data_retransmissions": 1,
+   "ltp_data_retransmissions": 0,
    "ltp_segments": {
-    "CP": 112,
+    "CP": 111,
     "DS": 38,
     "RA": 111,
     "RS": 16
@@ -132,15 +132,15 @@
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 277,
-   "rx_bytes": 56851,
+   "rx": 276,
+   "rx_bytes": 56694,
    "send_error": 0,
-   "tx": 277,
-   "tx_bytes": 56851
+   "tx": 276,
+   "tx_bytes": 56694
   }
  },
  "schema": "pbs-ion-demo-linkemu/1",
  "seed": 2,
- "stopped_us": 1791352237879922,
- "t0": 1791352105.0
+ "stopped_us": 1791357978397938,
+ "t0": 1791357845.0
 }

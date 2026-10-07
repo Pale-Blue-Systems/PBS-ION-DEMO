@@ -15,18 +15,18 @@
     "CP": 7,
     "DS": 65,
     "RA": 7,
-    "RS": 7
+    "RS": 8
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 86,
-   "rx_bytes": 67964,
+   "rx": 87,
+   "rx_bytes": 68471,
    "send_error": 0,
-   "tx": 86,
-   "tx_bytes": 67964
+   "tx": 87,
+   "tx_bytes": 68471
   },
   "gateway-earth": {
    "blackouts": [],
@@ -40,9 +40,9 @@
    "loss": 0.0,
    "ltp_data_retransmissions": 0,
    "ltp_segments": {
-    "CP": 7,
+    "CP": 8,
     "DS": 94,
-    "RA": 7,
+    "RA": 8,
     "RS": 7
    },
    "max_queue_bytes": 0,
@@ -50,11 +50,11 @@
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 115,
-   "rx_bytes": 98646,
+   "rx": 117,
+   "rx_bytes": 98833,
    "send_error": 0,
-   "tx": 115,
-   "tx_bytes": 98646
+   "tx": 117,
+   "tx_bytes": 98833
   },
   "gateway-rover": {
    "blackouts": [],
@@ -71,18 +71,18 @@
     "CP": 7,
     "DS": 65,
     "RA": 7,
-    "RS": 7
+    "RS": 8
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 86,
-   "rx_bytes": 67984,
+   "rx": 87,
+   "rx_bytes": 68490,
    "send_error": 0,
-   "tx": 86,
-   "tx_bytes": 67984
+   "tx": 87,
+   "tx_bytes": 68490
   },
   "rover-gateway": {
    "blackouts": [],
@@ -96,9 +96,9 @@
    "loss": 0.0,
    "ltp_data_retransmissions": 0,
    "ltp_segments": {
-    "CP": 7,
+    "CP": 8,
     "DS": 94,
-    "RA": 7,
+    "RA": 8,
     "RS": 7
    },
    "max_queue_bytes": 0,
@@ -106,15 +106,15 @@
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 115,
-   "rx_bytes": 98632,
+   "rx": 117,
+   "rx_bytes": 98816,
    "send_error": 0,
-   "tx": 115,
-   "tx_bytes": 98632
+   "tx": 117,
+   "tx_bytes": 98816
   }
  },
  "schema": "pbs-ion-demo-linkemu/1",
  "seed": 7,
- "stopped_us": 1791352745450726,
- "t0": 1791352692.0
+ "stopped_us": 1791358485968204,
+ "t0": 1791358433.0
 }

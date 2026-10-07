@@ -22,10 +22,10 @@
    "queue_bytes": null,
    "rate_Bps": null,
    "rx": 66,
-   "rx_bytes": 1496,
+   "rx_bytes": 1498,
    "send_error": 0,
    "tx": 66,
-   "tx_bytes": 1496
+   "tx_bytes": 1498
   },
   "gateway-earth": {
    "blackouts": [],
@@ -50,10 +50,10 @@
    "queue_bytes": null,
    "rate_Bps": null,
    "rx": 246,
-   "rx_bytes": 130694,
+   "rx_bytes": 130696,
    "send_error": 0,
    "tx": 246,
-   "tx_bytes": 130694
+   "tx_bytes": 130696
   },
   "gateway-rover": {
    "blackouts": [],
@@ -72,15 +72,15 @@
     "RS": 62
    },
    "max_queue_bytes": 281,
-   "max_queue_delay_s": 0.0,
+   "max_queue_delay_s": 0.001826,
    "pending_at_stop": 0,
    "queue_bytes": 65536,
    "rate_Bps": 4400.0,
    "rx": 66,
-   "rx_bytes": 1504,
+   "rx_bytes": 1503,
    "send_error": 0,
    "tx": 66,
-   "tx_bytes": 1504
+   "tx_bytes": 1503
   },
   "rover-gateway": {
    "blackouts": [],
@@ -99,20 +99,20 @@
     "RA": 62,
     "RS": 2
    },
-   "max_queue_bytes": 7567,
-   "max_queue_delay_s": 1.697892,
+   "max_queue_bytes": 7435,
+   "max_queue_delay_s": 1.667864,
    "pending_at_stop": 0,
    "queue_bytes": 65536,
    "rate_Bps": 4400.0,
    "rx": 246,
-   "rx_bytes": 130692,
+   "rx_bytes": 130691,
    "send_error": 0,
    "tx": 246,
-   "tx_bytes": 130692
+   "tx_bytes": 130691
   }
  },
  "schema": "pbs-ion-demo-linkemu/1",
  "seed": 4,
- "stopped_us": 1791352488654545,
- "t0": 1791352400.0
+ "stopped_us": 1791358228200580,
+ "t0": 1791358140.0
 }

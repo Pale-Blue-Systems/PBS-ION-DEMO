@@ -1,0 +1,200 @@
+{
+ "drain": {
+  "complete": true,
+  "duration_s": 0.0,
+  "end_scenario_s": 110.0,
+  "end_unix_s": 1791358978.0004888,
+  "max_s": 30,
+  "pending": []
+ },
+ "duration_s": 110,
+ "endpoint_a": {
+  "argv": [
+   "/home/user/pbs-ion-demo-runs/run-G/endpoint-python/bin/rover",
+   "--log",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S3/endpoint-a.jsonl",
+   "--scenario",
+   "S3",
+   "--plan",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S3/rover-plan.json",
+   "--duration",
+   "160",
+   "--ion-node-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion/rover",
+   "--ion-node-list-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion",
+   "--ready-file",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S3/rover.ready",
+   "--reply-ping"
+  ],
+  "launch_unix_s": 1791358867.900197,
+  "plan_origin_offset_s": -0.006126,
+  "plan_origin_unix_s": 1791358867.9938736,
+  "startup_s": 0.093677
+ },
+ "endpoint_b": {
+  "argv": [
+   "/home/user/pbs-ion-demo-runs/run-G/build/endpoint-c/pbs_earth",
+   "run",
+   "--plan",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S3/earth-plan.jsonl",
+   "--log",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S3/endpoint-b.jsonl",
+   "--scenario",
+   "S3",
+   "--t0-us",
+   "1791358868000000",
+   "--duration",
+   "160",
+   "--node-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion/earth"
+  ],
+  "launch_unix_s": 1791358868.0035489,
+  "plan_origin_unix_s": 1791358868.0
+ },
+ "exit": {
+  "emulator": 0,
+  "endpoint-a": 0,
+  "endpoint-b": 0,
+  "stop_nodes": 0
+ },
+ "finished_utc": "2026-10-07T07:43:26.653265+00:00",
+ "git": {
+  "commit": "25ffe97aa464007464b889685b500191c2e49f7e",
+  "worktree_modified": false
+ },
+ "host": {
+  "clock_source": "tsc",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "nproc": 4,
+  "ntp_synchronized": null,
+  "platform": "Linux-6.18.44-fc-v77-x86_64-with-glibc2.39",
+  "python": "3.13.16"
+ },
+ "ion": {
+  "commit": "568df887cb9f18aa8ec013b1a566d83215e499ae",
+  "tag": "ion-open-source-4.2.0"
+ },
+ "lead_s": 10,
+ "origin_unix_s": 1791358868.0,
+ "origin_us": 1791358868000000,
+ "post": [],
+ "probes": [
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-bpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791358978043847
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-ltpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791358978048692
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-bpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791358978053371
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-ltpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791358978058165
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-bpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791358978062902
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-ltpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791358978067283
+  }
+ ],
+ "scenario": "S3",
+ "scenario_file": "scenarios/S3.json",
+ "started_utc": "2026-10-07T07:40:56.324159+00:00",
+ "steps": [
+  {
+   "step": "emulator_ready",
+   "t_us": 1791358856413948
+  },
+  {
+   "step": "nodes_started",
+   "t0_utc": "2026/10/07-07:40:58",
+   "t_us": 1791358861855750
+  },
+  {
+   "plan_origin_offset_s": -0.006,
+   "step": "endpoint_a_ready",
+   "t_us": 1791358868002317
+  },
+  {
+   "step": "endpoint_b_started",
+   "t_us": 1791358868003551
+  },
+  {
+   "step": "traffic_phase_end",
+   "t_us": 1791358978000286
+  },
+  {
+   "duration_s": 0.0,
+   "pending": 0,
+   "step": "drain_end",
+   "t_us": 1791358978008072
+  },
+  {
+   "a": 0,
+   "b": 0,
+   "step": "endpoints_stopped",
+   "t_us": 1791358978043651
+  },
+  {
+   "status": 0,
+   "step": "nodes_stopped",
+   "t_us": 1791359006588232
+  },
+  {
+   "step": "emulator_stopped",
+   "t_us": 1791359006652621
+  }
+ ],
+ "stop_clean_without_fallback": true,
+ "stop_nodes_s": 27.5,
+ "t0_unix_s": 1791358858.0,
+ "t0_utc": "2026/10/07-07:40:58",
+ "title": "Unscheduled blackouts and random loss: LTP recovery"
+}

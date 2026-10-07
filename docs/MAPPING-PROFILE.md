@@ -137,5 +137,28 @@ lifetime expiry, not TTL expiry).
 
 ## 7. Recorded measurement
 
-The S4 values of the recorded run are in REPORT.md, section S4 (criteria
-S4-5 to S4-9 and S4-13 to S4-15, and the latency table per priority).
+S4 of run F, the run in `results/` (fresh clone of `25ffe97`, 2026-10-07
+07:20 UTC; REPORT.md, section S4). Rover-Gateway contact rate 4000 bytes/s;
+emulator 4400 bytes/s with a 65536-byte queue; 40 BULK envelopes of 3000
+bytes queued from 2 s; five envelopes each of CRITICAL, HIGH, NORMAL and LOW
+from 6 s, 3 s apart. Latency is receipt at Earth minus the envelope
+Timestamp; the propagation alone is 1.55 s.
+
+| Priority (ION queue) | Envelopes | Latency min / median / max (s) |
+|---|---|---|
+| CRITICAL (urgent) | 5 | 2.096 / 2.388 / 2.663 |
+| HIGH (urgent) | 5 | 2.593 / 2.645 / 2.917 |
+| NORMAL (standard) | 5 | 2.132 / 2.181 / 2.457 |
+| LOW (bulk) | 5 | 16.764 / 22.694 / 28.620 |
+| BULK (bulk) | 40 | 2.302 / 16.968 / 31.856 |
+
+Every CRITICAL, HIGH and NORMAL envelope (and the two PING replies, HIGH)
+arrived before 18 to 33 BULK envelopes that had been sent before it (S4-7);
+no LOW envelope arrived before a BULK envelope sent before it (S4-9); the
+emulator queue never overflowed (S4-10) and held no datagram longer than
+1.668 s (S4-15), while BULK envelopes took up to 31.856 s, so the backlog
+waited in ION, not in the emulated link.
+
+Run G (`runs/run-G/`, a second fresh clone of `25ffe97`, 07:35 UTC) gave
+the same picture: every range above within 0.05 s of run F's, except one
+HIGH envelope that took 1.671 s (HIGH 1.671 / 2.146 / 2.920 s).

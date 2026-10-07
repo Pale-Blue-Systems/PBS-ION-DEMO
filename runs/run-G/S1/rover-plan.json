@@ -1,0 +1,60 @@
+{
+ "items": [
+  {
+   "at_s": 2.0,
+   "count": 6,
+   "interval_s": 5.0,
+   "priority": 0,
+   "frame": "event",
+   "text": "EVT MOTOR_STALL WHEEL=3",
+   "label": "S1-CRITICAL"
+  },
+  {
+   "at_s": 2.1,
+   "count": 6,
+   "interval_s": 5.0,
+   "priority": 1,
+   "text": "TLM POWER BATT=27.9V SOC=81%",
+   "label": "S1-HIGH"
+  },
+  {
+   "at_s": 2.2,
+   "count": 6,
+   "interval_s": 5.0,
+   "priority": 2,
+   "text": "TLM THERMAL CPU=-12.5C",
+   "label": "S1-NORMAL"
+  },
+  {
+   "at_s": 2.3,
+   "count": 6,
+   "interval_s": 5.0,
+   "priority": 3,
+   "text": "TLM ENV DUST=0.02",
+   "label": "S1-LOW"
+  },
+  {
+   "at_s": 2.4,
+   "count": 6,
+   "interval_s": 5.0,
+   "priority": 4,
+   "text": "TLM IMAGE-CHUNK",
+   "label": "S1-BULK"
+  },
+  {
+   "at_s": 15.0,
+   "priority": 4,
+   "text": "TLM IMAGE-CHUNK NAVCAM-0001",
+   "payload_bytes": 20000,
+   "label": "S1-BULK-20000"
+  },
+  {
+   "at_s": 20.0,
+   "priority": 2,
+   "payload_bytes": 0,
+   "ack_req": true,
+   "label": "S1-HEADER-ONLY"
+  }
+ ],
+ "description": "Endpoint A plan for scenario S1"
+}

@@ -42,6 +42,18 @@
    "text": "TLM S7 BULK MAX",
    "payload_bytes": 65536,
    "label": "S7-P4-65536"
+  },
+  {
+   "at_s": 7.0,
+   "priority": 2,
+   "text": "TLM S7 WITH UNKNOWN FRAME",
+   "extra_frames": [
+    {
+     "type": "0x80",
+     "hex": "00ff00ff"
+    }
+   ],
+   "label": "S7-UNKNOWN-FRAME"
   }
  ],
  "description": "Endpoint A plan for scenario S7"

@@ -1,0 +1,68 @@
+{
+ "id": "S6",
+ "title": "Authenticated commands: tamper, replay, wrong key, expiry, authorization",
+ "summary": "All links up. Mission Control (Endpoint B) sends 25 commands 1.5 s apart, signed with the demo TEST KEYS (Ed25519 suite 0xFF02 unless noted, HMAC-SHA-256 suite 0xFF01 where noted): valid commands, commands altered after signing (command byte, priority, TTL, Timestamp, security_sequence, Authority Context, CRC, MUX frame_count lowered to 1 and to 0), byte-identical replays, commands signed with keys the rover does not hold, an unknown key_id, an expired command, unauthorized and authorized roles, a wrong policy epoch, a validly signed command naming an authority the rover policy does not know, an unsigned command, a command without Authority Context, and a protected command carrying an unknown frame type. The rover (Endpoint A) verifies each one per PBS-SEC-B-01 and PBS-AUTH-01 and logs its disposition; tampering is applied by Endpoint B before the envelope is handed to ION and stands for modification in transit.",
+ "duration_s": 44,
+ "seed": 6,
+ "links": {},
+ "contacts": {},
+ "outages": [],
+ "rover": {
+  "args": ["--reply-ping"],
+  "plan": {
+   "items": [
+     {"at_s": 2.0, "count": 7, "interval_s": 5.0, "priority": 2, "text": "TLM THERMAL", "label": "S6-TLM"}
+    ]
+  }
+ },
+ "earth": {
+  "plan": [
+    {"at_s": 2.0, "kind": "command", "command": "DRIVE 10", "label": "S6-01-VALID-ED25519", "note": "ACCEPT OK"},
+    {"at_s": 3.5, "kind": "command", "command": "SET_HEATER ON", "suite": "hmac", "label": "S6-02-VALID-HMAC", "note": "ACCEPT OK"},
+    {"at_s": 5.0, "kind": "command", "command": "DRIVE 10", "tamper": "command", "label": "S6-03-TAMPER-COMMAND", "note": "REJECT SEC_AUTH_FAIL"},
+    {"at_s": 6.5, "kind": "command", "command": "DRIVE 10", "tamper": "priority", "label": "S6-04-TAMPER-PRIORITY", "note": "REJECT SEC_AUTH_FAIL"},
+    {"at_s": 8.0, "kind": "command", "command": "DRIVE 10", "tamper": "ttl", "label": "S6-05-TAMPER-TTL", "note": "REJECT SEC_AUTH_FAIL"},
+    {"at_s": 9.5, "kind": "command", "command": "DRIVE 10", "tamper": "timestamp", "label": "S6-06-TAMPER-TIMESTAMP", "note": "REJECT SEC_AUTH_FAIL"},
+    {"at_s": 11.0, "kind": "command", "command": "DRIVE 10", "tamper": "security_sequence", "label": "S6-07-TAMPER-SECSEQ", "note": "REJECT SEC_AUTH_FAIL"},
+    {"at_s": 12.5, "kind": "command", "command": "DRIVE 10", "tamper": "authority", "label": "S6-08-TAMPER-AUTHORITY", "note": "REJECT SEC_AUTH_FAIL"},
+    {"at_s": 14.0, "kind": "replay", "replay_of": "S6-01-VALID-ED25519", "label": "S6-09-REPLAY-ED25519", "note": "REJECT SEC_REPLAY"},
+    {"at_s": 15.5, "kind": "replay", "replay_of": "S6-02-VALID-HMAC", "label": "S6-10-REPLAY-HMAC", "note": "REJECT SEC_REPLAY"},
+    {"at_s": 17.0, "kind": "command", "command": "DRIVE 10", "signing_key": "TEST-ED25519-ROGUE", "label": "S6-11-WRONG-KEY-ED25519", "note": "REJECT SEC_AUTH_FAIL"},
+    {"at_s": 18.5, "kind": "command", "command": "SET_HEATER OFF", "suite": "hmac", "signing_key": "TEST-HMAC-ROGUE", "label": "S6-12-WRONG-KEY-HMAC", "note": "REJECT SEC_AUTH_FAIL"},
+    {"at_s": 20.0, "kind": "command", "command": "DRIVE 10", "key_id": "TEST-ED25519-ROGUE", "label": "S6-13-UNKNOWN-KEY-ID", "note": "REJECT SEC_KEY_UNKNOWN"},
+    {"at_s": 21.5, "kind": "command", "command": "DRIVE 10", "ttl": 1, "lifetime_s": 60, "label": "S6-14-EXPIRED", "note": "REJECT TTL_EXPIRED"},
+    {"at_s": 23.0, "kind": "command", "command": "DRIVE 10", "role": "SCIENCE-OPS", "label": "S6-15-ROLE-NOT-AUTHORIZED", "note": "REJECT AUTHZ_DENIED"},
+    {"at_s": 24.5, "kind": "command", "command": "CAPTURE_IMAGE NAVCAM", "role": "SCIENCE-OPS", "label": "S6-16-ROLE-AUTHORIZED", "note": "ACCEPT OK"},
+    {"at_s": 26.0, "kind": "command", "command": "DRIVE 10", "policy_epoch": 2, "label": "S6-17-WRONG-POLICY-EPOCH", "note": "REJECT AUTHZ_DENIED"},
+    {"at_s": 27.5, "kind": "command", "command": "DRIVE 10", "unsigned": true, "label": "S6-18-UNSIGNED", "note": "REJECT SEC_MISSING"},
+    {"at_s": 29.0, "kind": "command", "command": "DRIVE 10", "omit_auth_ctx": true, "label": "S6-19-NO-AUTHORITY-CONTEXT", "note": "REJECT AUTH_CTX_MISSING"},
+    {"at_s": 30.5, "kind": "command", "command": "DRIVE 10", "tamper": "crc", "label": "S6-20-BAD-CRC", "note": "REJECT CRC"},
+    {"at_s": 32.0, "kind": "command", "command": "PING S6", "label": "S6-21-VALID-AFTER-REJECTS", "note": "ACCEPT OK"},
+    {"at_s": 33.5, "kind": "command", "command": "SET_MODE SAFE", "extra_frames": [{"type": "0x80", "text": "OPAQUE APPLICATION DATA"}], "label": "S6-22-UNKNOWN-FRAME-PROTECTED", "note": "ACCEPT OK"},
+    {"at_s": 35.0, "kind": "command", "command": "DRIVE 10", "tamper": "frame_count", "label": "S6-23-TAMPER-FRAME-COUNT-1", "note": "REJECT SEC_MISSING"},
+    {"at_s": 36.5, "kind": "command", "command": "DRIVE 10", "tamper": "frame_count_0", "label": "S6-24-TAMPER-FRAME-COUNT-0", "note": "REJECT SEC_MISSING"},
+    {"at_s": 38.0, "kind": "command", "command": "DRIVE 10", "authority_id": "PBS-DEMO-OTHER", "label": "S6-25-AUTHORITY-NOT-AUTHORIZED", "note": "REJECT AUTHZ_DENIED"}
+   ]
+ },
+ "probes": [],
+ "criteria": [
+   {"id": "S6-1", "check": "expect_by_label", "expect": {"S6-01-VALID-ED25519": "ACCEPT OK", "S6-02-VALID-HMAC": "ACCEPT OK", "S6-03-TAMPER-COMMAND": "REJECT SEC_AUTH_FAIL", "S6-04-TAMPER-PRIORITY": "REJECT SEC_AUTH_FAIL", "S6-05-TAMPER-TTL": "REJECT SEC_AUTH_FAIL", "S6-06-TAMPER-TIMESTAMP": "REJECT SEC_AUTH_FAIL", "S6-07-TAMPER-SECSEQ": "REJECT SEC_AUTH_FAIL", "S6-08-TAMPER-AUTHORITY": "REJECT SEC_AUTH_FAIL", "S6-09-REPLAY-ED25519": "REJECT SEC_REPLAY", "S6-10-REPLAY-HMAC": "REJECT SEC_REPLAY", "S6-11-WRONG-KEY-ED25519": "REJECT SEC_AUTH_FAIL", "S6-12-WRONG-KEY-HMAC": "REJECT SEC_AUTH_FAIL", "S6-13-UNKNOWN-KEY-ID": "REJECT SEC_KEY_UNKNOWN", "S6-14-EXPIRED": "REJECT TTL_EXPIRED", "S6-15-ROLE-NOT-AUTHORIZED": "REJECT AUTHZ_DENIED", "S6-16-ROLE-AUTHORIZED": "ACCEPT OK", "S6-17-WRONG-POLICY-EPOCH": "REJECT AUTHZ_DENIED", "S6-18-UNSIGNED": "REJECT SEC_MISSING", "S6-19-NO-AUTHORITY-CONTEXT": "REJECT AUTH_CTX_MISSING", "S6-20-BAD-CRC": "REJECT CRC", "S6-21-VALID-AFTER-REJECTS": "ACCEPT OK", "S6-22-UNKNOWN-FRAME-PROTECTED": "ACCEPT OK", "S6-23-TAMPER-FRAME-COUNT-1": "REJECT SEC_MISSING", "S6-24-TAMPER-FRAME-COUNT-0": "REJECT SEC_MISSING", "S6-25-AUTHORITY-NOT-AUTHORIZED": "REJECT AUTHZ_DENIED"}, "text": "Each command gets the expected disposition at the rover"},
+   {"id": "S6-2", "check": "exec", "endpoint": "A", "operations": ["DRIVE", "SET_HEATER", "CAPTURE_IMAGE", "PING", "SET_MODE"], "text": "Only the five accepted commands are executed (logged), in order"},
+   {"id": "S6-3", "check": "delivery", "select": {"dir": "B->A"}, "min_count": 25, "text": "Every command envelope handed to ION is received at the rover"},
+   {"id": "S6-4", "check": "byte_identical", "select": {"dir": "B->A"}, "text": "The rover receives the bytes Endpoint B handed to ION (tampered bytes included)"},
+   {"id": "S6-5", "check": "no_unmatched", "text": "Every recv record (audit line) matches an envelope that was sent; no duplicates"},
+   {"id": "S6-6", "check": "recv_result", "select": {"dir": "A->B"}, "expect": "ACCEPT OK", "min_count": 8, "text": "Rover telemetry and the PING reply continue to arrive and are accepted"},
+   {"id": "S6-7", "check": "ttl_respected", "text": "No receiver accepts an envelope older than its TTL"},
+   {"id": "S6-8", "check": "accepted_after_rejects", "label": "S6-21-VALID-AFTER-REJECTS", "expect": "ACCEPT OK", "min_rejects": 1, "text": "A valid command sent after the rejected ones is accepted; the measured value gives the number of envelopes the rover rejected before it"}
+  ],
+ "conformance": [
+   {"ref": "PBS-C02-T006", "how": "modifications tested, each rejected: command byte, priority, TTL, Timestamp, security_sequence and Authority Context altered after signing (SEC_AUTH_FAIL, S6-03 to S6-08); CRC32 field altered (CRC, S6-20); MUX frame_count lowered to 1 and to 0 (SEC_MISSING, S6-23, S6-24); signatures by keys the rover does not hold (SEC_AUTH_FAIL, S6-11, S6-12)"},
+   {"ref": "PBS-C02-T007", "how": "byte-identical replays rejected with SEC_REPLAY (S6-09, S6-10)"},
+   {"ref": "PBS-C02-T008", "how": "unauthorized role (S6-15), wrong policy epoch (S6-17) and an authority the rover policy does not know in a validly signed command (S6-25) rejected with AUTHZ_DENIED; authorized role accepted (S6-16)"},
+   {"ref": "PBS-C02-T004", "how": "expired command rejected with TTL_EXPIRED before authentication (S6-14)"},
+   {"ref": "PBS-C02-T014", "how": "unknown frame type inside a protected command skipped and covered by authentication (S6-22)"},
+   {"ref": "PBS-C02-T015", "how": "one recv audit record per command with reason code, one exec record per executed command (S6-2, S6-5)"},
+   {"ref": "PBS-CONFORMANCE-01 9", "how": "a valid command sent after the rejected ones is accepted; S6-8 gives the number of rejections before it, counted from the rover's log"},
+   {"ref": "PBS-SECB-REQ-001 to PBS-SECB-REQ-007; PBS-AUTH-REQ-002, PBS-AUTH-REQ-003, PBS-AUTH-REQ-005, PBS-AUTH-REQ-006; PBS-PRIO-01 10", "how": "S6-1, S6-2, S6-5"}
+  ]
+}

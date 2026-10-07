@@ -1,0 +1,150 @@
+{
+ "generated_utc": "2026-10-07T07:49:33.545234+00:00",
+ "git": {
+  "commit": "25ffe97aa464007464b889685b500191c2e49f7e",
+  "worktree_modified": false
+ },
+ "ion": {
+  "commit": "568df887cb9f18aa8ec013b1a566d83215e499ae",
+  "tag": "ion-open-source-4.2.0"
+ },
+ "host": {
+  "clock_source": "tsc",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "nproc": 4,
+  "ntp_synchronized": null,
+  "platform": "Linux-6.18.44-fc-v77-x86_64-with-glibc2.39",
+  "python": "3.13.16"
+ },
+ "test_vectors_sha256": "51e09856fa3c59130aa01f9c5d0e661a26cd19bda2aec74c45f8084bffd69b25",
+ "scenarios": [
+  {
+   "scenario": "S1",
+   "title": "Nominal traffic: rover telemetry at five priorities; signed commands, signed telemetry and a heartbeat from Earth; PING replies",
+   "passed": true,
+   "criteria_passed": 13,
+   "criteria_total": 13,
+   "envelopes_built": 46,
+   "envelopes_sent": 46,
+   "envelopes_received": 46,
+   "byte_identical": 46,
+   "latency_median_s": 1.5781855,
+   "latency_max_s": 1.617592,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S2",
+   "title": "Scheduled outages in the contact plan: storage at rover, relay and Earth",
+   "passed": true,
+   "criteria_passed": 15,
+   "criteria_total": 15,
+   "envelopes_built": 127,
+   "envelopes_sent": 127,
+   "envelopes_received": 127,
+   "byte_identical": 127,
+   "latency_median_s": 2.009721,
+   "latency_max_s": 29.427559,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S3",
+   "title": "Unscheduled blackouts and random loss: LTP recovery",
+   "passed": true,
+   "criteria_passed": 9,
+   "criteria_total": 9,
+   "envelopes_built": 119,
+   "envelopes_sent": 119,
+   "envelopes_received": 119,
+   "byte_identical": 119,
+   "latency_median_s": 1.583032,
+   "latency_max_s": 29.917781,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S4",
+   "title": "Priority under a rate-limited link",
+   "passed": true,
+   "criteria_passed": 12,
+   "criteria_total": 12,
+   "envelopes_built": 64,
+   "envelopes_sent": 64,
+   "envelopes_received": 64,
+   "byte_identical": 64,
+   "latency_median_s": 11.5535455,
+   "latency_max_s": 31.905184,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S5",
+   "title": "Expiry: bundle lifetime during an outage, and receivers rejecting expired envelopes",
+   "passed": true,
+   "criteria_passed": 20,
+   "criteria_total": 20,
+   "envelopes_built": 37,
+   "envelopes_sent": 33,
+   "envelopes_received": 20,
+   "byte_identical": 20,
+   "latency_median_s": 1.6286675,
+   "latency_max_s": 30.184482,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S6",
+   "title": "Authenticated commands: tamper, replay, wrong key, expiry, authorization",
+   "passed": true,
+   "criteria_passed": 8,
+   "criteria_total": 8,
+   "envelopes_built": 33,
+   "envelopes_sent": 33,
+   "envelopes_received": 33,
+   "byte_identical": 33,
+   "latency_median_s": 1.58095,
+   "latency_max_s": 13.579757,
+   "stop_clean_without_fallback": true
+  },
+  {
+   "scenario": "S7",
+   "title": "Cross-implementation: each endpoint parses the other's envelopes; identical inputs give identical bytes",
+   "passed": true,
+   "criteria_passed": 9,
+   "criteria_total": 9,
+   "envelopes_built": 15,
+   "envelopes_sent": 15,
+   "envelopes_received": 15,
+   "byte_identical": 15,
+   "latency_median_s": 1.585094,
+   "latency_max_s": 1.657934,
+   "stop_clean_without_fallback": true
+  }
+ ],
+ "selfchecks": [
+  {
+   "name": "emulator-tests",
+   "exit": 0,
+   "duration_s": 0.721,
+   "command": "/home/user/pbs-ion-demo-runs/run-G/build/venv-demo/bin/python emulator/test_linkemu.py",
+   "last_line": "OK"
+  },
+  {
+   "name": "scenario-tests",
+   "exit": 0,
+   "duration_s": 0.22,
+   "command": "/home/user/pbs-ion-demo-runs/run-G/build/venv-demo/bin/python scenarios/test_scenarios.py",
+   "last_line": "OK"
+  },
+  {
+   "name": "endpoint-b-tests",
+   "exit": 0,
+   "duration_s": 1.352,
+   "command": "make -s -C endpoint-c BUILD=/home/user/pbs-ion-demo-runs/run-G/build/endpoint-c test",
+   "last_line": "  pbs_tool plan s6_auth.jsonl: 16 items"
+  },
+  {
+   "name": "endpoint-a-tests",
+   "exit": 0,
+   "duration_s": 2.332,
+   "command": "endpoint-python/run_tests.sh",
+   "last_line": "318 passed, 1 skipped in 1.62s"
+  }
+ ]
+}

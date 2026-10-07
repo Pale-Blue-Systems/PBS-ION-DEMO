@@ -1,10 +1,10 @@
 {
  "tool": "endpoint-python vectors",
- "vectors": "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/docs/test-vectors.json",
- "vectors_sha256": "789ac1b4a02f38e8adf3d9bc1eeabe4d0bb7abc74a95b3dd8439633bcb3885ff",
+ "vectors": "/home/user/pbs-ion-demo-runs/run-F/docs/test-vectors.json",
+ "vectors_sha256": "51e09856fa3c59130aa01f9c5d0e661a26cd19bda2aec74c45f8084bffd69b25",
  "summary": {
-  "checks": 237,
-  "passed": 237,
+  "checks": 253,
+  "passed": 253,
   "failed": 0
  },
  "failures": [],
@@ -451,7 +451,7 @@
    "id": "RX-20",
    "check": "receive",
    "ok": true,
-   "detail": "ACCEPT/OK"
+   "detail": "REJECT/SEC_MISSING"
   },
   {
    "id": "RX-21",
@@ -464,6 +464,12 @@
    "check": "receive",
    "ok": true,
    "detail": "ACCEPT/OK"
+  },
+  {
+   "id": "RX-23",
+   "check": "receive",
+   "ok": true,
+   "detail": "REJECT/SEC_MISSING"
   },
   {
    "id": "LT-01",
@@ -1036,6 +1042,18 @@
    "detail": ""
   },
   {
+   "id": "CMD-19",
+   "check": "header",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-20",
+   "check": "header",
+   "ok": true,
+   "detail": ""
+  },
+  {
    "id": "CMD-W05",
    "check": "build",
    "ok": true,
@@ -1247,6 +1265,60 @@
   },
   {
    "id": "CMD-W00",
+   "check": "security_frame",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-21",
+   "check": "build",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-21",
+   "check": "header",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-21",
+   "check": "mux",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-22",
+   "check": "build",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-22",
+   "check": "auth_input",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-22",
+   "check": "auth_data",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-22",
+   "check": "header",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-22",
+   "check": "mux",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "id": "CMD-22",
    "check": "security_frame",
    "ok": true,
    "detail": ""
@@ -1384,6 +1456,30 @@
    "detail": "REJECT/SEC_MALFORMED"
   },
   {
+   "id": "SB-22/CMD-19",
+   "check": "receive",
+   "ok": true,
+   "detail": "REJECT/SEC_MISSING"
+  },
+  {
+   "id": "SB-23/CMD-20",
+   "check": "receive",
+   "ok": true,
+   "detail": "REJECT/SEC_MISSING"
+  },
+  {
+   "id": "SB-24/CMD-21",
+   "check": "receive",
+   "ok": true,
+   "detail": "REJECT/SEC_MISSING"
+  },
+  {
+   "id": "SB-25/CMD-22",
+   "check": "receive",
+   "ok": true,
+   "detail": "ACCEPT/OK"
+  },
+  {
    "id": "SB-21/CMD-W05",
    "check": "receive",
    "ok": true,
@@ -1466,6 +1562,8 @@
   "CMD-W70": "100100000010000045617274682d4d43430000000000000000064748462040000000008c0000001e36c59993010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000046544553542d454432353531392d30310e0028f52f8bc9d1c037dfe33d45db0b66f4e5f859ee59666eeb86f0e125e7b9fbfeb96b4b8b1bc351694b2459adab8654d7f15426b0d648ab1abe7b192ee407",
   "CMD-W07": "100100000011000045617274682d4d43430000000000000000064748462040000000008c0000001e784c923a010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000007544553542d454432353531392d3031c8d4c4c3852e03a1620062a04ae2e73c64fce23048ee3fdd0169d38ed1d21d22adcc670a6e836971c9893fc52c1971997285220d5d47a495ada09b30ecd9760c",
   "CMD-W06": "100100000012000045617274682d4d43430000000000000000064748462040000000008c0000001eabd78ec1010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000006544553542d454432353531392d3031cde291b8d1c7d84ef00998efa28624413c30d25401bdc465af3e396a0eb21dd5a5b19ef946aa0be49662906b57cb2b3485aa25addbce798798749ea681ae040d",
-  "CMD-W00": "100100000013000045617274682d4d43430000000000000000064748462040000000008c0000001ee55e8568010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000000544553542d454432353531392d3031eb59ac5010db5e67ea845404cc053db4800daf2cde85ada1f36e063d39b4308eee3a8e863bc1e846e90ece68167eba38f5a91cf88ab9fdf01301e9cd0db5a40a"
+  "CMD-W00": "100100000013000045617274682d4d43430000000000000000064748462040000000008c0000001ee55e8568010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000000544553542d454432353531392d3031eb59ac5010db5e67ea845404cc053db4800daf2cde85ada1f36e063d39b4308eee3a8e863bc1e846e90ece68167eba38f5a91cf88ab9fdf01301e9cd0db5a40a",
+  "CMD-21": "100200000014000045617274682d4d4343000000000000000006474846204000000000170000003ced650afc0101010012544c4d204d434320434c4f434b2053594e43",
+  "CMD-22": "100200000015000045617274682d4d4343000000000000000006474846204000000000790000003c374d5b630102010012544c4d204d434320434c4f434b2053594e430a005f01ff02010f0000400000000000000001544553542d454432353531392d3031e9e9c0d40f7f0758952bc85bb230017bf8e76e7f0203d33dd71c2db6c59488eca7352ba71a82cca7cb60d716adae8cfcadfd9de4ba1bfc89cd85f7c02fce3909"
  }
 }

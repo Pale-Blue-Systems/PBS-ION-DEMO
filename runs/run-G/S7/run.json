@@ -1,0 +1,287 @@
+{
+ "drain": {
+  "complete": true,
+  "duration_s": 0.0,
+  "end_scenario_s": 25.0,
+  "end_unix_s": 1791359337.0003784,
+  "max_s": 30,
+  "pending": []
+ },
+ "duration_s": 25,
+ "endpoint_a": {
+  "argv": [
+   "/home/user/pbs-ion-demo-runs/run-G/endpoint-python/bin/rover",
+   "--log",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S7/endpoint-a.jsonl",
+   "--scenario",
+   "S7",
+   "--plan",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S7/rover-plan.json",
+   "--duration",
+   "75",
+   "--ion-node-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion/rover",
+   "--ion-node-list-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion",
+   "--ready-file",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S7/rover.ready",
+   "--reply-ping",
+   "--log-hex-max",
+   "65580"
+  ],
+  "launch_unix_s": 1791359311.9001548,
+  "plan_origin_offset_s": 0.040358,
+  "plan_origin_unix_s": 1791359312.0403578,
+  "startup_s": 0.140203
+ },
+ "endpoint_b": {
+  "argv": [
+   "/home/user/pbs-ion-demo-runs/run-G/build/endpoint-c/pbs_earth",
+   "run",
+   "--plan",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S7/earth-plan.jsonl",
+   "--log",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S7/endpoint-b.jsonl",
+   "--scenario",
+   "S7",
+   "--t0-us",
+   "1791359312000000",
+   "--duration",
+   "75",
+   "--node-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion/earth",
+   "--log-hex-max",
+   "65580"
+  ],
+  "launch_unix_s": 1791359312.0437155,
+  "plan_origin_unix_s": 1791359312.0
+ },
+ "exit": {
+  "emulator": 0,
+  "endpoint-a": 0,
+  "endpoint-b": 0,
+  "stop_nodes": 0
+ },
+ "finished_utc": "2026-10-07T07:49:25.332267+00:00",
+ "git": {
+  "commit": "25ffe97aa464007464b889685b500191c2e49f7e",
+  "worktree_modified": false
+ },
+ "host": {
+  "clock_source": "tsc",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "nproc": 4,
+  "ntp_synchronized": null,
+  "platform": "Linux-6.18.44-fc-v77-x86_64-with-glibc2.39",
+  "python": "3.13.16"
+ },
+ "ion": {
+  "commit": "568df887cb9f18aa8ec013b1a566d83215e499ae",
+  "tag": "ion-open-source-4.2.0"
+ },
+ "lead_s": 10,
+ "origin_unix_s": 1791359312.0,
+ "origin_us": 1791359312000000,
+ "post": [
+  {
+   "argv": [
+    "/home/user/pbs-ion-demo-runs/run-G/endpoint-python/bin/tool",
+    "vectors",
+    "--out",
+    "/home/user/pbs-ion-demo-runs/run-G/results/S7/a-vectors.json"
+   ],
+   "duration_s": 0.163,
+   "exit": 0,
+   "file": "a-vectors.out",
+   "name": "a-vectors"
+  },
+  {
+   "argv": [
+    "/home/user/pbs-ion-demo-runs/run-G/build/venv-demo/bin/python",
+    "/home/user/pbs-ion-demo-runs/run-G/scenarios/s7_compare.py",
+    "--vectors",
+    "/home/user/pbs-ion-demo-runs/run-G/docs/test-vectors.json",
+    "--a-vectors",
+    "/home/user/pbs-ion-demo-runs/run-G/results/S7/a-vectors.json",
+    "--earth-tool",
+    "/home/user/pbs-ion-demo-runs/run-G/build/endpoint-c/pbs_tool",
+    "--out",
+    "/home/user/pbs-ion-demo-runs/run-G/results/S7/vector-comparison.json"
+   ],
+   "duration_s": 0.2,
+   "exit": 0,
+   "file": "vector-comparison.out",
+   "name": "vector-comparison"
+  },
+  {
+   "argv": [
+    "/home/user/pbs-ion-demo-runs/run-G/endpoint-python/bin/tool",
+    "crosscheck",
+    "/home/user/pbs-ion-demo-runs/run-G/results/S7/endpoint-b.jsonl",
+    "--own-log",
+    "/home/user/pbs-ion-demo-runs/run-G/results/S7/endpoint-a.jsonl"
+   ],
+   "duration_s": 0.149,
+   "exit": 0,
+   "file": "a-crosscheck.out",
+   "name": "a-crosscheck"
+  },
+  {
+   "argv": [
+    "/home/user/pbs-ion-demo-runs/run-G/build/endpoint-c/pbs_tool",
+    "crosscheck",
+    "/home/user/pbs-ion-demo-runs/run-G/results/S7/endpoint-a.jsonl",
+    "--own-log",
+    "/home/user/pbs-ion-demo-runs/run-G/results/S7/endpoint-b.jsonl",
+    "--out",
+    "/home/user/pbs-ion-demo-runs/run-G/results/S7/b-crosscheck.jsonl"
+   ],
+   "duration_s": 0.008,
+   "exit": 0,
+   "file": "b-crosscheck.out",
+   "name": "b-crosscheck"
+  }
+ ],
+ "probes": [
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-bpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791359337043579
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-ltpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791359337048326
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-bpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791359337052913
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-ltpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791359337057559
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-bpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791359337061977
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-ltpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791359337066430
+  }
+ ],
+ "scenario": "S7",
+ "scenario_file": "scenarios/S7.json",
+ "started_utc": "2026-10-07T07:48:20.729553+00:00",
+ "steps": [
+  {
+   "step": "emulator_ready",
+   "t_us": 1791359300795909
+  },
+  {
+   "step": "nodes_started",
+   "t0_utc": "2026/10/07-07:48:22",
+   "t_us": 1791359305688587
+  },
+  {
+   "plan_origin_offset_s": 0.04,
+   "step": "endpoint_a_ready",
+   "t_us": 1791359312042781
+  },
+  {
+   "step": "endpoint_b_started",
+   "t_us": 1791359312043718
+  },
+  {
+   "step": "traffic_phase_end",
+   "t_us": 1791359337000213
+  },
+  {
+   "duration_s": 0.0,
+   "pending": 0,
+   "step": "drain_end",
+   "t_us": 1791359337003000
+  },
+  {
+   "a": 0,
+   "b": 0,
+   "step": "endpoints_stopped",
+   "t_us": 1791359337043445
+  },
+  {
+   "status": 0,
+   "step": "nodes_stopped",
+   "t_us": 1791359364778869
+  },
+  {
+   "step": "emulator_stopped",
+   "t_us": 1791359364812146
+  },
+  {
+   "command": "a-vectors",
+   "status": 0,
+   "step": "post",
+   "t_us": 1791359364975698
+  },
+  {
+   "command": "vector-comparison",
+   "status": 0,
+   "step": "post",
+   "t_us": 1791359365175499
+  },
+  {
+   "command": "a-crosscheck",
+   "status": 0,
+   "step": "post",
+   "t_us": 1791359365324261
+  },
+  {
+   "command": "b-crosscheck",
+   "status": 0,
+   "step": "post",
+   "t_us": 1791359365332161
+  }
+ ],
+ "stop_clean_without_fallback": true,
+ "stop_nodes_s": 26.7,
+ "t0_unix_s": 1791359302.0,
+ "t0_utc": "2026/10/07-07:48:22",
+ "title": "Cross-implementation: each endpoint parses the other's envelopes; identical inputs give identical bytes"
+}

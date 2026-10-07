@@ -49,7 +49,7 @@
    "text": "The emulator dropped datagrams at random on every link direction",
    "check": "link_counter",
    "passed": true,
-   "measured": "drop_loss total 53 (rover-gateway=16, gateway-rover=8, gateway-earth=24, earth-gateway=5)",
+   "measured": "drop_loss total 56 (rover-gateway=17, gateway-rover=8, gateway-earth=26, earth-gateway=5)",
    "details": [],
    "informative": false
   },
@@ -58,7 +58,7 @@
    "text": "The emulator dropped datagrams in the unscheduled blackouts on every link direction",
    "check": "link_counter",
    "passed": true,
-   "measured": "drop_blackout total 84 (gateway-earth=50, earth-gateway=19, rover-gateway=13, gateway-rover=2)",
+   "measured": "drop_blackout total 84 (gateway-earth=50, earth-gateway=19, rover-gateway=12, gateway-rover=3)",
    "details": [],
    "informative": false
   },
@@ -67,7 +67,7 @@
    "text": "LTP retransmitted data segments (same session, offset and length seen again by the emulator)",
    "check": "link_counter",
    "passed": true,
-   "measured": "ltp_data_retransmissions total 85 (rover-gateway=20, gateway-rover=2, gateway-earth=57, earth-gateway=6)",
+   "measured": "ltp_data_retransmissions total 91 (rover-gateway=22, gateway-rover=2, gateway-earth=59, earth-gateway=8)",
    "details": [],
    "informative": false
   },
@@ -76,9 +76,9 @@
    "text": "Every recv record is a delivery of an envelope that was sent (byte-identical); a repeated delivery passes only when it is the same bundle as the first delivery (same creation timestamp) and ION re-forwarded at least as many bundles (bpstats rfw)",
    "check": "no_unknown",
    "passed": true,
-   "measured": "120 recv records; 1 further deliveries of an envelope already received; 0 unknown; ION re-forwarded 3 bundles (bpstats rfw, all nodes); 0 further deliveries not the same bundle",
+   "measured": "120 recv records; 1 further deliveries of an envelope already received; 0 unknown; ION re-forwarded 4 bundles (bpstats rfw, all nodes); 0 further deliveries not the same bundle",
    "details": [
-    "duplicate delivery: receiver B: Rover-Alpha seq 90 ACCEPT OK, bundle created 844667526021 count 89, at 92.384 s"
+    "duplicate delivery: receiver B: Rover-Alpha seq 90 ACCEPT OK, bundle created 844673265997 count 89, at 91.194 s"
    ],
    "informative": false
   },
@@ -96,7 +96,7 @@
    "text": "Latency of all envelopes (informative)",
    "check": "latency",
    "passed": true,
-   "measured": "n=119 min 1.568 s median 1.575 s max 22.165 s",
+   "measured": "n=119 min 1.571 s median 1.581 s max 27.484 s",
    "details": [],
    "informative": true
   },
@@ -105,7 +105,7 @@
    "text": "Checkpoints the Gateway resent to Earth (informative)",
    "check": "ltp_counter",
    "passed": true,
-   "measured": "gateway node, span to earth: ckpt_re_xmit = 51 (ltpstats -a)",
+   "measured": "gateway node, span to earth: ckpt_re_xmit = 53 (ltpstats -a)",
    "details": [],
    "informative": true
   },
@@ -114,7 +114,7 @@
    "text": "Checkpoints the rover resent to the Gateway (informative)",
    "check": "ltp_counter",
    "passed": true,
-   "measured": "rover node, span to gateway: ckpt_re_xmit = 18 (ltpstats -a)",
+   "measured": "rover node, span to gateway: ckpt_re_xmit = 20 (ltpstats -a)",
    "details": [],
    "informative": true
   },
@@ -133,6 +133,15 @@
    "check": "ion_counter",
    "passed": true,
    "measured": "gateway node bpstats rfw: 3 bundles",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-15",
+   "text": "Last receipt and its margin to the end of the traffic phase (110 s); receipts during the drain (informative)",
+   "check": "last_receipt",
+   "passed": true,
+   "measured": "last receipt at 95.199 s; traffic phase ends at 110 s (margin 14.801 s); 0 receipts after it; drain ended at 110.0 s, every envelope handed to ION received or its lifetime ended",
    "details": [],
    "informative": true
   }

@@ -1,0 +1,200 @@
+{
+ "drain": {
+  "complete": true,
+  "duration_s": 0.0,
+  "end_scenario_s": 40.0,
+  "end_unix_s": 1791358683.0003736,
+  "max_s": 30,
+  "pending": []
+ },
+ "duration_s": 40,
+ "endpoint_a": {
+  "argv": [
+   "/home/user/pbs-ion-demo-runs/run-G/endpoint-python/bin/rover",
+   "--log",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S1/endpoint-a.jsonl",
+   "--scenario",
+   "S1",
+   "--plan",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S1/rover-plan.json",
+   "--duration",
+   "90",
+   "--ion-node-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion/rover",
+   "--ion-node-list-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion",
+   "--ready-file",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S1/rover.ready",
+   "--reply-ping"
+  ],
+  "launch_unix_s": 1791358642.9002385,
+  "plan_origin_offset_s": 0.013494,
+  "plan_origin_unix_s": 1791358643.0134935,
+  "startup_s": 0.113255
+ },
+ "endpoint_b": {
+  "argv": [
+   "/home/user/pbs-ion-demo-runs/run-G/build/endpoint-c/pbs_earth",
+   "run",
+   "--plan",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S1/earth-plan.jsonl",
+   "--log",
+   "/home/user/pbs-ion-demo-runs/run-G/results/S1/endpoint-b.jsonl",
+   "--scenario",
+   "S1",
+   "--t0-us",
+   "1791358643000000",
+   "--duration",
+   "90",
+   "--node-dir",
+   "/home/user/pbs-ion-demo-runs/run-G/build/run/ion/earth"
+  ],
+  "launch_unix_s": 1791358643.024566,
+  "plan_origin_unix_s": 1791358643.0
+ },
+ "exit": {
+  "emulator": 0,
+  "endpoint-a": 0,
+  "endpoint-b": 0,
+  "stop_nodes": 0
+ },
+ "finished_utc": "2026-10-07T07:38:31.611602+00:00",
+ "git": {
+  "commit": "25ffe97aa464007464b889685b500191c2e49f7e",
+  "worktree_modified": false
+ },
+ "host": {
+  "clock_source": "tsc",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "nproc": 4,
+  "ntp_synchronized": null,
+  "platform": "Linux-6.18.44-fc-v77-x86_64-with-glibc2.39",
+  "python": "3.13.16"
+ },
+ "ion": {
+  "commit": "568df887cb9f18aa8ec013b1a566d83215e499ae",
+  "tag": "ion-open-source-4.2.0"
+ },
+ "lead_s": 10,
+ "origin_unix_s": 1791358643.0,
+ "origin_us": 1791358643000000,
+ "post": [],
+ "probes": [
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-bpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791358683037664
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-rover-ltpstats.txt",
+   "final": true,
+   "node": "rover",
+   "t_us": 1791358683041991
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-bpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791358683046318
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-gateway-ltpstats.txt",
+   "final": true,
+   "node": "gateway",
+   "t_us": 1791358683050676
+  },
+  {
+   "argv": [
+    "bpstats"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-bpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791358683055022
+  },
+  {
+   "argv": [
+    "ltpstats",
+    "-a"
+   ],
+   "exit": 0,
+   "file": "probes/final-earth-ltpstats.txt",
+   "final": true,
+   "node": "earth",
+   "t_us": 1791358683059181
+  }
+ ],
+ "scenario": "S1",
+ "scenario_file": "scenarios/S1.json",
+ "started_utc": "2026-10-07T07:37:11.642116+00:00",
+ "steps": [
+  {
+   "step": "emulator_ready",
+   "t_us": 1791358631736306
+  },
+  {
+   "step": "nodes_started",
+   "t0_utc": "2026/10/07-07:37:13",
+   "t_us": 1791358636851211
+  },
+  {
+   "plan_origin_offset_s": 0.013,
+   "step": "endpoint_a_ready",
+   "t_us": 1791358643023350
+  },
+  {
+   "step": "endpoint_b_started",
+   "t_us": 1791358643024568
+  },
+  {
+   "step": "traffic_phase_end",
+   "t_us": 1791358683000237
+  },
+  {
+   "duration_s": 0.0,
+   "pending": 0,
+   "step": "drain_end",
+   "t_us": 1791358683002109
+  },
+  {
+   "a": 0,
+   "b": 0,
+   "step": "endpoints_stopped",
+   "t_us": 1791358683037564
+  },
+  {
+   "status": 0,
+   "step": "nodes_stopped",
+   "t_us": 1791358711546371
+  },
+  {
+   "step": "emulator_stopped",
+   "t_us": 1791358711610931
+  }
+ ],
+ "stop_clean_without_fallback": true,
+ "stop_nodes_s": 27.5,
+ "t0_unix_s": 1791358633.0,
+ "t0_utc": "2026/10/07-07:37:13",
+ "title": "Nominal traffic: rover telemetry at five priorities; signed commands, signed telemetry and a heartbeat from Earth; PING replies"
+}

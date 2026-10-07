@@ -1,7 +1,7 @@
 {
  "id": "S2",
  "title": "Scheduled outages in the contact plan: storage at rover, relay and Earth",
- "summary": "Two planned outages that every node knows from the contact plan, each also enforced by the emulator: the rover-Gateway leg is down from 25 s to 50 s (rover out of view of the Gateway), and the Gateway-Earth leg is down from 65 s to 85 s (no Earth contact). The rover sends one telemetry envelope per second and answers PINGs; Mission Control sends a signed PING every 6 s. Envelopes are expected to wait in ION storage at the node in front of the closed leg and to be delivered after the contact resumes.",
+ "summary": "Two planned outages that every node knows from the contact plan, each also enforced by the emulator: the rover-Gateway leg is down from 25 s to 50 s (rover out of view of the Gateway), and the Gateway-Earth leg is down from 65 s to 85 s (no Earth contact). The rover sends one telemetry envelope per second and answers PINGs; Mission Control sends a signed PING every 6 s. Envelopes are expected to wait in ION storage at the node in front of the closed leg and to be delivered after the contact resumes. After the traffic phase (105 s) the runner keeps both endpoints running until every envelope handed to ION has been received, for at most 30 s; S2-1 and S2-2 count receipts up to the end of that drain, and S2-19 reports the last receipt and its margin to 105 s.",
  "duration_s": 105,
  "seed": 2,
  "links": {},
@@ -34,8 +34,8 @@
    {"at_s": 80.5, "node": "earth", "tool": "bplist_detail", "label": "Earth during Gateway-Earth outage"}
   ],
  "criteria": [
-   {"id": "S2-1", "check": "delivery", "select": {"dir": "A->B"}, "min_count": 90, "text": "Every rover envelope handed to ION is received at Earth"},
-   {"id": "S2-2", "check": "delivery", "select": {"dir": "B->A"}, "min_count": 16, "text": "Every Earth command handed to ION is received at the rover"},
+   {"id": "S2-1", "check": "delivery", "select": {"dir": "A->B"}, "min_count": 90, "text": "Every rover envelope handed to ION is received at Earth (receipts up to the end of the drain)"},
+   {"id": "S2-2", "check": "delivery", "select": {"dir": "B->A"}, "min_count": 16, "text": "Every Earth command handed to ION is received at the rover (receipts up to the end of the drain)"},
    {"id": "S2-3", "check": "byte_identical", "text": "Every received envelope is byte-identical to the envelope handed to ION"},
    {"id": "S2-4", "check": "recv_result", "expect": "ACCEPT OK", "min_count": 100, "text": "Every received envelope is accepted (no TTL expired in storage)"},
    {"id": "S2-5", "check": "probe_holds", "probe": "rover during rover-Gateway outage", "select": {"dir": "A->B", "sent_between": [25, 45]}, "min_count": 15, "text": "At 45 s the rover node holds rover envelopes sent since the rover-Gateway outage began"},
@@ -51,11 +51,12 @@
    {"id": "S2-15", "check": "link_counter", "links": ["rover-gateway", "gateway-rover", "gateway-earth", "earth-gateway"], "counter": "drop_blackout", "max": 0, "text": "No node transmits into a scheduled outage (emulator blackout drops = 0)"},
    {"id": "S2-16", "check": "ltp_counter", "node": "earth", "peer": "gateway", "stat": "in_seg_screened", "informative": true, "text": "LTP segments from the Gateway discarded by Earth's LTP screening (informative)"},
    {"id": "S2-17", "check": "ltp_counter", "node": "gateway", "peer": "rover", "stat": "in_seg_screened", "informative": true, "text": "LTP segments from the rover discarded by the Gateway's LTP screening (informative)"},
-   {"id": "S2-18", "check": "ltp_counter", "node": "gateway", "peer": "earth", "stat": "ckpt_re_xmit", "informative": true, "text": "Checkpoints the Gateway resent to Earth (informative)"}
+   {"id": "S2-18", "check": "ltp_counter", "node": "gateway", "peer": "earth", "stat": "ckpt_re_xmit", "informative": true, "text": "Checkpoints the Gateway resent to Earth (informative)"},
+   {"id": "S2-19", "check": "last_receipt", "informative": true, "text": "Last receipt and its margin to the end of the traffic phase (105 s); receipts during the drain (informative; no delivery deadline is a pass/fail criterion)"}
   ],
  "conformance": [
-   {"ref": "PBS-CONFORMANCE-02 T011", "how": "store-and-forward delivery across complete scheduled outages (S2-1, S2-2, S2-5 to S2-12)"},
-   {"ref": "PBS-CONFORMANCE-02 T002", "how": "S2-3: headers unchanged after storage in ION"},
+   {"ref": "PBS-C02-T011", "how": "store-and-forward delivery across complete scheduled outages (S2-1, S2-2, S2-5 to S2-12)"},
+   {"ref": "PBS-C02-T002", "how": "S2-3: headers unchanged after storage in ION"},
    {"ref": "PBS-CONFORMANCE-01 4.2", "how": "receive processing of stored-then-delivered envelopes (S2-4)"},
    {"ref": "PBS-DTN-MAP-01 9; PBS-DTN-MAP-02 10 (store-and-forward delivery)", "how": "envelopes stored as bundles at the rover, the relay and Earth (S2-5 to S2-8)"},
    {"ref": "PBS-CONFORMANCE-02 Section 4 (complete outage, delayed contact, service restoration)", "how": "two scheduled outages on different legs"}

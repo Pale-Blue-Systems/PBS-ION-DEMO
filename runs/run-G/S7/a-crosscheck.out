@@ -1,0 +1,13 @@
+{
+ "peer_log": "/home/user/pbs-ion-demo-runs/run-G/results/S7/endpoint-b.jsonl",
+ "peer_send_records": 7,
+ "decoded": 7,
+ "decode_mismatch": [],
+ "no_hex": 0,
+ "own_sent": 8,
+ "delivered": 8,
+ "byte_identical": 8,
+ "byte_mismatch": [],
+ "peer_duplicates": 0,
+ "ok": true
+}

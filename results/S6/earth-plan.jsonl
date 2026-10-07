@@ -21,3 +21,6 @@
 {"at_s":30.5,"kind":"command","command":"DRIVE 10","tamper":"crc","label":"S6-20-BAD-CRC","note":"REJECT CRC"}
 {"at_s":32.0,"kind":"command","command":"PING S6","label":"S6-21-VALID-AFTER-REJECTS","note":"ACCEPT OK"}
 {"at_s":33.5,"kind":"command","command":"SET_MODE SAFE","extra_frames":[{"type":"0x80","text":"OPAQUE APPLICATION DATA"}],"label":"S6-22-UNKNOWN-FRAME-PROTECTED","note":"ACCEPT OK"}
+{"at_s":35.0,"kind":"command","command":"DRIVE 10","tamper":"frame_count","label":"S6-23-TAMPER-FRAME-COUNT-1","note":"REJECT SEC_MISSING"}
+{"at_s":36.5,"kind":"command","command":"DRIVE 10","tamper":"frame_count_0","label":"S6-24-TAMPER-FRAME-COUNT-0","note":"REJECT SEC_MISSING"}
+{"at_s":38.0,"kind":"command","command":"DRIVE 10","authority_id":"PBS-DEMO-OTHER","label":"S6-25-AUTHORITY-NOT-AUTHORIZED","note":"REJECT AUTHZ_DENIED"}

@@ -156,7 +156,8 @@ def git_head():
                            text=True, check=True)
         # Tracked files only, outside the outputs this demo writes.
         dirty = subprocess.run(["git", "-C", ROOT, "status", "--porcelain",
-                                "--untracked-files=no", "--", ".", ":!results", ":!REPORT.md"],
+                                "--untracked-files=no", "--", ".", ":!results", ":!runs",
+                                ":!REPORT.md"],
                                capture_output=True, text=True).stdout.strip() != ""
         return {"commit": r.stdout.strip(), "worktree_modified": dirty}
     except (subprocess.CalledProcessError, FileNotFoundError):

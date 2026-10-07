@@ -1,28 +1,31 @@
-Endpoint B unit tests, vectors: /home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/docs/test-vectors.json
+Endpoint B unit tests, vectors: /home/user/pbs-ion-demo-runs/run-F/docs/test-vectors.json
   constants and CRC-32             9 checks passed, 0 failed
   envelopes (ENV-*)              166 checks passed, 0 failed
-  receiver cases (RX-*)           23 checks passed, 0 failed
+  receiver cases (RX-*)           24 checks passed, 0 failed
   lifetime cases (LT-*)           39 checks passed, 0 failed
   class of service map            16 checks passed, 0 failed
   test keys                       17 checks passed, 0 failed
   rover policy                     7 checks passed, 0 failed
-  SEC-B messages (CMD-*)         216 checks passed, 0 failed
-  SEC-B cases (SB-*)              30 checks passed, 0 failed
-  negative and edge cases         90 checks passed, 0 failed
-    CMD-01: 1504 single-bit flips: accepted-without-command 1 MAGIC 8 CRC 344 MUX_VERSION 8 MUX_MALFORMED 47 SEC_MISSING 10 SEC_MALFORMED 56 SEC_SUITE_UNKNOWN 16 SEC_KEY_UNKNOWN 120 SEC_AUTH_FAIL 894
-    CMD-02: 1264 single-bit flips: accepted-without-command 1 MAGIC 8 CRC 344 MUX_VERSION 8 MUX_MALFORMED 49 SEC_MISSING 10 SEC_MALFORMED 54 SEC_SUITE_UNKNOWN 16 SEC_KEY_UNKNOWN 96 SEC_AUTH_FAIL 678
-    random mutations: 24400, accepted 2058
-  bit flips, truncation, fuzz      9 checks passed, 0 failed
-  plan items (pbs_earth)          95 checks passed, 0 failed
-  log records and JSON            40 checks passed, 0 failed
-TOTAL: 757 checks passed, 0 failed
-  pbs_tool build --vectors: 34/34 byte-identical
+  SEC-B messages (CMD-*)         239 checks passed, 0 failed
+  SEC-B cases (SB-*)              34 checks passed, 0 failed
+  negative and edge cases         97 checks passed, 0 failed
+    CMD-01: 1504 single-bit flips: MAGIC 8 CRC 344 MUX_VERSION 8 MUX_MALFORMED 47 SEC_MISSING 11 SEC_MALFORMED 56 SEC_SUITE_UNKNOWN 16 SEC_KEY_UNKNOWN 120 SEC_AUTH_FAIL 894
+    CMD-02: 1264 single-bit flips: MAGIC 8 CRC 344 MUX_VERSION 8 MUX_MALFORMED 49 SEC_MISSING 11 SEC_MALFORMED 54 SEC_SUITE_UNKNOWN 16 SEC_KEY_UNKNOWN 96 SEC_AUTH_FAIL 678
+    random mutations: 26400, accepted 1975
+  bit flips, truncation, fuzz     15 checks passed, 0 failed
+  plan items (pbs_earth)         106 checks passed, 0 failed
+  log records and JSON            43 checks passed, 0 failed
+TOTAL: 812 checks passed, 0 failed
+  pbs_tool build --vectors: 36/36 byte-identical
   pbs_tool build (stdin): same bytes as --vectors
-  pbs_tool receive: 52/52 receiver and SEC-B deliveries as expected
+  pbs_tool receive: 57/57 receiver and SEC-B deliveries as expected
+  pbs_tool receive, Timestamp >= 2^63: latency_us [-9221604811254775808, None, -9221604811254775807] (as expected)
   pbs_tool lifetime: 10/10 as expected
   pbs_tool crosscheck: 16/16 peer envelopes decoded with no field mismatch
   pbs_tool crosscheck: altered sequence and frame_types reported
   pbs_tool crosscheck --own-log: 10 delivered, 9 identical, 1 digest mismatch reported
+  pbs_tool crosscheck: 15 of 16 send records decoded, 1 without envelope_hex: fails
+  pbs_tool crosscheck --own-log: 15 of 16 delivered, all identical: fails
   pbs_tool plan s1_nominal.jsonl: 10 items
   pbs_tool plan s5_expiry.jsonl: 6 items
   pbs_tool plan s6_auth.jsonl: 16 items

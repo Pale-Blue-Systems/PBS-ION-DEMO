@@ -1,6 +1,6 @@
 {
  "scenario": "S1",
- "title": "Nominal telemetry and commands both ways",
+ "title": "Nominal traffic: rover telemetry at five priorities; signed commands, signed telemetry and a heartbeat from Earth; PING replies",
  "run_completed": true,
  "run_error": null,
  "stop_clean_without_fallback": true,
@@ -67,7 +67,7 @@
    "text": "End-to-end latency between the 1.55 s propagation floor and 3.0 s",
    "check": "latency",
    "passed": true,
-   "measured": "n=46 min 1.569 s median 1.578 s max 1.612 s",
+   "measured": "n=46 min 1.574 s median 1.582 s max 1.662 s",
    "details": [],
    "informative": false
   },

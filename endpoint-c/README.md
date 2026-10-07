@@ -441,7 +441,7 @@ conformance claim and has no certification.
 | Identifier | Exercised by |
 |---|---|
 | PBS-CONFORMANCE-01 4.1, 4.3, 5.1 | ENV-01 to ENV-15 built and parsed; RX-07 to RX-09 |
-| PBS-CONFORMANCE-01 4.2, 9 | RX-01 to RX-22 receive order and reason codes; random mutation |
+| PBS-CONFORMANCE-01 4.2, 9 | RX-01 to RX-23 receive order and reason codes; random mutation |
 | PBS-CONFORMANCE-01 7 | Sequence 65535 then 0 (plan test P06) |
 | PBS-CONFORMANCE-01 8, receiver side of statements 1 and 2 (no relay steps) | RX-01, RX-02, RX-04 (TTL 30) and RX-05 (TTL 0) as unit tests with a set clock |
 | PBS-C02-T002 | byte identity after BPv7 carriage: smoke test A, B, C; interop crosschecks |

@@ -58,7 +58,7 @@
    "text": "Rover control envelopes arrive after the contact resumes (50 s + 1.55 s)",
    "check": "delivered_after",
    "passed": true,
-   "measured": "6 received; earliest receipt at 53.031 s",
+   "measured": "6 received; earliest receipt at 53.092 s",
    "details": [],
    "informative": false
   },
@@ -67,7 +67,7 @@
    "text": "Earth control envelopes arrive after the contact resumes (50 s + 0.25 s)",
    "check": "delivered_after",
    "passed": true,
-   "measured": "3 received; earliest receipt at 51.483 s",
+   "measured": "3 received; earliest receipt at 51.485 s",
    "details": [],
    "informative": false
   },
@@ -206,10 +206,10 @@
    "text": "Observed: TTL 3 envelopes (bundle lifetime 1 s at A, 2 s at B) and B's TTL 2 envelope handed over at its Timestamp (lifetime 1 s); the contact-plan ranges on the path sum to 3 s (informative)",
    "check": "observe",
    "passed": true,
-   "measured": "A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered; B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: ACCEPT OK, latency 1.575 s; B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered",
+   "measured": "A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered; B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: ACCEPT OK, latency 1.576 s; B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered",
    "details": [
     "A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered",
-    "B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: ACCEPT OK, latency 1.575 s",
+    "B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: ACCEPT OK, latency 1.576 s",
     "B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered"
    ],
    "informative": true

@@ -120,30 +120,46 @@ no-expiry bundle lifetime are documented in `docs/MAPPING-PROFILE.md`
 
 ## Recorded runs
 
-`results/` and `REPORT.md` in this commit are run E of commit `7095caa`,
-made before the round-2 review changes; they will be replaced by runs of
-this commit. Archived runs are in `runs/`, which `run_demo.sh` never
-touches: `runs/run-D/` (a second fresh-clone run of `7095caa`) and
-`runs/control/` (two S2 runs of `7095caa` with ION's default LTP delivery
-backlog limit, `ion/README.md` item 15). `scenarios/README.md` lists every
-run made, the headline numbers and what was observed about ION;
-`docs/CRITERIA-CHANGES.md` lists every change to a pass/fail criterion made
-after a run.
-
-`./run_demo.sh` writes REPORT.md without a Repeatability section. The
-committed REPORT.md compares two runs; it is written with
-`report/make_report.py --name NAME --compare NAME=runs/<run>`
+`results/` and `REPORT.md` are run F: `./run_demo.sh` in a fresh clone of
+commit `25ffe97` on 2026-10-07 (started 07:20:27 UTC, 866 s including
+cloning and building ION). `runs/run-G/` is run G, a second fresh-clone run
+of the same commit (07:35:04 UTC, 869 s). Both passed all 86 required
+criteria of the seven scenarios. REPORT.md's Repeatability section compares
+the two criterion by criterion; it was written with
+`report/make_report.py --name "run F" --compare "run G=runs/run-G"`, and
+`./run_demo.sh` alone writes REPORT.md without that section
 (`report/README.md`).
+
+`runs/` holds recorded runs that `run_demo.sh` never touches: `runs/run-G/`,
+`runs/run-D/` (a run of the earlier commit `7095caa`) and `runs/control/`
+(two S2 runs of `7095caa` with ION's default LTP delivery backlog limit,
+`ion/README.md` item 15). `scenarios/README.md` lists every run made, the
+headline numbers and what was observed about ION; `docs/CRITERIA-CHANGES.md`
+lists every change to a pass/fail criterion made after a run.
 
 ## Container and CI
 
 `Dockerfile` (`docker build -t pbs-ion-demo . && docker run --rm
 --shm-size=256m -v "$PWD/docker-results:/demo/results" pbs-ion-demo`) and
 `.github/workflows/demo.yml` run the same `./run_demo.sh` and keep
-`results/`. Both install `pkgconf`. Neither has been run by the authors: no
-Docker daemon is available on the host of the recorded runs, and the GitHub
-repository does not exist yet. Details: `scenarios/README.md`,
-`emulator/README.md`, `report/README.md`.
+`results/`. Both install `pkgconf`.
+
+No Docker daemon is available on the host of the recorded runs, so the
+image was emulated on 2026-10-07 (07:50 UTC, commit `25ffe97`): a chroot of
+`ubuntu-base-24.04.5-base-amd64` (SHA-256 checked) run with private mount,
+IPC and PID namespaces and a 256 MB `/dev/shm`; the Dockerfile's apt
+package list installed with `--no-install-recommends` (199 packages,
+`pkg.m4` present); the build context copied from a clone with the
+`.dockerignore` exclusions. The Dockerfile's `RUN` step passed in 133 s
+(ION built in 104 s), and its `CMD`, `./run_demo.sh`, passed in 635 s: 4 of
+4 self-checks and all 86 required criteria of S1 to S7, with Python 3.12.3.
+The only change to the image setup was network access through the host's
+HTTPS proxy (apt over https with the proxy's CA file). That run's
+`run.json` records a modified tree, because the image leaves out the
+tracked `runs/` directory; `scenarios/runner.py` now leaves `runs/` out of
+that check. The GitHub workflow has not been run: the GitHub repository
+does not exist yet. Details: `scenarios/README.md`, `emulator/README.md`,
+`report/README.md`.
 
 ## License
 

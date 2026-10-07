@@ -662,7 +662,7 @@ def main(argv=None):
     env_rows = [
         ["Demo repository commit", "%s%s" % (git.get("commit"), " (tracked files modified)" if
                                              git.get("worktree_modified") else
-                                             " (no tracked file modified outside results/ and REPORT.md)")],
+                                             " (no tracked file modified outside results/, runs/ and REPORT.md)")],
         ["ION", "nasa-jpl/ION-DTN tag %s, commit %s; version string %s; built by ion/build_ion.sh "
                 "with NULL crypto suites (no BPSec)" % (ion.get("tag"), ion.get("commit"),
                                                         (impls.get("A") or impls.get("B") or (None, None, None))[2])],

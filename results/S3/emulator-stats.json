@@ -17,24 +17,24 @@
    "jitter_s": 0.0,
    "listen": 22350,
    "loss": 0.05,
-   "ltp_data_retransmissions": 6,
+   "ltp_data_retransmissions": 8,
    "ltp_segments": {
     "CAS": 3,
-    "CP": 23,
-    "CR": 12,
+    "CP": 25,
+    "CR": 18,
     "RA": 18,
-    "RS": 145
+    "RS": 144
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 201,
-   "rx_bytes": 8769,
+   "rx": 208,
+   "rx_bytes": 9338,
    "send_error": 0,
-   "tx": 177,
-   "tx_bytes": 6836
+   "tx": 184,
+   "tx_bytes": 7146
   },
   "gateway-earth": {
    "blackouts": [
@@ -48,29 +48,29 @@
    "delay_s": 1.3,
    "dest": 12313,
    "drop_blackout": 50,
-   "drop_loss": 24,
+   "drop_loss": 26,
    "drop_queue_full": 0,
    "jitter_s": 0.0,
    "listen": 25023,
    "loss": 0.05,
-   "ltp_data_retransmissions": 57,
+   "ltp_data_retransmissions": 59,
    "ltp_segments": {
-    "CP": 163,
+    "CP": 168,
     "CS": 3,
-    "DS": 73,
-    "RA": 127,
-    "RS": 21
+    "DS": 78,
+    "RA": 128,
+    "RS": 22
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 387,
-   "rx_bytes": 98912,
+   "rx": 399,
+   "rx_bytes": 104440,
    "send_error": 0,
-   "tx": 313,
-   "tx_bytes": 77180
+   "tx": 323,
+   "tx_bytes": 79630
   },
   "gateway-rover": {
    "blackouts": [
@@ -83,7 +83,7 @@
    ],
    "delay_s": 0.25,
    "dest": 19913,
-   "drop_blackout": 2,
+   "drop_blackout": 3,
    "drop_loss": 8,
    "drop_queue_full": 0,
    "jitter_s": 0.0,
@@ -91,20 +91,21 @@
    "loss": 0.05,
    "ltp_data_retransmissions": 2,
    "ltp_segments": {
+    "CAS": 1,
     "CP": 19,
-    "RA": 20,
-    "RS": 118
+    "RA": 18,
+    "RS": 124
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 157,
-   "rx_bytes": 7230,
+   "rx": 162,
+   "rx_bytes": 7314,
    "send_error": 0,
-   "tx": 147,
-   "tx_bytes": 6577
+   "tx": 151,
+   "tx_bytes": 6626
   },
   "rover-gateway": {
    "blackouts": [
@@ -117,33 +118,34 @@
    ],
    "delay_s": 0.25,
    "dest": 15013,
-   "drop_blackout": 13,
-   "drop_loss": 16,
+   "drop_blackout": 12,
+   "drop_loss": 17,
    "drop_queue_full": 0,
    "jitter_s": 0.0,
    "listen": 29950,
    "loss": 0.05,
-   "ltp_data_retransmissions": 20,
+   "ltp_data_retransmissions": 22,
    "ltp_segments": {
-    "CP": 123,
-    "DS": 56,
-    "RA": 113,
-    "RS": 21
+    "CP": 126,
+    "CS": 1,
+    "DS": 59,
+    "RA": 115,
+    "RS": 18
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 313,
-   "rx_bytes": 76160,
+   "rx": 319,
+   "rx_bytes": 79419,
    "send_error": 0,
-   "tx": 284,
-   "tx_bytes": 68884
+   "tx": 290,
+   "tx_bytes": 72226
   }
  },
  "schema": "pbs-ion-demo-linkemu/1",
  "seed": 3,
- "stopped_us": 1791352388352331,
- "t0": 1791352250.0
+ "stopped_us": 1791358127896148,
+ "t0": 1791357990.0
 }

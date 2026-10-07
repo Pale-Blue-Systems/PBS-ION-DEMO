@@ -1,0 +1,110 @@
+{
+ "scenario": "S6",
+ "title": "Authenticated commands: tamper, replay, wrong key, expiry, authorization",
+ "run_completed": true,
+ "run_error": null,
+ "stop_clean_without_fallback": true,
+ "passed": true,
+ "criteria_passed": 8,
+ "criteria_total": 8,
+ "criteria": [
+  {
+   "id": "S6-1",
+   "text": "Each command gets the expected disposition at the rover",
+   "check": "expect_by_label",
+   "passed": true,
+   "measured": "25 labels checked",
+   "details": [
+    "PASS S6-01-VALID-ED25519      expected ACCEPT OK                  observed ACCEPT OK                  1.586 s",
+    "PASS S6-02-VALID-HMAC         expected ACCEPT OK                  observed ACCEPT OK                  1.583 s",
+    "PASS S6-03-TAMPER-COMMAND     expected REJECT SEC_AUTH_FAIL       observed REJECT SEC_AUTH_FAIL       1.580 s",
+    "PASS S6-04-TAMPER-PRIORITY    expected REJECT SEC_AUTH_FAIL       observed REJECT SEC_AUTH_FAIL       1.577 s",
+    "PASS S6-05-TAMPER-TTL         expected REJECT SEC_AUTH_FAIL       observed REJECT SEC_AUTH_FAIL       1.581 s",
+    "PASS S6-06-TAMPER-TIMESTAMP   expected REJECT SEC_AUTH_FAIL       observed REJECT SEC_AUTH_FAIL       -8.415 s",
+    "PASS S6-07-TAMPER-SECSEQ      expected REJECT SEC_AUTH_FAIL       observed REJECT SEC_AUTH_FAIL       1.581 s",
+    "PASS S6-08-TAMPER-AUTHORITY   expected REJECT SEC_AUTH_FAIL       observed REJECT SEC_AUTH_FAIL       1.581 s",
+    "PASS S6-09-REPLAY-ED25519     expected REJECT SEC_REPLAY          observed REJECT SEC_REPLAY          13.580 s",
+    "PASS S6-10-REPLAY-HMAC        expected REJECT SEC_REPLAY          observed REJECT SEC_REPLAY          13.575 s",
+    "PASS S6-11-WRONG-KEY-ED25519  expected REJECT SEC_AUTH_FAIL       observed REJECT SEC_AUTH_FAIL       1.584 s",
+    "PASS S6-12-WRONG-KEY-HMAC     expected REJECT SEC_AUTH_FAIL       observed REJECT SEC_AUTH_FAIL       1.579 s",
+    "PASS S6-13-UNKNOWN-KEY-ID     expected REJECT SEC_KEY_UNKNOWN     observed REJECT SEC_KEY_UNKNOWN     1.577 s",
+    "PASS S6-14-EXPIRED            expected REJECT TTL_EXPIRED         observed REJECT TTL_EXPIRED         1.581 s",
+    "PASS S6-15-ROLE-NOT-AUTHORIZED expected REJECT AUTHZ_DENIED        observed REJECT AUTHZ_DENIED        1.581 s",
+    "PASS S6-16-ROLE-AUTHORIZED    expected ACCEPT OK                  observed ACCEPT OK                  1.581 s",
+    "PASS S6-17-WRONG-POLICY-EPOCH expected REJECT AUTHZ_DENIED        observed REJECT AUTHZ_DENIED        1.577 s",
+    "PASS S6-18-UNSIGNED           expected REJECT SEC_MISSING         observed REJECT SEC_MISSING         1.576 s",
+    "PASS S6-19-NO-AUTHORITY-CONTEXT expected REJECT AUTH_CTX_MISSING    observed REJECT AUTH_CTX_MISSING    1.574 s",
+    "PASS S6-20-BAD-CRC            expected REJECT CRC                 observed REJECT CRC                 1.581 s",
+    "PASS S6-21-VALID-AFTER-REJECTS expected ACCEPT OK                  observed ACCEPT OK                  1.582 s",
+    "PASS S6-22-UNKNOWN-FRAME-PROTECTED expected ACCEPT OK                  observed ACCEPT OK                  1.582 s",
+    "PASS S6-23-TAMPER-FRAME-COUNT-1 expected REJECT SEC_MISSING         observed REJECT SEC_MISSING         1.580 s",
+    "PASS S6-24-TAMPER-FRAME-COUNT-0 expected REJECT SEC_MISSING         observed REJECT SEC_MISSING         1.579 s",
+    "PASS S6-25-AUTHORITY-NOT-AUTHORIZED expected REJECT AUTHZ_DENIED        observed REJECT AUTHZ_DENIED        1.579 s"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S6-2",
+   "text": "Only the five accepted commands are executed (logged), in order",
+   "check": "exec",
+   "passed": true,
+   "measured": "executed: DRIVE, SET_HEATER, CAPTURE_IMAGE, PING, SET_MODE",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S6-3",
+   "text": "Every command envelope handed to ION is received at the rover",
+   "check": "delivery",
+   "passed": true,
+   "measured": "25 of 25 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S6-4",
+   "text": "The rover receives the bytes Endpoint B handed to ION (tampered bytes included)",
+   "check": "byte_identical",
+   "passed": true,
+   "measured": "25 of 25 received envelopes byte-identical (SHA-256 and header)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S6-5",
+   "text": "Every recv record (audit line) matches an envelope that was sent; no duplicates",
+   "check": "no_unmatched",
+   "passed": true,
+   "measured": "33 recv records, 0 without a matching send record",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S6-6",
+   "text": "Rover telemetry and the PING reply continue to arrive and are accepted",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "8 of 8: ACCEPT OK",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S6-7",
+   "text": "No receiver accepts an envelope older than its TTL",
+   "check": "ttl_respected",
+   "passed": true,
+   "measured": "13 accepted envelopes with TTL > 0; 0 older than their TTL",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S6-8",
+   "text": "A valid command sent after the rejected ones is accepted; the measured value gives the number of envelopes the rover rejected before it",
+   "check": "accepted_after_rejects",
+   "passed": true,
+   "measured": "S6-21-VALID-AFTER-REJECTS received ACCEPT OK after 17 rejected envelopes at receiver A (AUTHZ_DENIED 2, AUTH_CTX_MISSING 1, CRC 1, SEC_AUTH_FAIL 8, SEC_KEY_UNKNOWN 1, SEC_MISSING 1, SEC_REPLAY 2, TTL_EXPIRED 1)",
+   "details": [],
+   "informative": false
+  }
+ ]
+}

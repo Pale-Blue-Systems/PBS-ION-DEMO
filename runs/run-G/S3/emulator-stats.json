@@ -1,0 +1,149 @@
+{
+ "links": {
+  "earth-gateway": {
+   "blackouts": [
+    {
+     "end_s": 55.0,
+     "kind": "unscheduled",
+     "label": "unannounced loss of the Gateway-Earth link",
+     "start_s": 40.0
+    }
+   ],
+   "delay_s": 1.3,
+   "dest": 15013,
+   "drop_blackout": 19,
+   "drop_loss": 4,
+   "drop_queue_full": 0,
+   "jitter_s": 0.0,
+   "listen": 22350,
+   "loss": 0.05,
+   "ltp_data_retransmissions": 6,
+   "ltp_segments": {
+    "CAS": 1,
+    "CP": 23,
+    "CR": 6,
+    "RA": 18,
+    "RS": 138
+   },
+   "max_queue_bytes": 0,
+   "max_queue_delay_s": 0.0,
+   "pending_at_stop": 0,
+   "queue_bytes": null,
+   "rate_Bps": null,
+   "rx": 186,
+   "rx_bytes": 8606,
+   "send_error": 0,
+   "tx": 163,
+   "tx_bytes": 6696
+  },
+  "gateway-earth": {
+   "blackouts": [
+    {
+     "end_s": 55.0,
+     "kind": "unscheduled",
+     "label": "unannounced loss of the Gateway-Earth link",
+     "start_s": 40.0
+    }
+   ],
+   "delay_s": 1.3,
+   "dest": 12313,
+   "drop_blackout": 49,
+   "drop_loss": 23,
+   "drop_queue_full": 0,
+   "jitter_s": 0.0,
+   "listen": 25023,
+   "loss": 0.05,
+   "ltp_data_retransmissions": 54,
+   "ltp_segments": {
+    "CP": 155,
+    "CS": 2,
+    "DS": 64,
+    "RA": 122,
+    "RS": 21
+   },
+   "max_queue_bytes": 0,
+   "max_queue_delay_s": 0.0,
+   "pending_at_stop": 0,
+   "queue_bytes": null,
+   "rate_Bps": null,
+   "rx": 364,
+   "rx_bytes": 89148,
+   "send_error": 0,
+   "tx": 292,
+   "tx_bytes": 71398
+  },
+  "gateway-rover": {
+   "blackouts": [
+    {
+     "end_s": 80.0,
+     "kind": "unscheduled",
+     "label": "unannounced loss of the rover-Gateway link",
+     "start_s": 75.0
+    }
+   ],
+   "delay_s": 0.25,
+   "dest": 19913,
+   "drop_blackout": 4,
+   "drop_loss": 8,
+   "drop_queue_full": 0,
+   "jitter_s": 0.0,
+   "listen": 25099,
+   "loss": 0.05,
+   "ltp_data_retransmissions": 3,
+   "ltp_segments": {
+    "CP": 20,
+    "RA": 18,
+    "RS": 121
+   },
+   "max_queue_bytes": 0,
+   "max_queue_delay_s": 0.0,
+   "pending_at_stop": 0,
+   "queue_bytes": null,
+   "rate_Bps": null,
+   "rx": 159,
+   "rx_bytes": 7547,
+   "send_error": 0,
+   "tx": 147,
+   "tx_bytes": 6844
+  },
+  "rover-gateway": {
+   "blackouts": [
+    {
+     "end_s": 80.0,
+     "kind": "unscheduled",
+     "label": "unannounced loss of the rover-Gateway link",
+     "start_s": 75.0
+    }
+   ],
+   "delay_s": 0.25,
+   "dest": 15013,
+   "drop_blackout": 12,
+   "drop_loss": 15,
+   "drop_queue_full": 0,
+   "jitter_s": 0.0,
+   "listen": 29950,
+   "loss": 0.05,
+   "ltp_data_retransmissions": 18,
+   "ltp_segments": {
+    "CP": 121,
+    "DS": 56,
+    "RA": 112,
+    "RS": 19
+   },
+   "max_queue_bytes": 0,
+   "max_queue_delay_s": 0.0,
+   "pending_at_stop": 0,
+   "queue_bytes": null,
+   "rate_Bps": null,
+   "rx": 308,
+   "rx_bytes": 75726,
+   "send_error": 0,
+   "tx": 281,
+   "tx_bytes": 68634
+  }
+ },
+ "schema": "pbs-ion-demo-linkemu/1",
+ "seed": 3,
+ "stopped_us": 1791359006614664,
+ "t0": 1791358868.0
+}

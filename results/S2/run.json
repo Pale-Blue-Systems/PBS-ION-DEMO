@@ -1,48 +1,56 @@
 {
+ "drain": {
+  "complete": true,
+  "duration_s": 0.0,
+  "end_scenario_s": 105.0,
+  "end_unix_s": 1791357950.0004208,
+  "max_s": 30,
+  "pending": []
+ },
  "duration_s": 105,
  "endpoint_a": {
   "argv": [
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/endpoint-python/bin/rover",
+   "/home/user/pbs-ion-demo-runs/run-F/endpoint-python/bin/rover",
    "--log",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S2/endpoint-a.jsonl",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S2/endpoint-a.jsonl",
    "--scenario",
    "S2",
    "--plan",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S2/rover-plan.json",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S2/rover-plan.json",
    "--duration",
-   "125",
+   "155",
    "--ion-node-dir",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion/rover",
+   "/home/user/pbs-ion-demo-runs/run-F/build/run/ion/rover",
    "--ion-node-list-dir",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion",
+   "/home/user/pbs-ion-demo-runs/run-F/build/run/ion",
    "--ready-file",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S2/rover.ready",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S2/rover.ready",
    "--reply-ping"
   ],
-  "launch_unix_s": 1791352104.9002285,
-  "plan_origin_offset_s": 0.003094,
-  "plan_origin_unix_s": 1791352105.0030942,
-  "startup_s": 0.102866
+  "launch_unix_s": 1791357844.9001646,
+  "plan_origin_offset_s": 0.005326,
+  "plan_origin_unix_s": 1791357845.0053263,
+  "startup_s": 0.105162
  },
  "endpoint_b": {
   "argv": [
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/endpoint-c/pbs_earth",
+   "/home/user/pbs-ion-demo-runs/run-F/build/endpoint-c/pbs_earth",
    "run",
    "--plan",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S2/earth-plan.jsonl",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S2/earth-plan.jsonl",
    "--log",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S2/endpoint-b.jsonl",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S2/endpoint-b.jsonl",
    "--scenario",
    "S2",
    "--t0-us",
-   "1791352105000000",
+   "1791357845000000",
    "--duration",
-   "125",
+   "155",
    "--node-dir",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion/earth"
+   "/home/user/pbs-ion-demo-runs/run-F/build/run/ion/earth"
   ],
-  "launch_unix_s": 1791352105.0242286,
-  "plan_origin_unix_s": 1791352105.0
+  "launch_unix_s": 1791357845.024438,
+  "plan_origin_unix_s": 1791357845.0
  },
  "exit": {
   "emulator": 0,
@@ -50,9 +58,9 @@
   "endpoint-b": 0,
   "stop_nodes": 0
  },
- "finished_utc": "2026-10-07T05:50:37.900667+00:00",
+ "finished_utc": "2026-10-07T07:26:18.414322+00:00",
  "git": {
-  "commit": "7095caaf1c12b92e3a382ed123b4b3d003b3b16c",
+  "commit": "25ffe97aa464007464b889685b500191c2e49f7e",
   "worktree_modified": false
  },
  "host": {
@@ -68,8 +76,8 @@
   "tag": "ion-open-source-4.2.0"
  },
  "lead_s": 10,
- "origin_unix_s": 1791352105.0,
- "origin_us": 1791352105000000,
+ "origin_unix_s": 1791357845.0,
+ "origin_us": 1791357845000000,
  "post": [],
  "probes": [
   {
@@ -82,7 +90,7 @@
    "label": "rover during rover-Gateway outage",
    "node": "rover",
    "scenario_t_s": 45.0,
-   "t_us": 1791352150000349
+   "t_us": 1791357890000249
   },
   {
    "argv": [
@@ -94,7 +102,7 @@
    "label": "Gateway during rover-Gateway outage",
    "node": "gateway",
    "scenario_t_s": 45.5,
-   "t_us": 1791352150500255
+   "t_us": 1791357890500298
   },
   {
    "argv": [
@@ -106,7 +114,7 @@
    "label": "Gateway during Gateway-Earth outage",
    "node": "gateway",
    "scenario_t_s": 80.0,
-   "t_us": 1791352185000220
+   "t_us": 1791357925000292
   },
   {
    "argv": [
@@ -118,7 +126,7 @@
    "label": "Earth during Gateway-Earth outage",
    "node": "earth",
    "scenario_t_s": 80.5,
-   "t_us": 1791352185500300
+   "t_us": 1791357925500226
   },
   {
    "argv": [
@@ -128,7 +136,7 @@
    "file": "probes/final-rover-bpstats.txt",
    "final": true,
    "node": "rover",
-   "t_us": 1791352210035951
+   "t_us": 1791357950043645
   },
   {
    "argv": [
@@ -139,7 +147,7 @@
    "file": "probes/final-rover-ltpstats.txt",
    "final": true,
    "node": "rover",
-   "t_us": 1791352210040883
+   "t_us": 1791357950048144
   },
   {
    "argv": [
@@ -149,7 +157,7 @@
    "file": "probes/final-gateway-bpstats.txt",
    "final": true,
    "node": "gateway",
-   "t_us": 1791352210045351
+   "t_us": 1791357950052330
   },
   {
    "argv": [
@@ -160,7 +168,7 @@
    "file": "probes/final-gateway-ltpstats.txt",
    "final": true,
    "node": "gateway",
-   "t_us": 1791352210049938
+   "t_us": 1791357950056658
   },
   {
    "argv": [
@@ -170,7 +178,7 @@
    "file": "probes/final-earth-bpstats.txt",
    "final": true,
    "node": "earth",
-   "t_us": 1791352210054391
+   "t_us": 1791357950060942
   },
   {
    "argv": [
@@ -181,82 +189,88 @@
    "file": "probes/final-earth-ltpstats.txt",
    "final": true,
    "node": "earth",
-   "t_us": 1791352210058928
+   "t_us": 1791357950065260
   }
  ],
  "scenario": "S2",
  "scenario_file": "scenarios/S2.json",
- "started_utc": "2026-10-07T05:48:13.636496+00:00",
+ "started_utc": "2026-10-07T07:23:53.040129+00:00",
  "steps": [
   {
    "step": "emulator_ready",
-   "t_us": 1791352093724964
+   "t_us": 1791357833113440
   },
   {
    "step": "nodes_started",
-   "t0_utc": "2026/10/07-05:48:15",
-   "t_us": 1791352098851867
+   "t0_utc": "2026/10/07-07:23:55",
+   "t_us": 1791357838852715
   },
   {
-   "plan_origin_offset_s": 0.003,
+   "plan_origin_offset_s": 0.005,
    "step": "endpoint_a_ready",
-   "t_us": 1791352105023008
+   "t_us": 1791357845023294
   },
   {
    "step": "endpoint_b_started",
-   "t_us": 1791352105024232
+   "t_us": 1791357845024442
   },
   {
    "at_s": 45.0,
    "node": "rover",
    "step": "probe",
-   "t_us": 1791352150008970,
+   "t_us": 1791357890004760,
    "tool": "bplist_detail"
   },
   {
    "at_s": 45.5,
    "node": "gateway",
    "step": "probe",
-   "t_us": 1791352150505324,
+   "t_us": 1791357890506789,
    "tool": "bplist_detail"
   },
   {
    "at_s": 80.0,
    "node": "gateway",
    "step": "probe",
-   "t_us": 1791352185004632,
+   "t_us": 1791357925009029,
    "tool": "bplist_detail"
   },
   {
    "at_s": 80.5,
    "node": "earth",
    "step": "probe",
-   "t_us": 1791352185504986,
+   "t_us": 1791357925504828,
    "tool": "bplist_detail"
   },
   {
    "step": "traffic_phase_end",
-   "t_us": 1791352210000258
+   "t_us": 1791357950000267
+  },
+  {
+   "duration_s": 0.0,
+   "pending": 0,
+   "step": "drain_end",
+   "t_us": 1791357950008047
   },
   {
    "a": 0,
    "b": 0,
    "step": "endpoints_stopped",
-   "t_us": 1791352210035830
+   "t_us": 1791357950043510
   },
   {
    "status": 0,
    "step": "nodes_stopped",
-   "t_us": 1791352237835603
+   "t_us": 1791357978349538
   },
   {
    "step": "emulator_stopped",
-   "t_us": 1791352237899863
+   "t_us": 1791357978413649
   }
  ],
  "stop_clean_without_fallback": true,
- "stop_nodes_s": 26.8,
- "t0_unix_s": 1791352095.0,
- "t0_utc": "2026/10/07-05:48:15",
+ "stop_nodes_s": 27.3,
+ "t0_unix_s": 1791357835.0,
+ "t0_utc": "2026/10/07-07:23:55",
  "title": "Scheduled outages in the contact plan: storage at rover, relay and Earth"
 }

@@ -1,26 +1,27 @@
-[05:44:59] run_demo: repository /home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO, results /home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results, scenarios S1 S2 S3 S4 S5 S6 S7
-[05:44:59] run_demo: step 1: ION
-Cloning into '/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/src/ION-DTN'...
-ION ion-open-source-4.2.0 built and installed in /home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/ion in 94 s (log: /home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/ion-build.log)
-[05:46:36] run_demo: step 2: Python environment
-[05:46:45] run_demo: step 3: PBS_LINK
-/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/pbs-link
-[05:46:46] run_demo: step 4: Endpoint B
-[05:46:49] run_demo: step 5: self-checks
-[05:46:50] run_demo:   emulator-tests: pass
-[05:46:50] run_demo:   scenario-tests: pass
-[05:46:51] run_demo:   endpoint-b-tests: pass
-[05:46:53] run_demo:   endpoint-a-tests: pass
-[05:46:53] run_demo: step 6: scenarios
-[05:46:53] run_demo: scenario S1
-[05:46:53] S1: emulator_ready 
-[05:46:58] S1: nodes_started t0_utc=2026/10/07-05:46:55
-[05:47:05] S1: endpoint_a_ready plan_origin_offset_s=0.006
-[05:47:05] S1: endpoint_b_started 
-[05:47:45] S1: traffic_phase_end 
-[05:47:45] S1: endpoints_stopped a=0 b=0
-[05:48:13] S1: nodes_stopped status=0
-[05:48:13] S1: emulator_stopped 
+[07:20:27] run_demo: repository /home/user/pbs-ion-demo-runs/run-F, results /home/user/pbs-ion-demo-runs/run-F/results, scenarios S1 S2 S3 S4 S5 S6 S7
+[07:20:27] run_demo: step 1: ION
+Cloning into '/home/user/pbs-ion-demo-runs/run-F/build/src/ION-DTN'...
+ION ion-open-source-4.2.0 built and installed in /home/user/pbs-ion-demo-runs/run-F/build/ion in 103 s (log: /home/user/pbs-ion-demo-runs/run-F/build/ion-build.log)
+[07:22:14] run_demo: step 2: Python environment
+[07:22:23] run_demo: step 3: PBS_LINK
+/home/user/pbs-ion-demo-runs/run-F/build/pbs-link
+[07:22:25] run_demo: step 4: Endpoint B
+[07:22:28] run_demo: step 5: self-checks
+[07:22:29] run_demo:   emulator-tests: pass
+[07:22:29] run_demo:   scenario-tests: pass
+[07:22:31] run_demo:   endpoint-b-tests: pass
+[07:22:33] run_demo:   endpoint-a-tests: pass
+[07:22:33] run_demo: step 6: scenarios
+[07:22:33] run_demo: scenario S1
+[07:22:33] S1: emulator_ready 
+[07:22:38] S1: nodes_started t0_utc=2026/10/07-07:22:35
+[07:22:45] S1: endpoint_a_ready plan_origin_offset_s=0.005
+[07:22:45] S1: endpoint_b_started 
+[07:23:25] S1: traffic_phase_end 
+[07:23:25] S1: drain_end duration_s=0.0 pending=0
+[07:23:25] S1: endpoints_stopped a=0 b=0
+[07:23:52] S1: nodes_stopped status=0
+[07:23:52] S1: emulator_stopped 
 S1: PASS (13/13 criteria)
   PASS S1-1   Every rover envelope handed to ION is received at Earth: 36 of 36 delivered (ratio 1.000)
   PASS S1-2   Every Earth envelope handed to ION is received at the rover: 10 of 10 delivered (ratio 1.000)
@@ -28,117 +29,123 @@ S1: PASS (13/13 criteria)
   PASS S1-4   Every received envelope is accepted: 46 of 46: ACCEPT OK
   PASS S1-5   The rover executes (logs) each authenticated command once, in order: executed: PING, SET_HEATER, DRIVE, CAPTURE_IMAGE, SET_MODE, PING, PING, PING
   PASS S1-6   Each PING is answered and the answer reaches Earth: 4 of 4 delivered (ratio 1.000)
-  PASS S1-7   End-to-end latency between the 1.55 s propagation floor and 3.0 s: n=46 min 1.569 s median 1.578 s max 1.612 s
+  PASS S1-7   End-to-end latency between the 1.55 s propagation floor and 3.0 s: n=46 min 1.574 s median 1.582 s max 1.662 s
   PASS S1-8   TTL 0 envelopes are sent with the 2147483647 s no-expiry bundle lifetime: 7 of 7 sent with lifetime 2147483647 s
   PASS S1-9   TTL 0 envelopes sent with that lifetime are delivered: 7 of 7 delivered (ratio 1.000)
   PASS S1-10  Every send uses the class of service of SPEC-DIGEST 7.5 for its priority: 46 of 46 sends used the 7.5 class of service
   PASS S1-11  Every bundle source EID matches the Source ID mapping (Rover-Alpha ipn:99.1, Earth-MCC ipn:23.1): 46 of 46 with the expected bundle source EID
   PASS S1-12  No duplicate or unknown envelope is received: 46 recv records, 0 without a matching send record
   PASS S1-13  No receiver accepts an envelope older than its TTL: 39 accepted envelopes with TTL > 0; 0 older than their TTL
-[05:48:13] run_demo: scenario S2
-[05:48:13] S2: emulator_ready 
-[05:48:18] S2: nodes_started t0_utc=2026/10/07-05:48:15
-[05:48:25] S2: endpoint_a_ready plan_origin_offset_s=0.003
-[05:48:25] S2: endpoint_b_started 
-[05:49:10] S2: probe node=rover tool=bplist_detail at_s=45.0
-[05:49:10] S2: probe node=gateway tool=bplist_detail at_s=45.5
-[05:49:45] S2: probe node=gateway tool=bplist_detail at_s=80.0
-[05:49:45] S2: probe node=earth tool=bplist_detail at_s=80.5
-[05:50:10] S2: traffic_phase_end 
-[05:50:10] S2: endpoints_stopped a=0 b=0
-[05:50:37] S2: nodes_stopped status=0
-[05:50:37] S2: emulator_stopped 
+[07:23:52] run_demo: scenario S2
+[07:23:53] S2: emulator_ready 
+[07:23:58] S2: nodes_started t0_utc=2026/10/07-07:23:55
+[07:24:05] S2: endpoint_a_ready plan_origin_offset_s=0.005
+[07:24:05] S2: endpoint_b_started 
+[07:24:50] S2: probe node=rover tool=bplist_detail at_s=45.0
+[07:24:50] S2: probe node=gateway tool=bplist_detail at_s=45.5
+[07:25:25] S2: probe node=gateway tool=bplist_detail at_s=80.0
+[07:25:25] S2: probe node=earth tool=bplist_detail at_s=80.5
+[07:25:50] S2: traffic_phase_end 
+[07:25:50] S2: drain_end duration_s=0.0 pending=0
+[07:25:50] S2: endpoints_stopped a=0 b=0
+[07:26:18] S2: nodes_stopped status=0
+[07:26:18] S2: emulator_stopped 
 S2: PASS (15/15 criteria)
-  PASS S2-1   Every rover envelope handed to ION is received at Earth: 111 of 111 delivered (ratio 1.000)
-  PASS S2-2   Every Earth command handed to ION is received at the rover: 16 of 16 delivered (ratio 1.000)
+  PASS S2-1   Every rover envelope handed to ION is received at Earth (receipts up to the end of the drain): 111 of 111 delivered (ratio 1.000)
+  PASS S2-2   Every Earth command handed to ION is received at the rover (receipts up to the end of the drain): 16 of 16 delivered (ratio 1.000)
   PASS S2-3   Every received envelope is byte-identical to the envelope handed to ION: 127 of 127 received envelopes byte-identical (SHA-256 and header)
   PASS S2-4   Every received envelope is accepted (no TTL expired in storage): 127 of 127: ACCEPT OK
-  PASS S2-5   At 45 s the rover node holds rover envelopes sent since the rover-Gateway outage began: rover node held 20 matching bundles at 45.000 s (all bundles: 22)
+  PASS S2-5   At 45 s the rover node holds rover envelopes sent since the rover-Gateway outage began: rover node held 20 matching bundles at 45.000 s (all bundles: 21)
   PASS S2-6   At 45.5 s the Gateway node holds Earth commands waiting for the rover contact: gateway node held 3 matching bundles at 45.500 s (all bundles: 3)
   PASS S2-7   At 80 s the Gateway node holds rover envelopes sent since 63 s, waiting for the Earth contact: gateway node held 17 matching bundles at 80.000 s (all bundles: 17)
   PASS S2-8   At 80.5 s the Earth node holds commands waiting for the Gateway contact: earth node held 2 matching bundles at 80.500 s (all bundles: 3)
-  PASS S2-9   Rover envelopes sent during the rover-Gateway outage arrive no earlier than its end (50 s) plus 1.55 s propagation: 24 received; earliest receipt at 53.143 s
-  PASS S2-10  Earth commands sent during the rover-Gateway outage arrive no earlier than its end plus 0.25 s: 4 received; earliest receipt at 51.555 s
-  PASS S2-11  Rover envelopes sent during the Gateway-Earth outage arrive no earlier than its end (85 s) plus 1.3 s: 19 received; earliest receipt at 92.697 s
-  PASS S2-12  Earth commands sent during the Gateway-Earth outage arrive no earlier than its end plus 1.55 s: 3 received; earliest receipt at 88.398 s
+  PASS S2-9   Rover envelopes sent during the rover-Gateway outage arrive no earlier than its end (50 s) plus 1.55 s propagation: 24 received; earliest receipt at 53.145 s
+  PASS S2-10  Earth commands sent during the rover-Gateway outage arrive no earlier than its end plus 0.25 s: 4 received; earliest receipt at 51.524 s
+  PASS S2-11  Rover envelopes sent during the Gateway-Earth outage arrive no earlier than its end (85 s) plus 1.3 s: 19 received; earliest receipt at 92.693 s
+  PASS S2-12  Earth commands sent during the Gateway-Earth outage arrive no earlier than its end plus 1.55 s: 3 received; earliest receipt at 88.393 s
   PASS S2-13  No duplicate or unknown envelope is received: 127 recv records, 0 without a matching send record
   PASS S2-14  No receiver accepts an envelope older than its TTL: 108 accepted envelopes with TTL > 0; 0 older than their TTL
   PASS S2-15  No node transmits into a scheduled outage (emulator blackout drops = 0): drop_blackout total 0 (rover-gateway=0, gateway-rover=0, gateway-earth=0, earth-gateway=0)
   info S2-16  LTP segments from the Gateway discarded by Earth's LTP screening (informative): earth node, span to gateway: in_seg_screened = 34 (ltpstats -a)
   info S2-17  LTP segments from the rover discarded by the Gateway's LTP screening (informative): gateway node, span to rover: in_seg_screened = 0 (ltpstats -a)
   info S2-18  Checkpoints the Gateway resent to Earth (informative): gateway node, span to earth: ckpt_re_xmit = 29 (ltpstats -a)
-[05:50:37] run_demo: scenario S3
-[05:50:38] S3: emulator_ready 
-[05:50:43] S3: nodes_started t0_utc=2026/10/07-05:50:40
-[05:50:50] S3: endpoint_a_ready plan_origin_offset_s=0.02
-[05:50:50] S3: endpoint_b_started 
-[05:52:40] S3: traffic_phase_end 
-[05:52:40] S3: endpoints_stopped a=0 b=0
-[05:53:08] S3: nodes_stopped status=0
-[05:53:08] S3: emulator_stopped 
+  info S2-19  Last receipt and its margin to the end of the traffic phase (105 s); receipts during the drain (informative; no delivery deadline is a pass/fail criterion): last receipt at 97.588 s; traffic phase ends at 105 s (margin 7.412 s); 0 receipts after it; drain ended at 105.0 s, every envelope handed to ION received or its lifetime ended
+[07:26:18] run_demo: scenario S3
+[07:26:18] S3: emulator_ready 
+[07:26:23] S3: nodes_started t0_utc=2026/10/07-07:26:20
+[07:26:30] S3: endpoint_a_ready plan_origin_offset_s=-0.004
+[07:26:30] S3: endpoint_b_started 
+[07:28:20] S3: traffic_phase_end 
+[07:28:20] S3: drain_end duration_s=0.0 pending=0
+[07:28:20] S3: endpoints_stopped a=0 b=0
+[07:28:47] S3: nodes_stopped status=0
+[07:28:47] S3: emulator_stopped 
 S3: PASS (9/9 criteria)
   PASS S3-1   Every rover envelope handed to ION is received at Earth: 102 of 102 delivered (ratio 1.000)
   PASS S3-2   Every Earth command handed to ION is received at the rover: 17 of 17 delivered (ratio 1.000)
   PASS S3-3   Every received envelope is byte-identical to the envelope handed to ION: 119 of 119 received envelopes byte-identical (SHA-256 and header)
   PASS S3-4   Every received envelope is accepted: 119 of 119: ACCEPT OK
-  PASS S3-5   The emulator dropped datagrams at random on every link direction: drop_loss total 53 (rover-gateway=16, gateway-rover=8, gateway-earth=24, earth-gateway=5)
-  PASS S3-6   The emulator dropped datagrams in the unscheduled blackouts on every link direction: drop_blackout total 84 (gateway-earth=50, earth-gateway=19, rover-gateway=13, gateway-rover=2)
-  PASS S3-7   LTP retransmitted data segments (same session, offset and length seen again by the emulator): ltp_data_retransmissions total 85 (rover-gateway=20, gateway-rover=2, gateway-earth=57, earth-gateway=6)
-  PASS S3-8   Every recv record is a delivery of an envelope that was sent (byte-identical); a repeated delivery passes only when it is the same bundle as the first delivery (same creation timestamp) and ION re-forwarded at least as many bundles (bpstats rfw): 120 recv records; 1 further deliveries of an envelope already received; 0 unknown; ION re-forwarded 3 bundles (bpstats rfw, all nodes); 0 further deliveries not the same bundle
+  PASS S3-5   The emulator dropped datagrams at random on every link direction: drop_loss total 56 (rover-gateway=17, gateway-rover=8, gateway-earth=26, earth-gateway=5)
+  PASS S3-6   The emulator dropped datagrams in the unscheduled blackouts on every link direction: drop_blackout total 84 (gateway-earth=50, earth-gateway=19, rover-gateway=12, gateway-rover=3)
+  PASS S3-7   LTP retransmitted data segments (same session, offset and length seen again by the emulator): ltp_data_retransmissions total 91 (rover-gateway=22, gateway-rover=2, gateway-earth=59, earth-gateway=8)
+  PASS S3-8   Every recv record is a delivery of an envelope that was sent (byte-identical); a repeated delivery passes only when it is the same bundle as the first delivery (same creation timestamp) and ION re-forwarded at least as many bundles (bpstats rfw): 120 recv records; 1 further deliveries of an envelope already received; 0 unknown; ION re-forwarded 4 bundles (bpstats rfw, all nodes); 0 further deliveries not the same bundle
   PASS S3-9   No receiver accepts an envelope older than its TTL: 103 accepted envelopes with TTL > 0; 0 older than their TTL
-  info S3-10  Latency of all envelopes (informative): n=119 min 1.568 s median 1.575 s max 22.165 s
-  info S3-11  Checkpoints the Gateway resent to Earth (informative): gateway node, span to earth: ckpt_re_xmit = 51 (ltpstats -a)
-  info S3-12  Checkpoints the rover resent to the Gateway (informative): rover node, span to gateway: ckpt_re_xmit = 18 (ltpstats -a)
+  info S3-10  Latency of all envelopes (informative): n=119 min 1.571 s median 1.581 s max 27.484 s
+  info S3-11  Checkpoints the Gateway resent to Earth (informative): gateway node, span to earth: ckpt_re_xmit = 53 (ltpstats -a)
+  info S3-12  Checkpoints the rover resent to the Gateway (informative): rover node, span to gateway: ckpt_re_xmit = 20 (ltpstats -a)
   info S3-13  LTP blocks the Gateway cancelled towards Earth (informative): gateway node, span to earth: export_cancel_xmit = 3 (ltpstats -a)
   info S3-14  Bundles the Gateway forwarded again after an LTP transmission failed (informative): gateway node bpstats rfw: 3 bundles
-[05:53:08] run_demo: scenario S4
-[05:53:08] S4: emulator_ready 
-[05:53:13] S4: nodes_started t0_utc=2026/10/07-05:53:10
-[05:53:20] S4: endpoint_a_ready plan_origin_offset_s=-0.005
-[05:53:20] S4: endpoint_b_started 
-[05:54:20] S4: traffic_phase_end 
-[05:54:20] S4: endpoints_stopped a=0 b=0
-[05:54:48] S4: nodes_stopped status=0
-[05:54:48] S4: emulator_stopped 
+  info S3-15  Last receipt and its margin to the end of the traffic phase (110 s); receipts during the drain (informative): last receipt at 95.199 s; traffic phase ends at 110 s (margin 14.801 s); 0 receipts after it; drain ended at 110.0 s, every envelope handed to ION received or its lifetime ended
+[07:28:47] run_demo: scenario S4
+[07:28:48] S4: emulator_ready 
+[07:28:53] S4: nodes_started t0_utc=2026/10/07-07:28:50
+[07:29:00] S4: endpoint_a_ready plan_origin_offset_s=-0.001
+[07:29:00] S4: endpoint_b_started 
+[07:30:00] S4: traffic_phase_end 
+[07:30:00] S4: drain_end duration_s=0.0 pending=0
+[07:30:00] S4: endpoints_stopped a=0 b=0
+[07:30:28] S4: nodes_stopped status=0
+[07:30:28] S4: emulator_stopped 
 S4: PASS (12/12 criteria)
   PASS S4-1   Every rover envelope handed to ION is received at Earth: 62 of 62 delivered (ratio 1.000)
   PASS S4-2   Every Earth command handed to ION is received at the rover: 2 of 2 delivered (ratio 1.000)
   PASS S4-3   Every received envelope is byte-identical to the envelope handed to ION: 64 of 64 received envelopes byte-identical (SHA-256 and header)
   PASS S4-4   Every received envelope is accepted: 64 of 64: ACCEPT OK
-  PASS S4-5   CRITICAL and HIGH envelopes (PING replies included) arrive within 4.0 s despite the BULK backlog: n=12 min 2.063 s median 2.601 s max 2.919 s
-  PASS S4-6   NORMAL envelopes arrive within 4.0 s despite the BULK backlog: n=5 min 2.100 s median 2.161 s max 2.454 s
+  PASS S4-5   CRITICAL and HIGH envelopes (PING replies included) arrive within 4.0 s despite the BULK backlog: n=12 min 2.096 s median 2.622 s max 2.917 s
+  PASS S4-6   NORMAL envelopes arrive within 4.0 s despite the BULK backlog: n=5 min 2.132 s median 2.181 s max 2.457 s
   PASS S4-7   Every CRITICAL, HIGH and NORMAL envelope arrives before at least one BULK envelope that was sent before it: 17 envelopes; each overtook min 18 / max 33 earlier-sent envelopes of the other group
-  PASS S4-8   The slowest CRITICAL or HIGH envelope is faster than the median BULK envelope: CRITICAL+HIGH max = 2.919 s; BULK median = 16.949 s
+  PASS S4-8   The slowest CRITICAL or HIGH envelope is faster than the median BULK envelope: CRITICAL+HIGH max = 2.917 s; BULK median = 16.968 s
   PASS S4-9   LOW envelopes (ION bulk class, same as BULK) do not overtake BULK envelopes sent before them: 5 envelopes; 0 overtook an earlier-sent envelope of the other group
   PASS S4-10  The emulator queue never overflowed (the backlog was held in ION): drop_queue_full total 0 (rover-gateway=0)
   PASS S4-11  Every send uses the class of service of SPEC-DIGEST 7.5 for its priority: 64 of 64 sends used the 7.5 class of service
   PASS S4-12  No duplicate or unknown envelope is received: 64 recv records, 0 without a matching send record
-  info S4-13  BULK latency (informative): n=40 min 2.301 s median 16.949 s max 31.834 s
-  info S4-14  LOW latency (informative): n=5 min 16.736 s median 22.666 s max 28.592 s
-  info S4-15  Largest wait in the emulator queue, rover-gateway (informative): max_queue_delay_s total 1.698 (rover-gateway=1.698)
-[05:54:48] run_demo: scenario S5
-[05:54:48] S5: emulator_ready 
-[05:54:53] S5: nodes_started t0_utc=2026/10/07-05:54:50
-[05:55:00] S5: endpoint_a_ready plan_origin_offset_s=-0.011
-[05:55:00] S5: endpoint_b_started 
-[05:55:26] S5: probe node=rover tool=bplist_detail at_s=26.0
-[05:55:26] S5: probe node=earth tool=bplist_detail at_s=26.4
-[05:55:26] S5: probe node=gateway tool=bplist_detail at_s=26.8
-[05:55:36] S5: probe node=rover tool=bplist_detail at_s=36.0
-[05:55:36] S5: probe node=earth tool=bplist_detail at_s=36.4
-[05:55:46] S5: probe node=rover tool=bplist_detail at_s=46.0
-[05:56:10] S5: traffic_phase_end 
-[05:56:10] S5: endpoints_stopped a=0 b=0
-[05:56:37] S5: nodes_stopped status=0
-[05:56:37] S5: emulator_stopped 
+  info S4-13  BULK latency (informative): n=40 min 2.302 s median 16.968 s max 31.856 s
+  info S4-14  LOW latency (informative): n=5 min 16.764 s median 22.694 s max 28.620 s
+  info S4-15  Largest wait in the emulator queue, rover-gateway (informative): max_queue_delay_s total 1.668 (rover-gateway=1.668)
+[07:30:28] run_demo: scenario S5
+[07:30:28] S5: emulator_ready 
+[07:30:33] S5: nodes_started t0_utc=2026/10/07-07:30:30
+[07:30:40] S5: endpoint_a_ready plan_origin_offset_s=-0.01
+[07:30:40] S5: endpoint_b_started 
+[07:31:06] S5: probe node=rover tool=bplist_detail at_s=26.0
+[07:31:06] S5: probe node=earth tool=bplist_detail at_s=26.4
+[07:31:06] S5: probe node=gateway tool=bplist_detail at_s=26.8
+[07:31:16] S5: probe node=rover tool=bplist_detail at_s=36.0
+[07:31:16] S5: probe node=earth tool=bplist_detail at_s=36.4
+[07:31:26] S5: probe node=rover tool=bplist_detail at_s=46.0
+[07:31:50] S5: traffic_phase_end 
+[07:31:50] S5: drain_end duration_s=0.0 pending=0
+[07:31:50] S5: endpoints_stopped a=0 b=0
+[07:32:18] S5: nodes_stopped status=0
+[07:32:18] S5: emulator_stopped 
 S5: PASS (20/20 criteria)
   PASS S5-1   Both endpoints refuse to send a TTL 1 envelope (lifetime bound below 1 ms after the 1 s margin): 2 of 2: NOT_SENT GW_EXPIRED
   PASS S5-2   Both endpoints refuse to send a TTL 2 envelope (lifetime bound below the 1 s ION minimum): 2 of 2: NOT_SENT GW_LIFETIME_UNDER_1S
   PASS S5-3   Receivers reject expired envelopes delivered by ION (PBS-ENV-01 12.2), including an expired command before authentication: 3 of 3: REJECT TTL_EXPIRED
   PASS S5-4   No TTL 10 or TTL 20 envelope sent during the outage is delivered (bundle lifetime ended in storage): 0 of 11 delivered
   PASS S5-5   TTL 60, TTL 0 and TTL 30 envelopes sent during the outage are delivered and accepted: 9 of 9: ACCEPT OK
-  PASS S5-6   Rover control envelopes arrive after the contact resumes (50 s + 1.55 s): 6 received; earliest receipt at 53.031 s
-  PASS S5-7   Earth control envelopes arrive after the contact resumes (50 s + 0.25 s): 3 received; earliest receipt at 51.483 s
+  PASS S5-6   Rover control envelopes arrive after the contact resumes (50 s + 1.55 s): 6 received; earliest receipt at 53.092 s
+  PASS S5-7   Earth control envelopes arrive after the contact resumes (50 s + 0.25 s): 3 received; earliest receipt at 51.485 s
   PASS S5-8   At 26 s the rover node holds the 8 short-TTL rover envelopes: rover node held 8 matching bundles at 26.000 s (all bundles: 14)
   PASS S5-9   At 36 s the TTL 10 envelopes (bundle lifetime 8 s) are gone from the rover node: rover node held 0 matching bundles at 36.000 s (all bundles: 10)
   PASS S5-10  At 36 s the TTL 20 envelopes (bundle lifetime 18 s) are still held: rover node held 4 matching bundles at 36.000 s (all bundles: 10)
@@ -152,47 +159,50 @@ S5: PASS (20/20 criteria)
   PASS S5-18  No receiver accepts an envelope older than its TTL: 15 accepted envelopes with TTL > 0; 0 older than their TTL
   PASS S5-19  No duplicate or unknown envelope is received: 20 recv records, 0 without a matching send record
   PASS S5-20  At 26.8 s the Gateway node holds the Earth TTL 60 envelopes and the command, waiting for the rover contact: gateway node held 3 matching bundles at 26.800 s (all bundles: 3)
-  info S5-21  Observed: TTL 3 envelopes (bundle lifetime 1 s at A, 2 s at B) and B's TTL 2 envelope handed over at its Timestamp (lifetime 1 s); the contact-plan ranges on the path sum to 3 s (informative): A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered; B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: ACCEPT OK, latency 1.575 s; B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered
-[05:56:38] run_demo: scenario S6
-[05:56:38] S6: emulator_ready 
-[05:56:43] S6: nodes_started t0_utc=2026/10/07-05:56:40
-[05:56:50] S6: endpoint_a_ready plan_origin_offset_s=-0.003
-[05:56:50] S6: endpoint_b_started 
-[05:57:32] S6: traffic_phase_end 
-[05:57:32] S6: endpoints_stopped a=0 b=0
-[05:58:00] S6: nodes_stopped status=0
-[05:58:00] S6: emulator_stopped 
-S6: PASS (7/7 criteria)
-  PASS S6-1   Each command gets the expected disposition at the rover: 22 labels checked
+  info S5-21  Observed: TTL 3 envelopes (bundle lifetime 1 s at A, 2 s at B) and B's TTL 2 envelope handed over at its Timestamp (lifetime 1 s); the contact-plan ranges on the path sum to 3 s (informative): A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered; B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: ACCEPT OK, latency 1.576 s; B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered
+[07:32:18] run_demo: scenario S6
+[07:32:18] S6: emulator_ready 
+[07:32:23] S6: nodes_started t0_utc=2026/10/07-07:32:20
+[07:32:30] S6: endpoint_a_ready plan_origin_offset_s=0.009
+[07:32:30] S6: endpoint_b_started 
+[07:33:14] S6: traffic_phase_end 
+[07:33:14] S6: drain_end duration_s=0.0 pending=0
+[07:33:14] S6: endpoints_stopped a=0 b=0
+[07:33:41] S6: nodes_stopped status=0
+[07:33:41] S6: emulator_stopped 
+S6: PASS (8/8 criteria)
+  PASS S6-1   Each command gets the expected disposition at the rover: 25 labels checked
   PASS S6-2   Only the five accepted commands are executed (logged), in order: executed: DRIVE, SET_HEATER, CAPTURE_IMAGE, PING, SET_MODE
-  PASS S6-3   Every command envelope handed to ION is received at the rover: 22 of 22 delivered (ratio 1.000)
-  PASS S6-4   The rover receives the bytes Endpoint B handed to ION (tampered bytes included): 22 of 22 received envelopes byte-identical (SHA-256 and header)
-  PASS S6-5   Every recv record (audit line) matches an envelope that was sent; no duplicates: 30 recv records, 0 without a matching send record
+  PASS S6-3   Every command envelope handed to ION is received at the rover: 25 of 25 delivered (ratio 1.000)
+  PASS S6-4   The rover receives the bytes Endpoint B handed to ION (tampered bytes included): 25 of 25 received envelopes byte-identical (SHA-256 and header)
+  PASS S6-5   Every recv record (audit line) matches an envelope that was sent; no duplicates: 33 recv records, 0 without a matching send record
   PASS S6-6   Rover telemetry and the PING reply continue to arrive and are accepted: 8 of 8: ACCEPT OK
   PASS S6-7   No receiver accepts an envelope older than its TTL: 13 accepted envelopes with TTL > 0; 0 older than their TTL
-[05:58:00] run_demo: scenario S7
-[05:58:00] S7: emulator_ready 
-[05:58:05] S7: nodes_started t0_utc=2026/10/07-05:58:02
-[05:58:12] S7: endpoint_a_ready plan_origin_offset_s=0.001
-[05:58:12] S7: endpoint_b_started 
-[05:58:37] S7: traffic_phase_end 
-[05:58:37] S7: endpoints_stopped a=0 b=0
-[05:59:05] S7: nodes_stopped status=0
-[05:59:05] S7: emulator_stopped 
-[05:59:05] S7: post command=a-vectors status=0
-[05:59:05] S7: post command=vector-comparison status=0
-[05:59:05] S7: post command=a-crosscheck status=0
-[05:59:05] S7: post command=b-crosscheck status=0
+  PASS S6-8   A valid command sent after the rejected ones is accepted; the measured value gives the number of envelopes the rover rejected before it: S6-21-VALID-AFTER-REJECTS received ACCEPT OK after 17 rejected envelopes at receiver A (AUTHZ_DENIED 2, AUTH_CTX_MISSING 1, CRC 1, SEC_AUTH_FAIL 8, SEC_KEY_UNKNOWN 1, SEC_MISSING 1, SEC_REPLAY 2, TTL_EXPIRED 1)
+[07:33:41] run_demo: scenario S7
+[07:33:42] S7: emulator_ready 
+[07:33:46] S7: nodes_started t0_utc=2026/10/07-07:33:43
+[07:33:53] S7: endpoint_a_ready plan_origin_offset_s=0.004
+[07:33:53] S7: endpoint_b_started 
+[07:34:18] S7: traffic_phase_end 
+[07:34:18] S7: drain_end duration_s=0.0 pending=0
+[07:34:18] S7: endpoints_stopped a=0 b=0
+[07:34:45] S7: nodes_stopped status=0
+[07:34:45] S7: emulator_stopped 
+[07:34:46] S7: post command=a-vectors status=0
+[07:34:46] S7: post command=vector-comparison status=0
+[07:34:46] S7: post command=a-crosscheck status=0
+[07:34:46] S7: post command=b-crosscheck status=0
 S7: PASS (9/9 criteria)
-  PASS S7-1   For every vector with inputs, Endpoint A and Endpoint B build the same bytes, equal to the vector file; for every receiver and SEC-B case both give the expected result and reason: build: 34 items, A==B 34, A==expected 34, B==expected 34; receive: 22 items, A==B 22, A==expected 22, B==expected 22; sec_b: 30 items, A==B 30, A==expected 30, B==expected 30
+  PASS S7-1   For every vector with inputs, Endpoint A and Endpoint B build the same bytes, equal to the vector file; for every receiver and SEC-B case both give the expected result and reason: build: 36 items, A==B 36, A==expected 36, B==expected 36; receive: 23 items, A==B 23, A==expected 23, B==expected 23; sec_b: 34 items, A==B 34, A==expected 34, B==expected 34
   PASS S7-2   Endpoint A's vector run passes every check: a-vectors exit status 0
   PASS S7-3   The comparison program finds no difference: vector-comparison exit status 0
-  PASS S7-4   Endpoint A decodes every envelope Endpoint B logged as sent with the same field values, and Endpoint B received every envelope A sent byte-identically: a-crosscheck exit status 0
-  PASS S7-5   Endpoint B decodes every envelope Endpoint A logged as sent with the same field values, and Endpoint A received every envelope B sent byte-identically: b-crosscheck exit status 0
-  PASS S7-6   Every envelope handed to ION is received by the other endpoint: 14 of 14 delivered (ratio 1.000)
-  PASS S7-7   Every received envelope is byte-identical to the envelope handed to ION: 14 of 14 received envelopes byte-identical (SHA-256 and header)
-  PASS S7-8   Each endpoint accepts every envelope of the other implementation: 14 of 14: ACCEPT OK
+  PASS S7-4   Endpoint A decodes every envelope Endpoint B logged as sent (all have envelope_hex) with the same field values, and Endpoint B received every envelope A sent, byte-identical (the tool fails otherwise): a-crosscheck exit status 0; decoded 7 of 7 peer send records (0 without bytes), 0 field mismatches; own envelopes delivered 8 of 8, byte-identical 8
+  PASS S7-5   Endpoint B decodes every envelope Endpoint A logged as sent (all have envelope_hex) with the same field values, and Endpoint A received every envelope B sent, byte-identical (the tool fails otherwise): b-crosscheck exit status 0; decoded 8 of 8 peer send records (0 without bytes), 0 field mismatches; own envelopes delivered 7 of 7, byte-identical 7
+  PASS S7-6   Every envelope handed to ION is received by the other endpoint: 15 of 15 delivered (ratio 1.000)
+  PASS S7-7   Every received envelope is byte-identical to the envelope handed to ION: 15 of 15 received envelopes byte-identical (SHA-256 and header)
+  PASS S7-8   Each endpoint accepts every envelope of the other implementation: 15 of 15: ACCEPT OK
   PASS S7-9   The protected command with an unknown frame type is executed: executed: PING
-[05:59:05] run_demo: step 7: report
-make_report: wrote /home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/REPORT.md (7 scenarios, charts: yes)
-[05:59:12] run_demo: finished in 853 s: self-checks passed, scenarios passed
+[07:34:46] run_demo: step 7: report
+make_report: wrote /home/user/pbs-ion-demo-runs/run-F/REPORT.md (7 scenarios, charts: yes)
+[07:34:53] run_demo: finished in 866 s: self-checks passed, scenarios passed

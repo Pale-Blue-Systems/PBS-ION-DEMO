@@ -1,48 +1,56 @@
 {
+ "drain": {
+  "complete": true,
+  "duration_s": 0.0,
+  "end_scenario_s": 110.0,
+  "end_unix_s": 1791358100.0004854,
+  "max_s": 30,
+  "pending": []
+ },
  "duration_s": 110,
  "endpoint_a": {
   "argv": [
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/endpoint-python/bin/rover",
+   "/home/user/pbs-ion-demo-runs/run-F/endpoint-python/bin/rover",
    "--log",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S3/endpoint-a.jsonl",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S3/endpoint-a.jsonl",
    "--scenario",
    "S3",
    "--plan",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S3/rover-plan.json",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S3/rover-plan.json",
    "--duration",
-   "130",
+   "160",
    "--ion-node-dir",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion/rover",
+   "/home/user/pbs-ion-demo-runs/run-F/build/run/ion/rover",
    "--ion-node-list-dir",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion",
+   "/home/user/pbs-ion-demo-runs/run-F/build/run/ion",
    "--ready-file",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S3/rover.ready",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S3/rover.ready",
    "--reply-ping"
   ],
-  "launch_unix_s": 1791352249.9001648,
-  "plan_origin_offset_s": 0.02005,
-  "plan_origin_unix_s": 1791352250.0200498,
-  "startup_s": 0.119885
+  "launch_unix_s": 1791357989.9003174,
+  "plan_origin_offset_s": -0.004037,
+  "plan_origin_unix_s": 1791357989.9959629,
+  "startup_s": 0.095645
  },
  "endpoint_b": {
   "argv": [
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/endpoint-c/pbs_earth",
+   "/home/user/pbs-ion-demo-runs/run-F/build/endpoint-c/pbs_earth",
    "run",
    "--plan",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S3/earth-plan.jsonl",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S3/earth-plan.jsonl",
    "--log",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S3/endpoint-b.jsonl",
+   "/home/user/pbs-ion-demo-runs/run-F/results/S3/endpoint-b.jsonl",
    "--scenario",
    "S3",
    "--t0-us",
-   "1791352250000000",
+   "1791357990000000",
    "--duration",
-   "130",
+   "160",
    "--node-dir",
-   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion/earth"
+   "/home/user/pbs-ion-demo-runs/run-F/build/run/ion/earth"
   ],
-  "launch_unix_s": 1791352250.023556,
-  "plan_origin_unix_s": 1791352250.0
+  "launch_unix_s": 1791357990.0035574,
+  "plan_origin_unix_s": 1791357990.0
  },
  "exit": {
   "emulator": 0,
@@ -50,9 +58,9 @@
   "endpoint-b": 0,
   "stop_nodes": 0
  },
- "finished_utc": "2026-10-07T05:53:08.366618+00:00",
+ "finished_utc": "2026-10-07T07:28:47.924585+00:00",
  "git": {
-  "commit": "7095caaf1c12b92e3a382ed123b4b3d003b3b16c",
+  "commit": "25ffe97aa464007464b889685b500191c2e49f7e",
   "worktree_modified": false
  },
  "host": {
@@ -68,8 +76,8 @@
   "tag": "ion-open-source-4.2.0"
  },
  "lead_s": 10,
- "origin_unix_s": 1791352250.0,
- "origin_us": 1791352250000000,
+ "origin_unix_s": 1791357990.0,
+ "origin_us": 1791357990000000,
  "post": [],
  "probes": [
   {
@@ -80,7 +88,7 @@
    "file": "probes/final-rover-bpstats.txt",
    "final": true,
    "node": "rover",
-   "t_us": 1791352360035711
+   "t_us": 1791358100043373
   },
   {
    "argv": [
@@ -91,7 +99,7 @@
    "file": "probes/final-rover-ltpstats.txt",
    "final": true,
    "node": "rover",
-   "t_us": 1791352360040008
+   "t_us": 1791358100048088
   },
   {
    "argv": [
@@ -101,7 +109,7 @@
    "file": "probes/final-gateway-bpstats.txt",
    "final": true,
    "node": "gateway",
-   "t_us": 1791352360044049
+   "t_us": 1791358100052786
   },
   {
    "argv": [
@@ -112,7 +120,7 @@
    "file": "probes/final-gateway-ltpstats.txt",
    "final": true,
    "node": "gateway",
-   "t_us": 1791352360048130
+   "t_us": 1791358100057039
   },
   {
    "argv": [
@@ -122,7 +130,7 @@
    "file": "probes/final-earth-bpstats.txt",
    "final": true,
    "node": "earth",
-   "t_us": 1791352360052286
+   "t_us": 1791358100061727
   },
   {
    "argv": [
@@ -133,54 +141,60 @@
    "file": "probes/final-earth-ltpstats.txt",
    "final": true,
    "node": "earth",
-   "t_us": 1791352360056405
+   "t_us": 1791358100066367
   }
  ],
  "scenario": "S3",
  "scenario_file": "scenarios/S3.json",
- "started_utc": "2026-10-07T05:50:38.027116+00:00",
+ "started_utc": "2026-10-07T07:26:18.547070+00:00",
  "steps": [
   {
    "step": "emulator_ready",
-   "t_us": 1791352238091919
+   "t_us": 1791357978637940
   },
   {
    "step": "nodes_started",
-   "t0_utc": "2026/10/07-05:50:40",
-   "t_us": 1791352243759760
+   "t0_utc": "2026/10/07-07:26:20",
+   "t_us": 1791357983822305
   },
   {
-   "plan_origin_offset_s": 0.02,
+   "plan_origin_offset_s": -0.004,
    "step": "endpoint_a_ready",
-   "t_us": 1791352250022569
+   "t_us": 1791357990002426
   },
   {
    "step": "endpoint_b_started",
-   "t_us": 1791352250023558
+   "t_us": 1791357990003559
   },
   {
    "step": "traffic_phase_end",
-   "t_us": 1791352360000220
+   "t_us": 1791358100000308
+  },
+  {
+   "duration_s": 0.0,
+   "pending": 0,
+   "step": "drain_end",
+   "t_us": 1791358100007627
   },
   {
    "a": 0,
    "b": 0,
    "step": "endpoints_stopped",
-   "t_us": 1791352360035609
+   "t_us": 1791358100043179
   },
   {
    "status": 0,
    "step": "nodes_stopped",
-   "t_us": 1791352388333940
+   "t_us": 1791358127859804
   },
   {
    "step": "emulator_stopped",
-   "t_us": 1791352388365886
+   "t_us": 1791358127923894
   }
  ],
  "stop_clean_without_fallback": true,
- "stop_nodes_s": 27.3,
- "t0_unix_s": 1791352240.0,
- "t0_utc": "2026/10/07-05:50:40",
+ "stop_nodes_s": 26.8,
+ "t0_unix_s": 1791357980.0,
+ "t0_utc": "2026/10/07-07:26:20",
  "title": "Unscheduled blackouts and random loss: LTP recovery"
 }

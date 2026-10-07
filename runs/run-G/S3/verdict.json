@@ -1,0 +1,147 @@
+{
+ "scenario": "S3",
+ "title": "Unscheduled blackouts and random loss: LTP recovery",
+ "run_completed": true,
+ "run_error": null,
+ "stop_clean_without_fallback": true,
+ "passed": true,
+ "criteria_passed": 9,
+ "criteria_total": 9,
+ "criteria": [
+  {
+   "id": "S3-1",
+   "text": "Every rover envelope handed to ION is received at Earth",
+   "check": "delivery",
+   "passed": true,
+   "measured": "102 of 102 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-2",
+   "text": "Every Earth command handed to ION is received at the rover",
+   "check": "delivery",
+   "passed": true,
+   "measured": "17 of 17 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-3",
+   "text": "Every received envelope is byte-identical to the envelope handed to ION",
+   "check": "byte_identical",
+   "passed": true,
+   "measured": "119 of 119 received envelopes byte-identical (SHA-256 and header)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-4",
+   "text": "Every received envelope is accepted",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "119 of 119: ACCEPT OK",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-5",
+   "text": "The emulator dropped datagrams at random on every link direction",
+   "check": "link_counter",
+   "passed": true,
+   "measured": "drop_loss total 50 (rover-gateway=15, gateway-rover=8, gateway-earth=23, earth-gateway=4)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-6",
+   "text": "The emulator dropped datagrams in the unscheduled blackouts on every link direction",
+   "check": "link_counter",
+   "passed": true,
+   "measured": "drop_blackout total 84 (gateway-earth=49, earth-gateway=19, rover-gateway=12, gateway-rover=4)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-7",
+   "text": "LTP retransmitted data segments (same session, offset and length seen again by the emulator)",
+   "check": "link_counter",
+   "passed": true,
+   "measured": "ltp_data_retransmissions total 81 (rover-gateway=18, gateway-rover=3, gateway-earth=54, earth-gateway=6)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-8",
+   "text": "Every recv record is a delivery of an envelope that was sent (byte-identical); a repeated delivery passes only when it is the same bundle as the first delivery (same creation timestamp) and ION re-forwarded at least as many bundles (bpstats rfw)",
+   "check": "no_unknown",
+   "passed": true,
+   "measured": "119 recv records; 0 further deliveries of an envelope already received; 0 unknown; ION re-forwarded 1 bundles (bpstats rfw, all nodes); 0 further deliveries not the same bundle",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-9",
+   "text": "No receiver accepts an envelope older than its TTL",
+   "check": "ttl_respected",
+   "passed": true,
+   "measured": "102 accepted envelopes with TTL > 0; 0 older than their TTL",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S3-10",
+   "text": "Latency of all envelopes (informative)",
+   "check": "latency",
+   "passed": true,
+   "measured": "n=119 min 1.572 s median 1.583 s max 29.918 s",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-11",
+   "text": "Checkpoints the Gateway resent to Earth (informative)",
+   "check": "ltp_counter",
+   "passed": true,
+   "measured": "gateway node, span to earth: ckpt_re_xmit = 48 (ltpstats -a)",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-12",
+   "text": "Checkpoints the rover resent to the Gateway (informative)",
+   "check": "ltp_counter",
+   "passed": true,
+   "measured": "rover node, span to gateway: ckpt_re_xmit = 16 (ltpstats -a)",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-13",
+   "text": "LTP blocks the Gateway cancelled towards Earth (informative)",
+   "check": "ltp_counter",
+   "passed": true,
+   "measured": "gateway node, span to earth: export_cancel_xmit = 2 (ltpstats -a)",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-14",
+   "text": "Bundles the Gateway forwarded again after an LTP transmission failed (informative)",
+   "check": "ion_counter",
+   "passed": true,
+   "measured": "gateway node bpstats rfw: 1 bundles",
+   "details": [],
+   "informative": true
+  },
+  {
+   "id": "S3-15",
+   "text": "Last receipt and its margin to the end of the traffic phase (110 s); receipts during the drain (informative)",
+   "check": "last_receipt",
+   "passed": true,
+   "measured": "last receipt at 87.577 s; traffic phase ends at 110 s (margin 22.423 s); 0 receipts after it; drain ended at 110.0 s, every envelope handed to ION received or its lifetime ended",
+   "details": [],
+   "informative": true
+  }
+ ]
+}

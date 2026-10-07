@@ -86,18 +86,20 @@ the two differ only by the drift of the realtime clock during a run.
 ## Measured forwarding accuracy
 
 The time each datagram was sent minus its scheduled delivery time, over
-S1 to S7 of the two recorded runs of commit `7095caa`
-(`scenarios/README.md`):
+S1 to S7 of the two recorded runs of commit `25ffe97`
+(`scenarios/README.md`; 99th percentile by nearest rank):
 
 | Run | Datagrams forwarded | Median | 99th percentile | Maximum |
 |---|---|---|---|---|
-| run E (`results/`) | 3461 | 0.773 ms | 2.235 ms | 18.831 ms |
-| run D (`runs/run-D/`) | 3388 | 0.759 ms | 2.215 ms | 15.394 ms |
+| run F (`results/`) | 3510 | 0.790 ms | 2.298 ms | 6.639 ms |
+| run G (`runs/run-G/`) | 3443 | 0.805 ms | 2.457 ms | 40.748 ms |
 
 The one-way delays the emulator adds are therefore 0.25 s and 1.3 s plus
-0.8 ms at the median. The largest value of each run was in S2 (18.8 ms and
-15.4 ms); every other scenario stayed at or below 8.1 ms (run E) and
-5.2 ms (run D). REPORT.md lists the figures per scenario.
+0.8 ms at the median. In run F no datagram was more than 6.7 ms late (S2).
+In run G two scenarios had larger single values, 40.7 ms in S5 and 24.1 ms
+in S3, and the others stayed at or below 6.1 ms. REPORT.md lists the
+figures per scenario. The two runs of commit `7095caa` (run E, run D) had
+maxima of 18.8 ms and 15.4 ms, both in S2.
 
 ## Event log (`--log`)
 

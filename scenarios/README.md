@@ -102,13 +102,13 @@ bytes/s per direction, unless a row says otherwise.
 
 | | Conditions | Traffic | Pass criteria (summary) | Conformance items |
 |---|---|---|---|---|
-| S1 | no loss, no outage; 40 s | rover to Earth (unsigned): 5 priorities x 6, a 20000-byte BULK envelope, a header-only envelope with ACK_REQ, PING replies; Earth to rover: 8 signed commands (Ed25519 and HMAC, two roles), signed MCC telemetry, a header-only TTL 0 heartbeat | every envelope delivered once and byte-identical; all accepted; 8 commands executed in order; latency 1.55 to 3.0 s; TTL 0 sent with the 2147483647 s lifetime and delivered; class of service per priority; bundle source EID matches | PBS-C02-T002, T010 (partial), T015, T016; C01 4.1-4.3, 5.1, 6, 7 |
-| S2 | scheduled outages: rover-Gateway 25-50 s, Gateway-Earth 65-85 s; 105 s | rover: 1 envelope/s rotating priorities (BULK 2000 bytes), PING replies; Earth: PING every 6 s | every envelope delivered and accepted; `bplist` shows envelopes held at the rover, the Gateway and Earth during the outages; envelopes sent during an outage arrive only after it ends; no datagram sent into a scheduled outage | PBS-C02-T011, T002; C01 4.2; DTN-MAP-01 9 |
-| S3 | 5 % random loss on all four directions; unscheduled blackouts Gateway-Earth 40-55 s and rover-Gateway 75-80 s; 110 s | as S2 (BULK 3000 bytes), PING every 5 s | every envelope delivered and accepted, byte-identical; every receipt is a sent envelope, and a repeated delivery only as an ION re-forward of the same bundle; losses and blackout drops on every direction; LTP data retransmissions observed | PBS-C02-T011, T002; C01 4.2 |
-| S4 | contact rate rover-Gateway 4000 bytes/s; emulator 4400 bytes/s with a 65536-byte queue on that leg; 60 s | rover: 40 BULK x 3000 bytes at 2 s, then 5 each of CRITICAL, HIGH, NORMAL, LOW 3 s apart; Earth: 2 PINGs | CRITICAL/HIGH/NORMAL within 4.0 s and ahead of earlier BULK; slowest CRITICAL/HIGH faster than median BULK; LOW (same ION class as BULK) never overtakes BULK; emulator queue never full | PBS-C02-T012 (partial), T010 (partial); C01 6; DTN-MAP-01 6.3; DTN-MAP-02 5 (`docs/MAPPING-PROFILE.md`) |
-| S5 | scheduled outage rover-Gateway 20-50 s; 70 s | both: TTL 1 and TTL 2 (not sendable), TTL 1 with a 60 s lifetime override (fault injection), TTL 10/20 during the outage, TTL 60/0 and a TTL 30 command during the outage, TTL 3 observations | TTL 1 `GW_EXPIRED` and TTL 2 `GW_LIFETIME_UNDER_1S` at both endpoints; injected envelopes `TTL_EXPIRED` at both receivers; no TTL 10/20 envelope delivered; `bplist` shows them held and then gone; `bpstats` counts the expiries; control envelopes delivered after the outage | PBS-C02-T004, T011, T016; C01 4.2, 8 (receiver side only), 9 |
-| S6 | no loss, no outage; 44 s | Earth: 25 commands (valid, 6 tamper modes plus CRC and two lowered `frame_count` values, replays, rogue keys, unknown key_id, expired, roles, wrong epoch, unknown authority, unsigned, no Authority Context, unknown frame); rover: telemetry, PING reply | every command gets its expected disposition; only the 5 accepted commands execute; every command has an audit record; a valid command after the rejections is accepted | PBS-C02-T004, T006, T007, T008, T014, T015; C01 9 |
-| S7 | no loss, no outage; 25 s | both: all priorities, header-only, ACK_REQ, up to 65536 bytes (A) and 65000 bytes (B), unknown frame types (unprotected from A, signed from B); every envelope logged with its bytes | both endpoints build identical bytes for every vector input and give the expected disposition for every receiver case; each endpoint decodes every envelope the other logged as sent, with identical fields; all delivered byte-identical and accepted | PBS-C02-T014, T002; C01 4.1, 4.3, 5.1, 7, 10 |
+| S1 | no loss, no outage; 40 s | rover to Earth (unsigned): 5 priorities x 6, a 20000-byte BULK envelope, a header-only envelope with ACK_REQ, PING replies; Earth to rover: 8 signed commands (Ed25519 and HMAC, two roles), signed MCC telemetry, a header-only TTL 0 heartbeat | every envelope delivered once and byte-identical; all accepted; 8 commands executed in order; latency 1.55 to 3.0 s; TTL 0 sent with the 2147483647 s lifetime and delivered; class of service per priority; bundle source EID matches | PBS-C02-T002, PBS-C02-T010 (partial), PBS-C02-T015, PBS-C02-T016; C01 4.1-4.3, 5.1, 6, 7 |
+| S2 | scheduled outages: rover-Gateway 25-50 s, Gateway-Earth 65-85 s; 105 s | rover: 1 envelope/s rotating priorities (BULK 2000 bytes), PING replies; Earth: PING every 6 s | every envelope delivered and accepted; `bplist` shows envelopes held at the rover, the Gateway and Earth during the outages; envelopes sent during an outage arrive only after it ends; no datagram sent into a scheduled outage | PBS-C02-T011, PBS-C02-T002; C01 4.2; DTN-MAP-01 9 |
+| S3 | 5 % random loss on all four directions; unscheduled blackouts Gateway-Earth 40-55 s and rover-Gateway 75-80 s; 110 s | as S2 (BULK 3000 bytes), PING every 5 s | every envelope delivered and accepted, byte-identical; every receipt is a sent envelope, and a repeated delivery only as an ION re-forward of the same bundle; losses and blackout drops on every direction; LTP data retransmissions observed | PBS-C02-T011, PBS-C02-T002; C01 4.2 |
+| S4 | contact rate rover-Gateway 4000 bytes/s; emulator 4400 bytes/s with a 65536-byte queue on that leg; 60 s | rover: 40 BULK x 3000 bytes at 2 s, then 5 each of CRITICAL, HIGH, NORMAL, LOW 3 s apart; Earth: 2 PINGs | CRITICAL/HIGH/NORMAL within 4.0 s and ahead of earlier BULK; slowest CRITICAL/HIGH faster than median BULK; LOW (same ION class as BULK) never overtakes BULK; emulator queue never full | PBS-C02-T012 (partial), PBS-C02-T010 (partial); C01 6; DTN-MAP-01 6.3; DTN-MAP-02 5 (`docs/MAPPING-PROFILE.md`) |
+| S5 | scheduled outage rover-Gateway 20-50 s; 70 s | both: TTL 1 and TTL 2 (not sendable), TTL 1 with a 60 s lifetime override (fault injection), TTL 10/20 during the outage, TTL 60/0 and a TTL 30 command during the outage, TTL 3 observations | TTL 1 `GW_EXPIRED` and TTL 2 `GW_LIFETIME_UNDER_1S` at both endpoints; injected envelopes `TTL_EXPIRED` at both receivers; no TTL 10/20 envelope delivered; `bplist` shows them held and then gone; `bpstats` counts the expiries; control envelopes delivered after the outage | PBS-C02-T004, PBS-C02-T011, PBS-C02-T016; C01 4.2, 8 (receiver side only), 9 |
+| S6 | no loss, no outage; 44 s | Earth: 25 commands (valid, 6 tamper modes plus CRC and two lowered `frame_count` values, replays, rogue keys, unknown key_id, expired, roles, wrong epoch, unknown authority, unsigned, no Authority Context, unknown frame); rover: telemetry, PING reply | every command gets its expected disposition; only the 5 accepted commands execute; every command has an audit record; a valid command after the rejections is accepted | PBS-C02-T004, PBS-C02-T006, PBS-C02-T007, PBS-C02-T008, PBS-C02-T014, PBS-C02-T015; C01 9 |
+| S7 | no loss, no outage; 25 s | both: all priorities, header-only, ACK_REQ, up to 65536 bytes (A) and 65000 bytes (B), unknown frame types (unprotected from A, signed from B); every envelope logged with its bytes | both endpoints build identical bytes for every vector input and give the expected disposition for every receiver case; each endpoint decodes every envelope the other logged as sent, with identical fields; all delivered byte-identical and accepted | PBS-C02-T014, PBS-C02-T002; C01 4.1, 4.3, 5.1, 7, 10 |
 
 C01 = PBS-CONFORMANCE-01 (cited by section; it has no test identifiers).
 PBS-C02-Tnnn are the PBS-CONFORMANCE-02 test identifiers of its Section 3
@@ -126,34 +126,45 @@ envelope after it is built and signed, before it is handed to ION (S6).
 ## Recorded runs
 
 `results/` and `REPORT.md` are the output of `./run_demo.sh` in a fresh
-`git clone` of commit `7095caa` in `/home/user/pbs-ion-demo-runs/run-E`
-(run E, started 2026-10-07 05:44:59 UTC). `runs/run-D/` holds a
-second complete run from another fresh clone of the same commit in
-`/home/user/pbs-ion-demo-runs/run-D` (run D, 05:30:42 UTC). REPORT.md's
-Repeatability section, written by `report/compare_runs.py`, compares the
-two criterion by criterion. `runs/control/` holds two S2 runs made in
-run E's clone after run E with the `m maxbacklog` lines removed from
-`ion/nodes/*/node.ltprc`, that is with ION's default LTP delivery backlog
-limit (observation 6). Paths inside `results/` (`run.json`, `argv` fields)
-are those of the clones. `7095caa` differs from the commit holding these
-files only in documentation, comments in `ion/nodes/*/node.ltprc`,
-REPORT.md and `results/`.
+`git clone` of commit `25ffe97` in `/home/user/pbs-ion-demo-runs/run-F`
+(run F, started 2026-10-07 07:20:27 UTC). `runs/run-G/` holds a second
+complete run from another fresh clone of the same commit in
+`/home/user/pbs-ion-demo-runs/run-G` (run G, 07:35:04 UTC). REPORT.md's
+Repeatability section, written by `report/compare_runs.py` through
+`make_report.py --name "run F" --compare "run G=runs/run-G"`, compares the
+two criterion by criterion. Paths inside `results/` and `runs/` (`run.json`,
+`argv` fields) are those of the clones. `25ffe97` differs from the commit
+holding these files only in `results/`, `runs/run-G/`, REPORT.md,
+documentation, `scenarios/runner.py`, which now leaves `runs/` out of the
+modified-tree check recorded in `run.json` (the Docker context excludes
+`runs/`), and the matching wording of that check in
+`report/make_report.py`.
+
+Older runs: `runs/run-D/` is a complete run of commit `7095caa` (run D),
+and `runs/control/` two S2 runs of `7095caa` with ION's default LTP
+delivery backlog limit (observation 6). Run E of `7095caa`, the run that
+was in `results/` before, is in the repository history at commit
+`db0b886`. These runs predate rule R8a (SPEC-DIGEST.md A38), the drain
+and the other changes of `25ffe97`; their verdicts were made with the
+criteria of their own commit, copied into each `scenario.json`.
 
 Host (REPORT.md has the details): 4 vCPU Intel Xeon 2.80 GHz, Linux 6.18,
-Python 3.13.16, ION 4.2.0 built by `ion/build_ion.sh`. Run E took 853 s,
-of which 97 s cloning and building ION; run D 857 s, of which 99 s for ION.
-Both passed all 85 required criteria of the 7 scenarios, and every ION stop
-was clean without the fallback.
+Python 3.13.16, ION 4.2.0 built by `ion/build_ion.sh`. Run F took 866 s,
+of which 107 s cloning and building ION; run G 869 s, of which 108 s for
+ION. Both passed all 86 required criteria of the 7 scenarios, every ION
+stop was clean without the fallback, and in every scenario of both runs
+the drain ended at the end of the traffic phase, with every envelope
+handed to ION already received or expired.
 
-| | Run E (run D where it differs) |
+| | Run F (run G where it differs) |
 |---|---|
-| S1 | 46 of 46 envelopes delivered and accepted, byte-identical; latency 1.569 to 1.612 s (D: 1.569 to 1.597 s) against the 1.55 s emulated propagation |
-| S2 | 127 of 127 delivered; at 45 s the rover held 20 rover envelopes sent since the rover-Gateway outage began (22 bundles in all), at 80 s the Gateway held 17 sent since 63 s (`bplist`); rover envelopes sent during the rover-Gateway outage arrived 3.14 to 3.43 s after it ended (D: 3.01 to 3.28 s), those sent during the Gateway-Earth outage 7.70 to 10.39 s after it ended (D: 2.62 to 2.69 s). In run E Earth screened the Gateway's first 34 LTP segments after that outage, which cost one checkpoint timeout (observation 2); in run D it screened none. Neither run discarded a segment for delivery backlog |
-| S3 | 119 of 119 delivered; the emulator dropped 53 datagrams at random and 84 in the two blackouts (D: 52 and 84); LTP sent 85 data segments again (same in D); the Gateway cancelled 3 LTP blocks towards Earth and BP re-forwarded 3 bundles (D: 2 and 2); in each run one BULK envelope reached Earth twice as the same bundle (E: sent at 76.0 s, copies 0.14 s apart; D: sent at 41.0 s, copies 0.61 s apart), which S3-8 admits (observation 4); maximum latency 22.17 s (D: 26.60 s) |
-| S4 | CRITICAL 2.06 to 2.66 s, HIGH 2.57 to 2.92 s, NORMAL 2.10 to 2.45 s while the 40 BULK envelopes took 2.30 to 31.83 s (median 16.95 s); LOW 16.74 to 28.59 s, behind the BULK envelopes sent before them. Every one of these figures differs by at most 0.014 s in run D |
-| S5 | TTL 1 and TTL 2 not sent at either endpoint (`GW_EXPIRED`, `GW_LIFETIME_UNDER_1S`); the three fault-injected expired envelopes rejected with `TTL_EXPIRED`; 0 of 11 TTL 10/20 envelopes delivered and 9 of 9 TTL 60/0/30 envelopes delivered after the outage; `bpstats` counted 9 expiries at the rover and 4 at Earth (D: 9 and 5) |
-| S6 | 22 of 22 commands with the expected disposition; 5 executed (same in D) |
-| S7 | 34 of 34 built vectors identical between the endpoints and the vector file; 22 of 22 receiver cases and 30 of 30 SEC-B deliveries with the expected result at both endpoints; both cross-checks exit 0 (same in D) |
+| S1 | 46 of 46 envelopes delivered and accepted, byte-identical; latency 1.574 to 1.662 s (G: 1.572 to 1.618 s) against the 1.55 s emulated propagation |
+| S2 | 127 of 127 delivered; at 45 s the rover held 20 rover envelopes sent since the rover-Gateway outage began (21 bundles in all), at 80 s the Gateway held 17 sent since 63 s (`bplist`); rover envelopes sent during the rover-Gateway outage arrived 3.14 to 3.51 s after it ended (G: 3.19 to 3.84 s), those sent during the Gateway-Earth outage 7.69 to 10.40 s after it ended (G: 7.76 to 10.45 s). In both runs Earth screened the Gateway's first 34 LTP segments after that outage, which cost one checkpoint timeout (observation 2); neither discarded a segment for delivery backlog. The last receipt came at 97.59 s, 7.41 s before the end of the traffic phase (S2-19, both runs) |
+| S3 | 119 of 119 delivered; the emulator dropped 56 datagrams at random and 84 in the two blackouts (G: 50 and 84); LTP sent 91 data segments again (G: 81); the Gateway cancelled 3 LTP blocks towards Earth and BP re-forwarded 3 bundles at the Gateway and 1 at the rover (G: 2 cancelled, 1 re-forwarded at the Gateway); in run F one BULK envelope reached Earth twice as the same bundle (sent at 76.0 s, copies at 87.225 and 91.194 s), which S3-8 admits (observation 4); run G had no repeat; maximum latency 27.48 s (G: 29.92 s) |
+| S4 | CRITICAL 2.10 to 2.66 s, HIGH 2.59 to 2.92 s, NORMAL 2.13 to 2.46 s while the 40 BULK envelopes took 2.30 to 31.86 s (median 16.97 s); LOW 16.76 to 28.62 s, behind the BULK envelopes sent before them. In run G every one of these figures is within 0.05 s, except one HIGH envelope that took 1.671 s |
+| S5 | TTL 1 and TTL 2 not sent at either endpoint (`GW_EXPIRED`, `GW_LIFETIME_UNDER_1S`); the three fault-injected expired envelopes rejected with `TTL_EXPIRED`; 0 of 11 TTL 10/20 envelopes delivered and 9 of 9 TTL 60/0/30 envelopes delivered after the outage; `bpstats` counted 9 expiries at the rover and 4 at Earth (same in G) |
+| S6 | 25 of 25 commands with the expected disposition, including `frame_count` lowered to 1 and to 0 (`SEC_MISSING`) and a validly signed command naming an unknown authority (`AUTHZ_DENIED`); 5 executed; 17 rejections before S6-21 (same in G) |
+| S7 | 36 of 36 built vectors identical between the endpoints and the vector file; 23 of 23 receiver cases and 34 of 34 SEC-B deliveries with the expected result at both endpoints; Endpoint A decoded all 7 envelopes Endpoint B logged and Endpoint B all 8 of Endpoint A, and each found all its own envelopes delivered byte-identical (same in G) |
 
 ### All runs on 2026-10-07
 
@@ -174,6 +185,10 @@ was clean without the fallback.
 | 05:44 | `7095caa` | fresh clone (run E) | 853 s | all 7 passed (`results/`) |
 | 05:59 | `7095caa`, `m maxbacklog` lines removed | run E's clone, S2 only (control 1) | 148 s | S2 passed (`runs/control/maxbacklog-default-1/`) |
 | 06:01 | `7095caa`, `m maxbacklog` lines removed | run E's clone, S2 only (control 2) | 148 s | S2 passed (`runs/control/maxbacklog-default-2/`) |
+| 07:10 | working tree that became `25ffe97`, ION already built, self-checks skipped | S6, S7 and S1 only | 235 s | all 3 passed; files not kept |
+| 07:20 | `25ffe97` | fresh clone (run F) | 866 s | all 7 passed (`results/`) |
+| 07:35 | `25ffe97` | fresh clone (run G) | 869 s | all 7 passed (`runs/run-G/`) |
+| 07:53 | `25ffe97` | emulated Docker image (chroot of ubuntu-base 24.04.5, Dockerfile package list, Python 3.12.3; README.md, Container and CI); ION built by the image's `RUN` step | 635 s | all 7 passed; files not kept in the repository |
 
 The runs up to 04:07 are described by the earlier version of this file;
 their files were not kept except those of 04:07. The runs from 04:24 to
@@ -194,8 +209,9 @@ limit of the nodes.
    insertion, about lines 880 to 930; default in `ici/library/ion.c` line
    970). In the six runs up to 04:07 the first datagram after an S2 outage
    reached the emulator 1.240 to 1.272 s (rover-Gateway) and 1.141 to
-   1.343 s (Gateway-Earth) after the outage end, and in the nine S2 runs
-   from 04:24 to 06:01 1.228 to 1.283 s and 1.285 to 1.362 s. No node sent
+   1.343 s (Gateway-Earth) after the outage end, in the nine S2 runs from
+   04:24 to 06:01 1.228 to 1.283 s and 1.285 to 1.362 s, and in runs F and
+   G 1.263 and 1.294 s and 1.348 and 1.389 s. No node sent
    a datagram into a scheduled outage (S2-15: 0 blackout drops in every
    run).
 
@@ -227,6 +243,8 @@ limit of the nodes.
    | `7095caa` 05:44 (run E) | 31 / 24 | 34 | 7.70 to 10.39 s | 5 / 0 | 0 | 1.56 to 1.59 s |
    | `7095caa` default backlog limit, 05:59 (control 1) | 31 / 24 | 34 | 7.67 to 10.40 s | 5 / 1 | 1 | 1.50 to 4.51 s |
    | `7095caa` default backlog limit, 06:01 (control 2) | 30 / 23 | 33 | 7.69 to 15.34 s | 5 / 0 | 0 | 1.54 to 1.64 s |
+   | `25ffe97` 07:20 (run F) | 31 / 24 | 34 | 7.69 to 10.40 s | 5 / 0 | 0 | 1.52 to 1.59 s |
+   | `25ffe97` 07:35 (run G) | 31 / 24 | 34 | 7.76 to 10.45 s | 5 / 0 | 0 | 1.57 to 1.64 s |
 
    (`ltpstats` was added in `ce737fa`.) In the runs up to 04:07 with
    resent checkpoints towards Earth, the unanswered blocks reached Earth
@@ -260,15 +278,21 @@ limit of the nodes.
    forwarded those bundles again (`rfw` in `bpstats`): 3, 0, 1, 2, 1 and 1
    bundles in the six runs up to 04:07, and 1, 2, 2, 0, 2 and 3 in the
    complete runs at 04:24, 04:37, 04:55, 05:09, 05:30 (run D) and 05:44
-   (run E). Earth received one BULK envelope twice in three of these twelve
-   runs: at 03:35 (`cba2de1`) 0.61 s apart; in run D sequence 48, sent at
-   41.0 s, at 67.618 and 68.230 s; in run E sequence 90, sent at 76.0 s, at
-   92.248 and 92.384 s. Each time both copies had the same bundle creation
+   (run E), and 3 and 1 in runs F and G (07:20 and 07:35; in run F the
+   rover also re-forwarded 1). Earth received one BULK envelope twice in
+   four of these fourteen runs: at 03:35 (`cba2de1`) 0.61 s apart; in run D
+   sequence 48, sent at 41.0 s, at 67.618 and 68.230 s; in run E sequence
+   90, sent at 76.0 s, at 92.248 and 92.384 s; in run F sequence 90, sent at
+   76.0 s, at 87.225 and 91.194 s. Each time both copies had the same bundle creation
    time and count, were byte-identical and were accepted (telemetry has no
    replay protection in PBS; a repeated command would be rejected by the
    PBS-SEC-B-01 replay window). S3-8 admits a repeat only when it is the
    same bundle and ION re-forwarded at least as many bundles
-   (`docs/CRITERIA-CHANGES.md`); it passed in runs D and E on that basis.
+   (`docs/CRITERIA-CHANGES.md`); it passed in runs D, E and F on that
+   basis. Endpoint B logged the second copy with `x_duplicates_before` 1
+   and accepted it, as it accepts every repeated unprotected envelope; no
+   envelope declares a delivery mode, so PBS gives no rule for the repeat
+   (REPORT.md, Not exercised).
 
 5. **Very short lifetimes are at the mercy of whole-second ION timing.** The
    S5 observation envelopes over the 1.55 s path, whose contact-plan ranges
@@ -288,6 +312,8 @@ limit of the nodes.
    | `de92b9c` 05:09 (run C) | not delivered | delivered, accepted | not delivered |
    | `7095caa` 05:30 (run D) | not delivered | delivered, accepted | not delivered |
    | `7095caa` 05:44 (run E) | not delivered | delivered, accepted | not delivered |
+   | `25ffe97` 07:20 (run F) | not delivered | delivered, accepted | not delivered |
+   | `25ffe97` 07:35 (run G) | not delivered | delivered, accepted | not delivered |
 
    Endpoint A and Endpoint B give TTL 3 different lifetimes, and TTL 2
    different outcomes, while both follow SPEC-DIGEST.md 7.4: Endpoint A
@@ -311,11 +337,11 @@ limit of the nodes.
    per span let a peer have 32 blocks open towards a node, so a limit of 10
    could not absorb a full window. `de92b9c` sets `m maxbacklog` to the
    blocks the peers can have open (32 at the rover and Earth, 64 at the
-   Gateway). The five S2 runs with the raised limit (04:51, runs B, C, D
-   and E) discarded no segment for backlog on any node. Four of them had
-   the same screening (33 or 34 segments) and delivered the rover
-   envelopes held at the Gateway at most 10.44 s after the outage end; run
-   D had no screening and delivered them at most 2.69 s after it. Two
+   Gateway). The seven S2 runs with the raised limit (04:51, runs B to G)
+   discarded no segment for backlog on any node. Six of them had the same
+   screening (33 or 34 segments) and delivered the rover envelopes held at
+   the Gateway at most 10.45 s after the outage end; run D had no
+   screening and delivered them at most 2.69 s after it. Two
    control runs of S2 with the `m maxbacklog` lines removed
    (`runs/control/`), both with the same screening, discarded 1 segment
    from the rover at the Gateway (control 1) and 5 segments at Earth

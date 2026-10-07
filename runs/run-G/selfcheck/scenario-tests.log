@@ -1,0 +1,59 @@
+/home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:130: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmptrzk088c/X/scenario.json' mode='w' encoding='utf-8'>
+  json.dump({"id": "X", "criteria": [crit]}, open(os.path.join(d, "scenario.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:131: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmptrzk088c/X/run.json' mode='w' encoding='utf-8'>
+  json.dump({"scenario": "X", "origin_unix_s": 1000.0}, open(os.path.join(d, "run.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/report/collect.py:377: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmptrzk088c/X/ion/gateway.ion.log' mode='r' encoding='utf-8'>
+  out[node] = parse_bpstats(open(p, errors="replace").read())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:130: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpfvyiaovb/X/scenario.json' mode='w' encoding='utf-8'>
+  json.dump({"id": "X", "criteria": [crit]}, open(os.path.join(d, "scenario.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:131: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpfvyiaovb/X/run.json' mode='w' encoding='utf-8'>
+  json.dump({"scenario": "X", "origin_unix_s": 1000.0}, open(os.path.join(d, "run.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/report/collect.py:377: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpfvyiaovb/X/ion/gateway.ion.log' mode='r' encoding='utf-8'>
+  out[node] = parse_bpstats(open(p, errors="replace").read())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:130: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmppjtqil5y/X/scenario.json' mode='w' encoding='utf-8'>
+  json.dump({"id": "X", "criteria": [crit]}, open(os.path.join(d, "scenario.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:131: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmppjtqil5y/X/run.json' mode='w' encoding='utf-8'>
+  json.dump({"scenario": "X", "origin_unix_s": 1000.0}, open(os.path.join(d, "run.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/report/collect.py:377: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmppjtqil5y/X/ion/gateway.ion.log' mode='r' encoding='utf-8'>
+  out[node] = parse_bpstats(open(p, errors="replace").read())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:130: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpjc2tflur/X/scenario.json' mode='w' encoding='utf-8'>
+  json.dump({"id": "X", "criteria": [crit]}, open(os.path.join(d, "scenario.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:131: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpjc2tflur/X/run.json' mode='w' encoding='utf-8'>
+  json.dump({"scenario": "X", "origin_unix_s": 1000.0}, open(os.path.join(d, "run.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/report/collect.py:377: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpjc2tflur/X/ion/gateway.ion.log' mode='r' encoding='utf-8'>
+  out[node] = parse_bpstats(open(p, errors="replace").read())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:130: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpa5moimn5/X/scenario.json' mode='w' encoding='utf-8'>
+  json.dump({"id": "X", "criteria": [crit]}, open(os.path.join(d, "scenario.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:131: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpa5moimn5/X/run.json' mode='w' encoding='utf-8'>
+  json.dump({"scenario": "X", "origin_unix_s": 1000.0}, open(os.path.join(d, "run.json"), "w"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/report/collect.py:377: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpa5moimn5/X/ion/gateway.ion.log' mode='r' encoding='utf-8'>
+  out[node] = parse_bpstats(open(p, errors="replace").read())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+....../home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:40: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/user/pbs-ion-demo-runs/run-G/ion/nodes/rover/node.ltprc' mode='r' encoding='utf-8'>
+  text = "\n".join(l for l in open(os.path.join(ROOT, "ion", "nodes", name, "node.ltprc"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:40: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/user/pbs-ion-demo-runs/run-G/ion/nodes/gateway/node.ltprc' mode='r' encoding='utf-8'>
+  text = "\n".join(l for l in open(os.path.join(ROOT, "ion", "nodes", name, "node.ltprc"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/user/pbs-ion-demo-runs/run-G/scenarios/test_scenarios.py:40: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/user/pbs-ion-demo-runs/run-G/ion/nodes/earth/node.ltprc' mode='r' encoding='utf-8'>
+  text = "\n".join(l for l in open(os.path.join(ROOT, "ion", "nodes", name, "node.ltprc"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..
+----------------------------------------------------------------------
+Ran 12 tests in 0.086s
+
+OK
