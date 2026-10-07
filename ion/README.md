@@ -64,6 +64,11 @@ gcc 13.3.0, autoconf 2.71, automake 1.16.5, libtool 2.4.7. The install
 prefix is 34 MB with 162 programs in `build/ion/bin`. The log contains 24
 compiler warnings and no errors.
 
+Clean-checkout check (same host, same day): in a fresh `git clone` of this
+repository, `ion/selftest.sh` cloned ION, built it (88 s), ran the
+self-test (pass; `bping` RTT 3142.2 / 3152.3 / 3176.2 ms min / avg / max)
+and stopped cleanly, in 2 min 38 s in total.
+
 ## Ports and links
 
 Every inter-node link direction has its own UDP port on 127.0.0.1, owned
