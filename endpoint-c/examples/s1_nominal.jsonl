@@ -1,0 +1,11 @@
+# S1 example plan for pbs_earth (Earth -> rover). Times are seconds after t0.
+# A telemetry request is the signed command PING <tag>; the rover answers
+# with telemetry. Defaults: commands priority 1 (HIGH), TTL 30, suite 0xFF02.
+{"at_s": 0.0, "kind": "command", "command": "PING TLM-REQ-1", "label": "req1"}
+{"at_s": 1.0, "kind": "command", "command": "SET_HEATER ON"}
+{"at_s": 2.0, "kind": "command", "command": "DRIVE 10"}
+{"at_s": 3.0, "kind": "command", "command": "CAPTURE_IMAGE NAVCAM", "role": "SCIENCE-OPS"}
+{"at_s": 4.0, "kind": "command", "command": "SET_MODE SCIENCE", "suite": "hmac"}
+{"at_s": 5.0, "kind": "telemetry", "text": "TLM MCC CLOCK SYNC", "priority": 2, "ttl": 60}
+{"at_s": 6.0, "kind": "heartbeat", "priority": 0, "ttl": 0}
+{"at_s": 7.0, "kind": "command", "command": "PING TLM-REQ-2", "count": 3, "interval_s": 1.0}

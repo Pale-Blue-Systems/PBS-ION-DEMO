@@ -1,0 +1,8 @@
+# S5 example plan for pbs_earth: short-TTL envelopes. Bundle lifetime from
+# docs/SPEC-DIGEST.md Section 7.4 (1 s margin, whole seconds).
+{"at_s": 0.0, "kind": "telemetry", "text": "TLM SHORT TTL 5", "ttl": 5, "note": "bundle lifetime 4 s"}
+{"at_s": 0.0, "kind": "telemetry", "text": "TLM SHORT TTL 3", "ttl": 3, "note": "bundle lifetime 2 s"}
+{"at_s": 0.0, "kind": "telemetry", "text": "TLM TTL 0", "ttl": 0, "note": "no-expiry lifetime 2147483647 s"}
+{"at_s": 0.0, "kind": "telemetry", "text": "TLM TTL 1", "ttl": 1, "note": "not sent: GW_EXPIRED"}
+{"at_s": 0.0, "kind": "telemetry", "text": "TLM STALE", "ttl": 30, "timestamp_offset_us": -31000000, "note": "not sent: GW_EXPIRED"}
+{"at_s": 1.0, "kind": "telemetry", "text": "TLM EXPIRES IN TRANSIT", "ttl": 1, "lifetime_s": 60, "note": "lifetime override (test only): receiver TTL_EXPIRED"}

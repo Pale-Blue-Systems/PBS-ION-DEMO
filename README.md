@@ -21,3 +21,27 @@ endpoint-python/bin/tool vectors --out endpoint-a-vectors.json
 ```
 
 Details, options and measured results: `endpoint-python/README.md`.
+
+## Endpoint B (Earth, C)
+
+`endpoint-c/` is the PBS endpoint at Mission Control. It runs on the EARTH
+ION node and opens `ipn:23.1` with ION's `bp_open()`, `bp_send()` and
+`bp_receive()`. It is written in C11 from the PBS v1.5.0 specification text and
+`docs/SPEC-DIGEST.md`, without PBS_LINK, and uses OpenSSL libcrypto for
+Ed25519, HMAC-SHA-256 and SHA-256. `pbs_earth` sends telemetry requests and
+commands signed with the TEST KEYS from a JSON-lines plan. The plan can also
+inject tampered, replayed, wrongly signed, unauthorized and expired commands.
+`pbs_earth` validates every envelope it receives (CRC32, length, expiry,
+authentication where present) and writes JSON lines in the format of
+`docs/LOG-SCHEMA.md`. `pbs_tool` builds, parses and crosschecks envelopes
+without ION.
+
+```sh
+make -C endpoint-c && make -C endpoint-c test     # 757 unit checks on docs/test-vectors.json and negative cases
+endpoint-c/tests/ion_smoke.sh                     # three ION nodes, ION tools on the rover side
+endpoint-c/tests/ion_interop.sh                   # three ION nodes, Endpoint A on the rover
+ION_NODE_WDNAME="$ION_RUN_DIR/earth" endpoint-c/build/pbs_earth run \
+  --plan endpoint-c/examples/s6_auth.jsonl --scenario S6 --duration 40 --log endpoint-b.jsonl
+```
+
+Details, plan format, options and measured results: `endpoint-c/README.md`.

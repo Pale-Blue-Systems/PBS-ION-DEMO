@@ -1,0 +1,19 @@
+# S6 example plan for pbs_earth: authenticated commands with the demo TEST
+# KEYS, then the rejection cases. Each line's "note" gives the rover verdict
+# expected under docs/SPEC-DIGEST.md Section 6.6.
+{"at_s": 0.0, "kind": "command", "command": "DRIVE 10", "label": "valid", "note": "ACCEPT OK"}
+{"at_s": 1.0, "kind": "command", "command": "SET_HEATER ON", "suite": "hmac", "note": "ACCEPT OK"}
+{"at_s": 2.0, "kind": "command", "command": "DRIVE 10", "tamper": "command", "note": "REJECT SEC_AUTH_FAIL"}
+{"at_s": 3.0, "kind": "command", "command": "DRIVE 10", "tamper": "priority", "note": "REJECT SEC_AUTH_FAIL"}
+{"at_s": 4.0, "kind": "command", "command": "DRIVE 10", "tamper": "ttl", "note": "REJECT SEC_AUTH_FAIL"}
+{"at_s": 5.0, "kind": "command", "command": "DRIVE 10", "tamper": "security_sequence", "note": "REJECT SEC_AUTH_FAIL"}
+{"at_s": 6.0, "kind": "replay", "replay_of": "valid", "note": "REJECT SEC_REPLAY"}
+{"at_s": 7.0, "kind": "command", "command": "DRIVE 10", "signing_key": "TEST-ED25519-ROGUE", "note": "REJECT SEC_AUTH_FAIL (wrong key)"}
+{"at_s": 8.0, "kind": "command", "command": "DRIVE 10", "suite": "hmac", "signing_key": "TEST-HMAC-ROGUE", "note": "REJECT SEC_AUTH_FAIL (wrong key)"}
+{"at_s": 9.0, "kind": "command", "command": "DRIVE 10", "key_id": "TEST-ED25519-ROGUE", "note": "REJECT SEC_KEY_UNKNOWN"}
+{"at_s": 10.0, "kind": "command", "command": "DRIVE 10", "ttl": 1, "lifetime_s": 60, "note": "REJECT TTL_EXPIRED (lifetime override: test only)"}
+{"at_s": 11.0, "kind": "command", "command": "DRIVE 10", "role": "SCIENCE-OPS", "note": "REJECT AUTHZ_DENIED"}
+{"at_s": 12.0, "kind": "command", "command": "DRIVE 10", "unsigned": true, "note": "REJECT SEC_MISSING"}
+{"at_s": 13.0, "kind": "command", "command": "DRIVE 10", "omit_auth_ctx": true, "note": "REJECT AUTH_CTX_MISSING"}
+{"at_s": 14.0, "kind": "command", "command": "DRIVE 10", "policy_epoch": 2, "note": "REJECT AUTHZ_DENIED"}
+{"at_s": 15.0, "kind": "command", "command": "PING AFTER-REJECTS", "note": "ACCEPT OK"}
