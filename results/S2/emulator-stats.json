@@ -17,22 +17,22 @@
    "jitter_s": 0.0,
    "listen": 22350,
    "loss": 0.0,
-   "ltp_data_retransmissions": 0,
+   "ltp_data_retransmissions": 1,
    "ltp_segments": {
-    "CP": 16,
+    "CP": 17,
     "RA": 16,
-    "RS": 111
+    "RS": 118
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 143,
-   "rx_bytes": 6211,
+   "rx": 151,
+   "rx_bytes": 6597,
    "send_error": 0,
-   "tx": 143,
-   "tx_bytes": 6211
+   "tx": 151,
+   "tx_bytes": 6597
   },
   "gateway-earth": {
    "blackouts": [
@@ -51,23 +51,23 @@
    "jitter_s": 0.0,
    "listen": 25023,
    "loss": 0.0,
-   "ltp_data_retransmissions": 0,
+   "ltp_data_retransmissions": 34,
    "ltp_segments": {
-    "CP": 111,
-    "DS": 38,
-    "RA": 111,
-    "RS": 16
+    "CP": 145,
+    "DS": 48,
+    "RA": 118,
+    "RS": 17
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 276,
-   "rx_bytes": 56854,
+   "rx": 328,
+   "rx_bytes": 71416,
    "send_error": 0,
-   "tx": 276,
-   "tx_bytes": 56854
+   "tx": 328,
+   "tx_bytes": 71416
   },
   "gateway-rover": {
    "blackouts": [
@@ -90,18 +90,18 @@
    "ltp_segments": {
     "CP": 16,
     "RA": 16,
-    "RS": 111
+    "RS": 112
    },
    "max_queue_bytes": 0,
    "max_queue_delay_s": 0.0,
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 143,
-   "rx_bytes": 6255,
+   "rx": 144,
+   "rx_bytes": 6270,
    "send_error": 0,
-   "tx": 143,
-   "tx_bytes": 6255
+   "tx": 144,
+   "tx_bytes": 6270
   },
   "rover-gateway": {
    "blackouts": [
@@ -120,9 +120,9 @@
    "jitter_s": 0.0,
    "listen": 29950,
    "loss": 0.0,
-   "ltp_data_retransmissions": 2,
+   "ltp_data_retransmissions": 1,
    "ltp_segments": {
-    "CP": 113,
+    "CP": 112,
     "DS": 38,
     "RA": 111,
     "RS": 16
@@ -132,15 +132,15 @@
    "pending_at_stop": 0,
    "queue_bytes": null,
    "rate_Bps": null,
-   "rx": 278,
-   "rx_bytes": 57019,
+   "rx": 277,
+   "rx_bytes": 56851,
    "send_error": 0,
-   "tx": 278,
-   "tx_bytes": 57019
+   "tx": 277,
+   "tx_bytes": 56851
   }
  },
  "schema": "pbs-ion-demo-linkemu/1",
  "seed": 2,
- "stopped_us": 1791346390240038,
- "t0": 1791346257.0
+ "stopped_us": 1791352237879922,
+ "t0": 1791352105.0
 }

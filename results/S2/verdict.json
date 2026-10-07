@@ -49,7 +49,7 @@
    "text": "At 45 s the rover node holds rover envelopes sent since the rover-Gateway outage began",
    "check": "probe_holds",
    "passed": true,
-   "measured": "rover node held 20 matching bundles at 45.000 s (all bundles: 21)",
+   "measured": "rover node held 20 matching bundles at 45.000 s (all bundles: 22)",
    "details": [
     "S2-BULK x4",
     "S2-CRITICAL x4",
@@ -75,12 +75,12 @@
    "text": "At 80 s the Gateway node holds rover envelopes sent since 63 s, waiting for the Earth contact",
    "check": "probe_holds",
    "passed": true,
-   "measured": "gateway node held 18 matching bundles at 80.000 s (all bundles: 18)",
+   "measured": "gateway node held 17 matching bundles at 80.000 s (all bundles: 17)",
    "details": [
     "PING-REPLY x1",
     "S2-BULK x3",
     "S2-CRITICAL x3",
-    "S2-HIGH x4",
+    "S2-HIGH x3",
     "S2-LOW x3",
     "S2-NORMAL x4"
    ],
@@ -102,7 +102,7 @@
    "text": "Rover envelopes sent during the rover-Gateway outage arrive no earlier than its end (50 s) plus 1.55 s propagation",
    "check": "delivered_after",
    "passed": true,
-   "measured": "24 received; earliest receipt at 53.191 s",
+   "measured": "24 received; earliest receipt at 53.143 s",
    "details": [],
    "informative": false
   },
@@ -111,7 +111,7 @@
    "text": "Earth commands sent during the rover-Gateway outage arrive no earlier than its end plus 0.25 s",
    "check": "delivered_after",
    "passed": true,
-   "measured": "4 received; earliest receipt at 51.569 s",
+   "measured": "4 received; earliest receipt at 51.555 s",
    "details": [],
    "informative": false
   },
@@ -120,7 +120,7 @@
    "text": "Rover envelopes sent during the Gateway-Earth outage arrive no earlier than its end (85 s) plus 1.3 s",
    "check": "delivered_after",
    "passed": true,
-   "measured": "19 received; earliest receipt at 87.684 s",
+   "measured": "19 received; earliest receipt at 92.697 s",
    "details": [],
    "informative": false
   },
@@ -129,7 +129,7 @@
    "text": "Earth commands sent during the Gateway-Earth outage arrive no earlier than its end plus 1.55 s",
    "check": "delivered_after",
    "passed": true,
-   "measured": "3 received; earliest receipt at 87.718 s",
+   "measured": "3 received; earliest receipt at 88.398 s",
    "details": [],
    "informative": false
   },
@@ -165,7 +165,7 @@
    "text": "LTP segments from the Gateway discarded by Earth's LTP screening (informative)",
    "check": "ltp_counter",
    "passed": true,
-   "measured": "earth node, span to gateway: in_seg_screened = 0 (ltpstats -a)",
+   "measured": "earth node, span to gateway: in_seg_screened = 34 (ltpstats -a)",
    "details": [],
    "informative": true
   },
@@ -183,7 +183,7 @@
    "text": "Checkpoints the Gateway resent to Earth (informative)",
    "check": "ltp_counter",
    "passed": true,
-   "measured": "gateway node, span to earth: ckpt_re_xmit = 0 (ltpstats -a)",
+   "measured": "gateway node, span to earth: ckpt_re_xmit = 29 (ltpstats -a)",
    "details": [],
    "informative": true
   }

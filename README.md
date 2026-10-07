@@ -78,9 +78,15 @@ make python3 python3-venv libssl-dev procps`, and network access to GitHub
 | S7 | cross-implementation: identical bytes for identical inputs, each endpoint parses the other's envelopes |
 
 `results/` and `REPORT.md` in this repository are one recorded run: a fresh
-clone of commit `88747a8` on 2026-10-07, 861 s including the ION build, all
-seven scenarios passed. `scenarios/README.md` gives the headline numbers and
-what was observed about ION across six runs.
+clone of commit `7095caa` on 2026-10-07, 853 s including the ION build, all
+seven scenarios and all 85 required criteria passed. A second fresh-clone
+run of the same commit is in `results/repeat/run-D/` (857 s, all passed),
+and REPORT.md's Repeatability section compares the two criterion by
+criterion. `results/control/` holds two S2 runs with ION's default LTP
+delivery backlog limit, the setting that made S2 fail once
+(`ion/README.md` item 15). `scenarios/README.md` lists every run made, the headline numbers
+and what was observed about ION; `docs/CRITERIA-CHANGES.md` lists every
+change to a pass/fail criterion made after a run.
 
 Container and CI: `Dockerfile` (`docker build -t pbs-ion-demo . && docker
 run --rm --shm-size=256m -v "$PWD/docker-results:/demo/results"

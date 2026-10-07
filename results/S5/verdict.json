@@ -58,7 +58,7 @@
    "text": "Rover control envelopes arrive after the contact resumes (50 s + 1.55 s)",
    "check": "delivered_after",
    "passed": true,
-   "measured": "6 received; earliest receipt at 52.961 s",
+   "measured": "6 received; earliest receipt at 53.031 s",
    "details": [],
    "informative": false
   },
@@ -67,7 +67,7 @@
    "text": "Earth control envelopes arrive after the contact resumes (50 s + 0.25 s)",
    "check": "delivered_after",
    "passed": true,
-   "measured": "3 received; earliest receipt at 51.479 s",
+   "measured": "3 received; earliest receipt at 51.483 s",
    "details": [],
    "informative": false
   },
@@ -76,7 +76,7 @@
    "text": "At 26 s the rover node holds the 8 short-TTL rover envelopes",
    "check": "probe_holds",
    "passed": true,
-   "measured": "rover node held 8 matching bundles at 26.000 s (all bundles: 13)",
+   "measured": "rover node held 8 matching bundles at 26.000 s (all bundles: 14)",
    "details": [
     "S5-TTL10-IN-OUTAGE x4",
     "S5-TTL20-IN-OUTAGE x4"
@@ -158,7 +158,7 @@
    "text": "The Earth node's bpstats count the Earth short-TTL bundles as deleted at lifetime expiry",
    "check": "ion_expired",
    "passed": true,
-   "measured": "earth node bpstats: 5 bundles deleted at lifetime expiry",
+   "measured": "earth node bpstats: 4 bundles deleted at lifetime expiry",
    "details": [],
    "informative": false
   },
@@ -176,7 +176,7 @@
    "text": "No receiver accepts an envelope older than its TTL",
    "check": "ttl_respected",
    "passed": true,
-   "measured": "14 accepted envelopes with TTL > 0; 0 older than their TTL",
+   "measured": "15 accepted envelopes with TTL > 0; 0 older than their TTL",
    "details": [],
    "informative": false
   },
@@ -185,7 +185,7 @@
    "text": "No duplicate or unknown envelope is received",
    "check": "no_unmatched",
    "passed": true,
-   "measured": "19 recv records, 0 without a matching send record",
+   "measured": "20 recv records, 0 without a matching send record",
    "details": [],
    "informative": false
   },
@@ -206,10 +206,10 @@
    "text": "Observed: TTL 3 envelopes (bundle lifetime 1 s at A, 2 s at B) and B's TTL 2 envelope handed over at its Timestamp (lifetime 1 s); the contact-plan ranges on the path sum to 3 s (informative)",
    "check": "observe",
    "passed": true,
-   "measured": "B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: not delivered; A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered; B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered",
+   "measured": "A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered; B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: ACCEPT OK, latency 1.575 s; B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered",
    "details": [
-    "B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: not delivered",
     "A->B S5-TTL3 TTL 3 s, bundle lifetime 1 s: not delivered",
+    "B->A S5-TTL3 TTL 3 s, bundle lifetime 2 s: ACCEPT OK, latency 1.575 s",
     "B->A S5-TTL2-ZERO-AGE TTL 2 s, bundle lifetime 1 s: not delivered"
    ],
    "informative": true

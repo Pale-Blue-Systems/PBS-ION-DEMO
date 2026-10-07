@@ -49,7 +49,7 @@
    "text": "CRITICAL and HIGH envelopes (PING replies included) arrive within 4.0 s despite the BULK backlog",
    "check": "latency",
    "passed": true,
-   "measured": "n=12 min 1.947 s median 2.472 s max 2.920 s",
+   "measured": "n=12 min 2.063 s median 2.601 s max 2.919 s",
    "details": [],
    "informative": false
   },
@@ -58,7 +58,7 @@
    "text": "NORMAL envelopes arrive within 4.0 s despite the BULK backlog",
    "check": "latency",
    "passed": true,
-   "measured": "n=5 min 1.979 s median 2.031 s max 2.463 s",
+   "measured": "n=5 min 2.100 s median 2.161 s max 2.454 s",
    "details": [],
    "informative": false
   },
@@ -76,7 +76,7 @@
    "text": "The slowest CRITICAL or HIGH envelope is faster than the median BULK envelope",
    "check": "latency_compare",
    "passed": true,
-   "measured": "CRITICAL+HIGH max = 2.920 s; BULK median = 16.824 s",
+   "measured": "CRITICAL+HIGH max = 2.919 s; BULK median = 16.949 s",
    "details": [],
    "informative": false
   },
@@ -121,7 +121,7 @@
    "text": "BULK latency (informative)",
    "check": "latency",
    "passed": true,
-   "measured": "n=40 min 2.299 s median 16.824 s max 31.704 s",
+   "measured": "n=40 min 2.301 s median 16.949 s max 31.834 s",
    "details": [],
    "informative": true
   },
@@ -130,7 +130,7 @@
    "text": "LOW latency (informative)",
    "check": "latency",
    "passed": true,
-   "measured": "n=5 min 16.616 s median 22.544 s max 28.475 s",
+   "measured": "n=5 min 16.736 s median 22.666 s max 28.592 s",
    "details": [],
    "informative": true
   },
@@ -139,7 +139,7 @@
    "text": "Largest wait in the emulator queue, rover-gateway (informative)",
    "check": "link_counter",
    "passed": true,
-   "measured": "max_queue_delay_s total 1.819 (rover-gateway=1.819)",
+   "measured": "max_queue_delay_s total 1.698 (rover-gateway=1.698)",
    "details": [],
    "informative": true
   }

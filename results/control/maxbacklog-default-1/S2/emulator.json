@@ -1,0 +1,78 @@
+{
+ "seed": 2,
+ "scenario": "S2",
+ "links": [
+  {
+   "name": "earth-gateway",
+   "listen": 22350,
+   "dest": 15013,
+   "delay_s": 1.3,
+   "jitter_s": 0.0,
+   "loss": 0.0,
+   "rate_Bps": null,
+   "queue_bytes": null,
+   "blackouts": [
+    {
+     "start_s": 65,
+     "end_s": 85,
+     "label": "no Gateway-Earth contact (planned)",
+     "kind": "scheduled"
+    }
+   ]
+  },
+  {
+   "name": "gateway-earth",
+   "listen": 25023,
+   "dest": 12313,
+   "delay_s": 1.3,
+   "jitter_s": 0.0,
+   "loss": 0.0,
+   "rate_Bps": null,
+   "queue_bytes": null,
+   "blackouts": [
+    {
+     "start_s": 65,
+     "end_s": 85,
+     "label": "no Gateway-Earth contact (planned)",
+     "kind": "scheduled"
+    }
+   ]
+  },
+  {
+   "name": "gateway-rover",
+   "listen": 25099,
+   "dest": 19913,
+   "delay_s": 0.25,
+   "jitter_s": 0.0,
+   "loss": 0.0,
+   "rate_Bps": null,
+   "queue_bytes": null,
+   "blackouts": [
+    {
+     "start_s": 25,
+     "end_s": 50,
+     "label": "rover out of view of the Gateway (planned)",
+     "kind": "scheduled"
+    }
+   ]
+  },
+  {
+   "name": "rover-gateway",
+   "listen": 29950,
+   "dest": 15013,
+   "delay_s": 0.25,
+   "jitter_s": 0.0,
+   "loss": 0.0,
+   "rate_Bps": null,
+   "queue_bytes": null,
+   "blackouts": [
+    {
+     "start_s": 25,
+     "end_s": 50,
+     "label": "rover out of view of the Gateway (planned)",
+     "kind": "scheduled"
+    }
+   ]
+  }
+ ]
+}

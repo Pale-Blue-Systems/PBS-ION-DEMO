@@ -1,0 +1,20 @@
+[i] admin pgm using SDR parm overrides from node.ionconfig.
+wmKey:           131095
+wmSize:          20000000
+wmAddress:       0
+sdrName:        'ion23'
+sdrWmSize:       1000000
+sdrWmKey:        65303
+configFlags:     13
+heapWords:       4000000
+heapKey:         196631
+logSize:         0
+logKey:          -1
+pathName:       '/home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/build/run/ion/earth'
+traceShmSize:    0
+Stopping ionadmin.
+Stopping ionadmin.
+Stopping ionsecadmin.
+Stopping ltpadmin.
+Stopping ipnadmin.
+Stopping bpadmin.

@@ -10,7 +10,7 @@ heapWords:       4000000
 heapKey:         196631
 logSize:         0
 logKey:          -1
-pathName:       '/home/user/PBS-ION-DEMO-run/build/run/ion/earth'
+pathName:       '/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion/earth'
 traceShmSize:    0
 Stopping ionadmin.
 Stopping ionadmin.

@@ -10,7 +10,7 @@ heapWords:       4000000
 heapKey:         196658
 logSize:         0
 logKey:          -1
-pathName:       '/home/user/PBS-ION-DEMO-run/build/run/ion/gateway'
+pathName:       '/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion/gateway'
 traceShmSize:    0
 Initializing semaphores to use: Posix Named Semaphores - max : 8192
 Stopping ionadmin.

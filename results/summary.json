@@ -1,7 +1,7 @@
 {
- "generated_utc": "2026-10-07T04:21:44.520146+00:00",
+ "generated_utc": "2026-10-07T06:04:52.590946+00:00",
  "git": {
-  "commit": "88747a82b61e121ea4d3a83d9599c86938555e12",
+  "commit": "7095caaf1c12b92e3a382ed123b4b3d003b3b16c",
   "worktree_modified": false
  },
  "ion": {
@@ -28,8 +28,8 @@
    "envelopes_sent": 46,
    "envelopes_received": 46,
    "byte_identical": 46,
-   "latency_median_s": 1.578561,
-   "latency_max_s": 1.600979,
+   "latency_median_s": 1.577702,
+   "latency_max_s": 1.611511,
    "stop_clean_without_fallback": true
   },
   {
@@ -42,8 +42,8 @@
    "envelopes_sent": 127,
    "envelopes_received": 127,
    "byte_identical": 127,
-   "latency_median_s": 1.615618,
-   "latency_max_s": 28.309152,
+   "latency_median_s": 1.801507,
+   "latency_max_s": 29.378303,
    "stop_clean_without_fallback": true
   },
   {
@@ -56,8 +56,8 @@
    "envelopes_sent": 119,
    "envelopes_received": 119,
    "byte_identical": 119,
-   "latency_median_s": 1.58225,
-   "latency_max_s": 24.153817,
+   "latency_median_s": 1.575443,
+   "latency_max_s": 22.164824,
    "stop_clean_without_fallback": true
   },
   {
@@ -70,8 +70,8 @@
    "envelopes_sent": 64,
    "envelopes_received": 64,
    "byte_identical": 64,
-   "latency_median_s": 11.710854,
-   "latency_max_s": 31.704234,
+   "latency_median_s": 11.4908555,
+   "latency_max_s": 31.834192,
    "stop_clean_without_fallback": true
   },
   {
@@ -82,10 +82,10 @@
    "criteria_total": 20,
    "envelopes_built": 37,
    "envelopes_sent": 33,
-   "envelopes_received": 19,
-   "byte_identical": 19,
-   "latency_median_s": 1.587821,
-   "latency_max_s": 29.894593,
+   "envelopes_received": 20,
+   "byte_identical": 20,
+   "latency_median_s": 1.581763,
+   "latency_max_s": 30.068768,
    "stop_clean_without_fallback": true
   },
   {
@@ -98,8 +98,8 @@
    "envelopes_sent": 30,
    "envelopes_received": 30,
    "byte_identical": 30,
-   "latency_median_s": 1.582849,
-   "latency_max_s": 13.58188,
+   "latency_median_s": 1.575553,
+   "latency_max_s": 13.57668,
    "stop_clean_without_fallback": true
   },
   {
@@ -112,8 +112,8 @@
    "envelopes_sent": 14,
    "envelopes_received": 14,
    "byte_identical": 14,
-   "latency_median_s": 1.583032,
-   "latency_max_s": 1.675682,
+   "latency_median_s": 1.5758135,
+   "latency_max_s": 1.646063,
    "stop_clean_without_fallback": true
   }
  ],
@@ -121,30 +121,30 @@
   {
    "name": "emulator-tests",
    "exit": 0,
-   "duration_s": 0.791,
-   "command": "/home/user/PBS-ION-DEMO-run/build/venv-demo/bin/python emulator/test_linkemu.py",
+   "duration_s": 0.702,
+   "command": "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/venv-demo/bin/python emulator/test_linkemu.py",
    "last_line": "OK"
   },
   {
    "name": "scenario-tests",
    "exit": 0,
-   "duration_s": 0.215,
-   "command": "/home/user/PBS-ION-DEMO-run/build/venv-demo/bin/python scenarios/test_scenarios.py",
+   "duration_s": 0.157,
+   "command": "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/venv-demo/bin/python scenarios/test_scenarios.py",
    "last_line": "OK"
   },
   {
    "name": "endpoint-b-tests",
    "exit": 0,
-   "duration_s": 1.338,
-   "command": "make -s -C endpoint-c BUILD=/home/user/PBS-ION-DEMO-run/build/endpoint-c test",
+   "duration_s": 1.094,
+   "command": "make -s -C endpoint-c BUILD=/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/endpoint-c test",
    "last_line": "  pbs_tool plan s6_auth.jsonl: 16 items"
   },
   {
    "name": "endpoint-a-tests",
    "exit": 0,
-   "duration_s": 2.166,
+   "duration_s": 1.877,
    "command": "endpoint-python/run_tests.sh",
-   "last_line": "294 passed, 1 skipped in 1.37s"
+   "last_line": "294 passed, 1 skipped in 1.25s"
   }
  ]
 }

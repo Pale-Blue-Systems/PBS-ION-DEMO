@@ -1,0 +1,105 @@
+{
+ "scenario": "S7",
+ "title": "Cross-implementation: each endpoint parses the other's envelopes; identical inputs give identical bytes",
+ "run_completed": true,
+ "run_error": null,
+ "stop_clean_without_fallback": true,
+ "passed": true,
+ "criteria_passed": 9,
+ "criteria_total": 9,
+ "criteria": [
+  {
+   "id": "S7-1",
+   "text": "For every vector with inputs, Endpoint A and Endpoint B build the same bytes, equal to the vector file; for every receiver and SEC-B case both give the expected result and reason",
+   "check": "vectors_identical",
+   "passed": true,
+   "measured": "build: 34 items, A==B 34, A==expected 34, B==expected 34; receive: 22 items, A==B 22, A==expected 22, B==expected 22; sec_b: 30 items, A==B 30, A==expected 30, B==expected 30",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S7-2",
+   "text": "Endpoint A's vector run passes every check",
+   "check": "post_exit",
+   "passed": true,
+   "measured": "a-vectors exit status 0",
+   "details": [
+    "vectors: 237 checks, 237 passed, 0 failed"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S7-3",
+   "text": "The comparison program finds no difference",
+   "check": "post_exit",
+   "passed": true,
+   "measured": "vector-comparison exit status 0",
+   "details": [
+    "receive   22 items: A == B  22, A == expected  22, B == expected  22",
+    "sec_b     30 items: A == B  30, A == expected  30, B == expected  30",
+    "all identical"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S7-4",
+   "text": "Endpoint A decodes every envelope Endpoint B logged as sent with the same field values, and Endpoint B received every envelope A sent byte-identically",
+   "check": "post_exit",
+   "passed": true,
+   "measured": "a-crosscheck exit status 0",
+   "details": [
+    " \"peer_duplicates\": 0,",
+    " \"ok\": true",
+    "}"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S7-5",
+   "text": "Endpoint B decodes every envelope Endpoint A logged as sent with the same field values, and Endpoint A received every envelope B sent byte-identically",
+   "check": "post_exit",
+   "passed": true,
+   "measured": "b-crosscheck exit status 0",
+   "details": [
+    "{\"impl\":\"endpoint-c 0.1.0\",\"peer_log\":\"/home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/results/S7/endpoint-a.jsonl\",\"decoded\":5,\"no_hex\":2,\"decode_mismatch_records\":0,\"decode_mismatch\":[],\"b_receive_accept\":5,\"b_receive_reject\":0,\"b_receive_reasons\":{\"OK\":5},\"own_log\":\"/home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/results/S7/endpoint-b.jsonl\",\"own_sent\":7,\"delivered\":7,\"byte_identical\":7,\"peer_duplicates\":0,\"byte_mismatch\":[],\"ok\":true}"
+   ],
+   "informative": false
+  },
+  {
+   "id": "S7-6",
+   "text": "Every envelope handed to ION is received by the other endpoint",
+   "check": "delivery",
+   "passed": true,
+   "measured": "14 of 14 delivered (ratio 1.000)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S7-7",
+   "text": "Every received envelope is byte-identical to the envelope handed to ION",
+   "check": "byte_identical",
+   "passed": true,
+   "measured": "14 of 14 received envelopes byte-identical (SHA-256 and header)",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S7-8",
+   "text": "Each endpoint accepts every envelope of the other implementation",
+   "check": "recv_result",
+   "passed": true,
+   "measured": "14 of 14: ACCEPT OK",
+   "details": [],
+   "informative": false
+  },
+  {
+   "id": "S7-9",
+   "text": "The protected command with an unknown frame type is executed",
+   "check": "exec",
+   "passed": true,
+   "measured": "executed: PING",
+   "details": [],
+   "informative": false
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+[
+ {
+  "name": "emulator-tests",
+  "exit": 0,
+  "duration_s": 0.701,
+  "command": "/home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/build/venv-demo/bin/python emulator/test_linkemu.py",
+  "last_line": "OK"
+ },
+ {
+  "name": "scenario-tests",
+  "exit": 0,
+  "duration_s": 0.182,
+  "command": "/home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/build/venv-demo/bin/python scenarios/test_scenarios.py",
+  "last_line": "OK"
+ },
+ {
+  "name": "endpoint-b-tests",
+  "exit": 0,
+  "duration_s": 1.084,
+  "command": "make -s -C endpoint-c BUILD=/home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/build/endpoint-c test",
+  "last_line": "  pbs_tool plan s6_auth.jsonl: 16 items"
+ },
+ {
+  "name": "endpoint-a-tests",
+  "exit": 0,
+  "duration_s": 1.849,
+  "command": "endpoint-python/run_tests.sh",
+  "last_line": "294 passed, 1 skipped in 1.22s"
+ }
+]

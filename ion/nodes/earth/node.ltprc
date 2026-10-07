@@ -16,7 +16,7 @@
 # checkpoint costs the sender a checkpoint timeout. The limit is set to the
 # blocks the peers can have open towards this node at once (32 import
 # sessions per span, one span = 32), so a full window of blocks completing
-# together, as after a scheduled outage, stays below the limit.
+# together, as after a scheduled outage, is accepted in full.
 1 64
 a span 50 32 32 1024 1 1 'udplso 127.0.0.1:22350' 1
 a seat 'udplsi 127.0.0.1:12313'

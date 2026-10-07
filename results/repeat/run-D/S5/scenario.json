@@ -1,0 +1,83 @@
+{
+ "id": "S5",
+ "title": "Expiry: bundle lifetime during an outage, and receivers rejecting expired envelopes",
+ "summary": "The rover-Gateway leg has a scheduled outage from 20 s to 50 s. During it both endpoints send short-TTL envelopes (TTL 10 s and 20 s) whose bundle lifetime, computed from the TTL per PBS-DTN-MAP-01 6.1, ends before the contact resumes, together with control envelopes (TTL 60, TTL 0 and a TTL 30 command) that outlive it. Before the outage, each endpoint offers TTL 1 and TTL 2 envelopes (too short to send; Endpoint B's TTL 2 envelope carries a Timestamp 1 ms in the past) and sends one TTL 1 envelope with a bundle lifetime override of 60 s (fault injection, not conformant to PBS-DTN-MAP-01 6.1) so that an expired envelope reaches the other receiver. TTL 3 envelopes and a TTL 2 envelope handed over at its Timestamp are sent as observations.",
+ "duration_s": 70,
+ "seed": 5,
+ "links": {},
+ "contacts": {},
+ "outages": [
+   {"leg": "rover-gateway", "start_s": 20, "end_s": 50, "kind": "scheduled", "label": "rover out of view of the Gateway (planned)"}
+  ],
+ "rover": {
+  "args": ["--reply-ping"],
+  "plan": {
+   "items": [
+     {"at_s": 3.0, "priority": 2, "ttl_s": 1, "text": "TLM TTL1", "label": "S5-GW-TTL1"},
+     {"at_s": 3.5, "priority": 2, "ttl_s": 2, "text": "TLM TTL2", "label": "S5-GW-TTL2"},
+     {"at_s": 4.0, "priority": 2, "ttl_s": 3, "text": "TLM TTL3", "label": "S5-TTL3"},
+     {"at_s": 5.0, "priority": 2, "ttl_s": 1, "text": "TLM INJECTED", "lifespan_override_s": 60, "label": "S5-INJECT-EXPIRED"},
+     {"at_s": 6.0, "priority": 2, "ttl_s": 60, "text": "TLM BEFORE OUTAGE", "label": "S5-PRE"},
+     {"at_s": 22.0, "count": 4, "interval_s": 1.0, "priority": 2, "ttl_s": 10, "text": "TLM SHORT", "label": "S5-TTL10-IN-OUTAGE"},
+     {"at_s": 22.5, "count": 4, "interval_s": 1.0, "priority": 2, "ttl_s": 20, "text": "TLM SHORT", "label": "S5-TTL20-IN-OUTAGE"},
+     {"at_s": 23.0, "count": 4, "interval_s": 1.0, "priority": 2, "ttl_s": 60, "text": "TLM LONG", "label": "S5-TTL60-IN-OUTAGE"},
+     {"at_s": 23.5, "count": 2, "interval_s": 2.0, "priority": 0, "ttl_s": 0, "frame": "event", "text": "EVT NO-EXPIRY", "label": "S5-TTL0-IN-OUTAGE"},
+     {"at_s": 55.0, "priority": 2, "ttl_s": 60, "text": "TLM AFTER OUTAGE", "label": "S5-POST"}
+    ]
+  }
+ },
+ "earth": {
+  "plan": [
+    {"at_s": 3.0, "kind": "telemetry", "text": "TLM MCC TTL1", "ttl": 1, "label": "S5-GW-TTL1"},
+    {"at_s": 3.5, "kind": "telemetry", "text": "TLM MCC TTL2 AGE 1MS", "ttl": 2, "label": "S5-GW-TTL2", "timestamp_offset_us": -1000},
+    {"at_s": 3.7, "kind": "telemetry", "text": "TLM MCC TTL2", "ttl": 2, "label": "S5-TTL2-ZERO-AGE"},
+    {"at_s": 4.0, "kind": "telemetry", "text": "TLM MCC TTL3", "ttl": 3, "label": "S5-TTL3"},
+    {"at_s": 5.0, "kind": "telemetry", "text": "TLM MCC INJECTED", "ttl": 1, "lifetime_s": 60, "label": "S5-INJECT-EXPIRED"},
+    {"at_s": 6.0, "kind": "command", "command": "DRIVE 5", "ttl": 1, "lifetime_s": 60, "label": "S5-INJECT-EXPIRED-CMD"},
+    {"at_s": 7.0, "kind": "command", "command": "PING S5-PRE", "label": "S5-PRE"},
+    {"at_s": 22.0, "count": 3, "interval_s": 1.0, "kind": "telemetry", "text": "TLM MCC SHORT", "ttl": 10, "label": "S5-TTL10-IN-OUTAGE"},
+    {"at_s": 23.5, "count": 2, "interval_s": 1.0, "kind": "telemetry", "text": "TLM MCC LONG", "ttl": 60, "label": "S5-TTL60-IN-OUTAGE"},
+    {"at_s": 25.0, "kind": "command", "command": "PING S5-IN-OUTAGE", "label": "S5-CMD-IN-OUTAGE"},
+    {"at_s": 55.0, "kind": "command", "command": "PING S5-POST", "label": "S5-POST"}
+   ]
+ },
+ "probes": [
+   {"at_s": 26.0, "node": "rover", "tool": "bplist_detail", "label": "rover at 26 s"},
+   {"at_s": 26.4, "node": "earth", "tool": "bplist_detail", "label": "Earth at 26.4 s"},
+   {"at_s": 26.8, "node": "gateway", "tool": "bplist_detail", "label": "Gateway at 26.8 s"},
+   {"at_s": 36.0, "node": "rover", "tool": "bplist_detail", "label": "rover at 36 s"},
+   {"at_s": 36.4, "node": "earth", "tool": "bplist_detail", "label": "Earth at 36.4 s"},
+   {"at_s": 46.0, "node": "rover", "tool": "bplist_detail", "label": "rover at 46 s"}
+  ],
+ "criteria": [
+   {"id": "S5-1", "check": "send_result", "select": {"label": "S5-GW-TTL1"}, "expect": "NOT_SENT GW_EXPIRED", "min_count": 2, "text": "Both endpoints refuse to send a TTL 1 envelope (lifetime bound below 1 ms after the 1 s margin)"},
+   {"id": "S5-2", "check": "send_result", "select": {"label": "S5-GW-TTL2"}, "expect": "NOT_SENT GW_LIFETIME_UNDER_1S", "min_count": 2, "text": "Both endpoints refuse to send a TTL 2 envelope (lifetime bound below the 1 s ION minimum)"},
+   {"id": "S5-3", "check": "recv_result", "select": {"label": ["S5-INJECT-EXPIRED", "S5-INJECT-EXPIRED-CMD"]}, "expect": "REJECT TTL_EXPIRED", "min_count": 3, "text": "Receivers reject expired envelopes delivered by ION (PBS-ENV-01 12.2), including an expired command before authentication"},
+   {"id": "S5-4", "check": "not_delivered", "select": {"label": ["S5-TTL10-IN-OUTAGE", "S5-TTL20-IN-OUTAGE"]}, "min_count": 11, "text": "No TTL 10 or TTL 20 envelope sent during the outage is delivered (bundle lifetime ended in storage)"},
+   {"id": "S5-5", "check": "recv_result", "select": {"label": ["S5-TTL60-IN-OUTAGE", "S5-TTL0-IN-OUTAGE", "S5-CMD-IN-OUTAGE"]}, "expect": "ACCEPT OK", "min_count": 9, "text": "TTL 60, TTL 0 and TTL 30 envelopes sent during the outage are delivered and accepted"},
+   {"id": "S5-6", "check": "delivered_after", "select": {"dir": "A->B", "label": ["S5-TTL60-IN-OUTAGE", "S5-TTL0-IN-OUTAGE"]}, "t_s": 51.55, "min_count": 6, "text": "Rover control envelopes arrive after the contact resumes (50 s + 1.55 s)"},
+   {"id": "S5-7", "check": "delivered_after", "select": {"dir": "B->A", "label": ["S5-TTL60-IN-OUTAGE", "S5-TTL0-IN-OUTAGE", "S5-CMD-IN-OUTAGE"]}, "t_s": 50.25, "min_count": 3, "text": "Earth control envelopes arrive after the contact resumes (50 s + 0.25 s)"},
+   {"id": "S5-8", "check": "probe_holds", "probe": "rover at 26 s", "select": {"label": ["S5-TTL10-IN-OUTAGE", "S5-TTL20-IN-OUTAGE"]}, "min_count": 8, "text": "At 26 s the rover node holds the 8 short-TTL rover envelopes"},
+   {"id": "S5-9", "check": "probe_holds", "probe": "rover at 36 s", "select": {"label": "S5-TTL10-IN-OUTAGE"}, "max_count": 0, "text": "At 36 s the TTL 10 envelopes (bundle lifetime 8 s) are gone from the rover node"},
+   {"id": "S5-10", "check": "probe_holds", "probe": "rover at 36 s", "select": {"label": "S5-TTL20-IN-OUTAGE"}, "min_count": 4, "text": "At 36 s the TTL 20 envelopes (bundle lifetime 18 s) are still held"},
+   {"id": "S5-11", "check": "probe_holds", "probe": "rover at 46 s", "select": {"label": ["S5-TTL10-IN-OUTAGE", "S5-TTL20-IN-OUTAGE"]}, "max_count": 0, "text": "At 46 s no short-TTL envelope is left at the rover node"},
+   {"id": "S5-12", "check": "probe_holds", "probe": "rover at 46 s", "select": {"label": ["S5-TTL60-IN-OUTAGE", "S5-TTL0-IN-OUTAGE"]}, "min_count": 6, "text": "At 46 s the TTL 60 and TTL 0 envelopes are still held at the rover node"},
+   {"id": "S5-13", "check": "probe_holds", "probe": "Earth at 26.4 s", "select": {"dir": "B->A", "label": "S5-TTL10-IN-OUTAGE"}, "min_count": 3, "text": "At 26.4 s the Earth node holds the three TTL 10 Earth envelopes (not forwarded: no route arrives before their lifetime ends)"},
+   {"id": "S5-14", "check": "probe_holds", "probe": "Earth at 36.4 s", "select": {"dir": "B->A", "label": "S5-TTL10-IN-OUTAGE"}, "max_count": 0, "text": "At 36.4 s they are gone from the Earth node"},
+   {"id": "S5-15", "check": "ion_expired", "node": "rover", "min_count": 8, "text": "The rover node's bpstats count the short-TTL bundles as deleted at lifetime expiry"},
+   {"id": "S5-16", "check": "ion_expired", "node": "earth", "min_count": 3, "text": "The Earth node's bpstats count the Earth short-TTL bundles as deleted at lifetime expiry"},
+   {"id": "S5-17", "check": "recv_result", "select": {"label": ["S5-PRE", "S5-POST"]}, "expect": "ACCEPT OK", "min_count": 4, "text": "Envelopes before and after the outage are delivered and accepted"},
+   {"id": "S5-18", "check": "ttl_respected", "text": "No receiver accepts an envelope older than its TTL"},
+   {"id": "S5-19", "check": "no_unmatched", "text": "No duplicate or unknown envelope is received"},
+   {"id": "S5-20", "check": "probe_holds", "probe": "Gateway at 26.8 s", "select": {"dir": "B->A", "label": ["S5-TTL60-IN-OUTAGE", "S5-CMD-IN-OUTAGE"]}, "min_count": 3, "text": "At 26.8 s the Gateway node holds the Earth TTL 60 envelopes and the command, waiting for the rover contact"},
+   {"id": "S5-21", "check": "observe", "informative": true, "labels": ["S5-TTL3", "S5-TTL2-ZERO-AGE"], "text": "Observed: TTL 3 envelopes (bundle lifetime 1 s at A, 2 s at B) and B's TTL 2 envelope handed over at its Timestamp (lifetime 1 s); the contact-plan ranges on the path sum to 3 s (informative)"}
+  ],
+ "conformance": [
+   {"ref": "PBS-CONFORMANCE-02 T004", "how": "expired envelopes rejected by both receivers with TTL_EXPIRED (S5-3)"},
+   {"ref": "PBS-CONFORMANCE-02 T011", "how": "short-TTL envelopes not delivered after an outage longer than their lifetime; longer ones delivered (S5-4, S5-5)"},
+   {"ref": "PBS-CONFORMANCE-02 T016", "how": "TTL 0 envelopes held through the outage and delivered (S5-5, S5-12)"},
+   {"ref": "PBS-CONFORMANCE-01 4.2, 9", "how": "TTL check in receive order; discard and continue (S5-3, S5-17)"},
+   {"ref": "PBS-CONFORMANCE-01 8 statements 1 and 2", "how": "as unit tests with an injected clock (vectors RX-01 to RX-06) in both endpoints' test suites and in S7"},
+   {"ref": "PBS-ENV-01 12.1 to 12.5; PBS-DTN-MAP-01 6.1, 6.1.1, 7.3; PBS-DTN-MAP-02 4, 10 (deadline-to-lifetime bounding, expiry during disruption, no-expiry lifetime)", "how": "S5-1, S5-2, S5-4, S5-8 to S5-16"}
+  ]
+}

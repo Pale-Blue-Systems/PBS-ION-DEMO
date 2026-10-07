@@ -1,5 +1,5 @@
 {
- "peer_log": "/home/user/PBS-ION-DEMO-run/results/S7/endpoint-b.jsonl",
+ "peer_log": "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/endpoint-b.jsonl",
  "decoded": 6,
  "decode_mismatch": [],
  "no_hex": 1,

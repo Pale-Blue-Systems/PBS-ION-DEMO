@@ -99,7 +99,11 @@ LTP spans (`node.ltprc`): `a span <peer> 32 32 1024 1 1 '<udplso>' 1`
 - 32 export and 32 import sessions per span, 1024-byte maximum segment;
 - aggregation size threshold 1 byte, so every bundle is sent as its own LTP
   block as soon as `ltpclo` dequeues it (see gotcha 9);
-- queuing latency 1 s (ION default).
+- queuing latency 1 s (ION default);
+- `m maxbacklog` 32 at the rover and Earth, 64 at the Gateway: the blocks
+  the node's peers can have open towards it (32 import sessions per span).
+  With ION's default of 10, Earth discarded checkpoints after a scheduled
+  outage (gotcha 15).
 
 BP (`node.bprc`): scheme `ipn`, endpoints `ipn:N.0`, `ipn:N.1`, `ipn:N.2`
 with rule `q` (bundles for an endpoint that no application has open are
@@ -333,6 +337,26 @@ waits about 2 s for `rfxclock` to end (both visible in `stop.log` and
     engine arriving while the contact plan gives that engine no transmit
     rate to the local node are discarded. Contact windows, ranges and
     clocks must agree. All three nodes share one host clock here.
+15. **LTP discards red segments while the delivery backlog is full**
+    (`m maxbacklog`, `ltprc(5)`, default 10; `ltp/library/libltpP.c`
+    about line 6779; counted by `ltpstats` as `in_seg_too_fast`). The
+    limit counts blocks waiting for delivery to BP on the whole engine.
+    Checkpoints are red segments, so a discarded checkpoint costs the
+    sender a checkpoint timeout (5.0 s on the Gateway-Earth leg in these
+    runs). In a fresh-clone run on 2026-10-07 (04:37 UTC, commit
+    `9dfb41f`, default limit), Earth screened the Gateway's burst of 24
+    blocks after the S2 Gateway-Earth outage. The Gateway resent the 24
+    checkpoints within 21 ms; Earth answered exactly 10 of them and
+    discarded the others, 19 segments in all over two checkpoint rounds,
+    and two BULK envelopes reached Earth only after the traffic phase (S2
+    failed). With the limit raised to the peers' open blocks (the change
+    committed as `de92b9c`), an S2 run with the same screening (33
+    segments) discarded no segment, and Earth sent 24 reports between
+    92.58 and 92.78 s in the corresponding checkpoint round. None of the five S2 runs with the
+    raised limit discarded a segment for backlog; two S2 runs with the
+    `m maxbacklog` lines removed (`results/control/`) discarded 1 and 5
+    (`scenarios/README.md`, observation 6). Run A's files are not in the
+    repository; the figures above were read from them.
 
 ## Open observation
 

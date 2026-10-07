@@ -2,47 +2,47 @@
  "duration_s": 25,
  "endpoint_a": {
   "argv": [
-   "/home/user/PBS-ION-DEMO-run/endpoint-python/bin/rover",
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/endpoint-python/bin/rover",
    "--log",
-   "/home/user/PBS-ION-DEMO-run/results/S7/endpoint-a.jsonl",
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/endpoint-a.jsonl",
    "--scenario",
    "S7",
    "--plan",
-   "/home/user/PBS-ION-DEMO-run/results/S7/rover-plan.json",
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/rover-plan.json",
    "--duration",
    "45",
    "--ion-node-dir",
-   "/home/user/PBS-ION-DEMO-run/build/run/ion/rover",
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion/rover",
    "--ion-node-list-dir",
-   "/home/user/PBS-ION-DEMO-run/build/run/ion",
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion",
    "--ready-file",
-   "/home/user/PBS-ION-DEMO-run/results/S7/rover.ready",
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/rover.ready",
    "--reply-ping"
   ],
-  "launch_unix_s": 1791346843.9001641,
-  "plan_origin_offset_s": 0.004209,
-  "plan_origin_unix_s": 1791346844.0042086,
-  "startup_s": 0.104044
+  "launch_unix_s": 1791352691.9001694,
+  "plan_origin_offset_s": 0.00131,
+  "plan_origin_unix_s": 1791352692.0013096,
+  "startup_s": 0.10114
  },
  "endpoint_b": {
   "argv": [
-   "/home/user/PBS-ION-DEMO-run/build/endpoint-c/pbs_earth",
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/endpoint-c/pbs_earth",
    "run",
    "--plan",
-   "/home/user/PBS-ION-DEMO-run/results/S7/earth-plan.jsonl",
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/earth-plan.jsonl",
    "--log",
-   "/home/user/PBS-ION-DEMO-run/results/S7/endpoint-b.jsonl",
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/endpoint-b.jsonl",
    "--scenario",
    "S7",
    "--t0-us",
-   "1791346844000000",
+   "1791352692000000",
    "--duration",
    "45",
    "--node-dir",
-   "/home/user/PBS-ION-DEMO-run/build/run/ion/earth"
+   "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/run/ion/earth"
   ],
-  "launch_unix_s": 1791346844.024461,
-  "plan_origin_unix_s": 1791346844.0
+  "launch_unix_s": 1791352692.003483,
+  "plan_origin_unix_s": 1791352692.0
  },
  "exit": {
   "emulator": 0,
@@ -50,9 +50,9 @@
   "endpoint-b": 0,
   "stop_nodes": 0
  },
- "finished_utc": "2026-10-07T04:21:37.402037+00:00",
+ "finished_utc": "2026-10-07T05:59:05.841235+00:00",
  "git": {
-  "commit": "88747a82b61e121ea4d3a83d9599c86938555e12",
+  "commit": "7095caaf1c12b92e3a382ed123b4b3d003b3b16c",
   "worktree_modified": false
  },
  "host": {
@@ -68,63 +68,63 @@
   "tag": "ion-open-source-4.2.0"
  },
  "lead_s": 10,
- "origin_unix_s": 1791346844.0,
- "origin_us": 1791346844000000,
+ "origin_unix_s": 1791352692.0,
+ "origin_us": 1791352692000000,
  "post": [
   {
    "argv": [
-    "/home/user/PBS-ION-DEMO-run/endpoint-python/bin/tool",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/endpoint-python/bin/tool",
     "vectors",
     "--out",
-    "/home/user/PBS-ION-DEMO-run/results/S7/a-vectors.json"
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/a-vectors.json"
    ],
-   "duration_s": 0.121,
+   "duration_s": 0.118,
    "exit": 0,
    "file": "a-vectors.out",
    "name": "a-vectors"
   },
   {
    "argv": [
-    "/home/user/PBS-ION-DEMO-run/build/venv-demo/bin/python",
-    "/home/user/PBS-ION-DEMO-run/scenarios/s7_compare.py",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/venv-demo/bin/python",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/scenarios/s7_compare.py",
     "--vectors",
-    "/home/user/PBS-ION-DEMO-run/docs/test-vectors.json",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/docs/test-vectors.json",
     "--a-vectors",
-    "/home/user/PBS-ION-DEMO-run/results/S7/a-vectors.json",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/a-vectors.json",
     "--earth-tool",
-    "/home/user/PBS-ION-DEMO-run/build/endpoint-c/pbs_tool",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/endpoint-c/pbs_tool",
     "--out",
-    "/home/user/PBS-ION-DEMO-run/results/S7/vector-comparison.json"
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/vector-comparison.json"
    ],
-   "duration_s": 0.159,
+   "duration_s": 0.157,
    "exit": 0,
    "file": "vector-comparison.out",
    "name": "vector-comparison"
   },
   {
    "argv": [
-    "/home/user/PBS-ION-DEMO-run/endpoint-python/bin/tool",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/endpoint-python/bin/tool",
     "crosscheck",
-    "/home/user/PBS-ION-DEMO-run/results/S7/endpoint-b.jsonl",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/endpoint-b.jsonl",
     "--own-log",
-    "/home/user/PBS-ION-DEMO-run/results/S7/endpoint-a.jsonl"
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/endpoint-a.jsonl"
    ],
-   "duration_s": 0.112,
+   "duration_s": 0.103,
    "exit": 0,
    "file": "a-crosscheck.out",
    "name": "a-crosscheck"
   },
   {
    "argv": [
-    "/home/user/PBS-ION-DEMO-run/build/endpoint-c/pbs_tool",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/build/endpoint-c/pbs_tool",
     "crosscheck",
-    "/home/user/PBS-ION-DEMO-run/results/S7/endpoint-a.jsonl",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/endpoint-a.jsonl",
     "--own-log",
-    "/home/user/PBS-ION-DEMO-run/results/S7/endpoint-b.jsonl",
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/endpoint-b.jsonl",
     "--out",
-    "/home/user/PBS-ION-DEMO-run/results/S7/b-crosscheck.jsonl"
+    "/home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/results/S7/b-crosscheck.jsonl"
    ],
-   "duration_s": 0.006,
+   "duration_s": 0.005,
    "exit": 0,
    "file": "b-crosscheck.out",
    "name": "b-crosscheck"
@@ -139,7 +139,7 @@
    "file": "probes/final-rover-bpstats.txt",
    "final": true,
    "node": "rover",
-   "t_us": 1791346869035824
+   "t_us": 1791352717019488
   },
   {
    "argv": [
@@ -150,7 +150,7 @@
    "file": "probes/final-rover-ltpstats.txt",
    "final": true,
    "node": "rover",
-   "t_us": 1791346869040578
+   "t_us": 1791352717023610
   },
   {
    "argv": [
@@ -160,7 +160,7 @@
    "file": "probes/final-gateway-bpstats.txt",
    "final": true,
    "node": "gateway",
-   "t_us": 1791346869045050
+   "t_us": 1791352717027635
   },
   {
    "argv": [
@@ -171,7 +171,7 @@
    "file": "probes/final-gateway-ltpstats.txt",
    "final": true,
    "node": "gateway",
-   "t_us": 1791346869049621
+   "t_us": 1791352717031672
   },
   {
    "argv": [
@@ -181,7 +181,7 @@
    "file": "probes/final-earth-bpstats.txt",
    "final": true,
    "node": "earth",
-   "t_us": 1791346869054226
+   "t_us": 1791352717035638
   },
   {
    "argv": [
@@ -192,78 +192,78 @@
    "file": "probes/final-earth-ltpstats.txt",
    "final": true,
    "node": "earth",
-   "t_us": 1791346869058774
+   "t_us": 1791352717039668
   }
  ],
  "scenario": "S7",
  "scenario_file": "scenarios/S7.json",
- "started_utc": "2026-10-07T04:20:32.808626+00:00",
+ "started_utc": "2026-10-07T05:58:00.416173+00:00",
  "steps": [
   {
    "step": "emulator_ready",
-   "t_us": 1791346832902155
+   "t_us": 1791352680486633
   },
   {
    "step": "nodes_started",
-   "t0_utc": "2026/10/07-04:20:34",
-   "t_us": 1791346837864094
+   "t0_utc": "2026/10/07-05:58:02",
+   "t_us": 1791352685798922
   },
   {
-   "plan_origin_offset_s": 0.004,
+   "plan_origin_offset_s": 0.001,
    "step": "endpoint_a_ready",
-   "t_us": 1791346844023485
+   "t_us": 1791352692002180
   },
   {
    "step": "endpoint_b_started",
-   "t_us": 1791346844024463
+   "t_us": 1791352692003486
   },
   {
    "step": "traffic_phase_end",
-   "t_us": 1791346869000235
+   "t_us": 1791352717000249
   },
   {
    "a": 0,
    "b": 0,
    "step": "endpoints_stopped",
-   "t_us": 1791346869035698
+   "t_us": 1791352717019391
   },
   {
    "status": 0,
    "step": "nodes_stopped",
-   "t_us": 1791346896937894
+   "t_us": 1791352745426347
   },
   {
    "step": "emulator_stopped",
-   "t_us": 1791346897002039
+   "t_us": 1791352745458324
   },
   {
    "command": "a-vectors",
    "status": 0,
    "step": "post",
-   "t_us": 1791346897124182
+   "t_us": 1791352745576651
   },
   {
    "command": "vector-comparison",
    "status": 0,
    "step": "post",
-   "t_us": 1791346897283169
+   "t_us": 1791352745733389
   },
   {
    "command": "a-crosscheck",
    "status": 0,
    "step": "post",
-   "t_us": 1791346897395758
+   "t_us": 1791352745836058
   },
   {
    "command": "b-crosscheck",
    "status": 0,
    "step": "post",
-   "t_us": 1791346897401940
+   "t_us": 1791352745841126
   }
  ],
  "stop_clean_without_fallback": true,
- "stop_nodes_s": 26.9,
- "t0_unix_s": 1791346834.0,
- "t0_utc": "2026/10/07-04:20:34",
+ "stop_nodes_s": 27.4,
+ "t0_unix_s": 1791352682.0,
+ "t0_utc": "2026/10/07-05:58:02",
  "title": "Cross-implementation: each endpoint parses the other's envelopes; identical inputs give identical bytes"
 }

@@ -1,4 +1,4 @@
-Endpoint B unit tests, vectors: /home/user/PBS-ION-DEMO-run/docs/test-vectors.json
+Endpoint B unit tests, vectors: /home/user/pbs-ion-demo-runs/run-E/PBS-ION-DEMO/docs/test-vectors.json
   constants and CRC-32             9 checks passed, 0 failed
   envelopes (ENV-*)              166 checks passed, 0 failed
   receiver cases (RX-*)           23 checks passed, 0 failed

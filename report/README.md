@@ -16,9 +16,14 @@ Both read only files written during a run: the endpoint logs
 python3 report/collect.py results/S2              # results/S2/*.csv
 python3 report/make_report.py                     # REPORT.md from results/
 python3 report/make_report.py --results results --out results/REPORT.md
-python3 report/compare_runs.py --run "run 1=results/repeat/run-1" --run "run 2=results"
-python3 report/make_report.py --name "run 2" --compare "run 1=results/repeat/run-1"
+python3 report/compare_runs.py --run "run D=results/repeat/run-D" --run "run E=results"
+python3 report/make_report.py --name "run E" --compare "run D=results/repeat/run-D"
 ```
+
+The last command wrote the REPORT.md in this repository (and, with
+`--out results/REPORT.md`, its copy in `results/`). `results/` holds run E;
+`results/repeat/` and `results/control/` are not scenario directories, so
+`make_report.py` reads only run E from `results/`.
 
 `compare_runs.py` reads complete results directories of `./run_demo.sh`
 (`<S>/run.json`, `<S>/verdict.json`, the logs and `run_demo.log`) and lists,

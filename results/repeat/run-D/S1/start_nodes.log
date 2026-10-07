@@ -1,0 +1,4 @@
+start_nodes: gateway (ipn:50) running in /home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/build/run/ion/gateway
+start_nodes: rover (ipn:99) running in /home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/build/run/ion/rover
+start_nodes: earth (ipn:23) running in /home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/build/run/ion/earth
+start_nodes: contact plan contacts.ionrc, reference time 2026/10/07-05:32:42 UTC

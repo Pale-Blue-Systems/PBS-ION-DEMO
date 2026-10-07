@@ -1,0 +1,21 @@
+[i] admin pgm using SDR parm overrides from node.ionconfig.
+wmKey:           131122
+wmSize:          20000000
+wmAddress:       0
+sdrName:        'ion50'
+sdrWmSize:       1000000
+sdrWmKey:        65330
+configFlags:     13
+heapWords:       4000000
+heapKey:         196658
+logSize:         0
+logKey:          -1
+pathName:       '/home/user/pbs-ion-demo-runs/run-D/PBS-ION-DEMO/build/run/ion/gateway'
+traceShmSize:    0
+Initializing semaphores to use: Posix Named Semaphores - max : 8192
+Stopping ionadmin.
+Stopping ionadmin.
+Stopping ionsecadmin.
+Stopping ltpadmin.
+Stopping ipnadmin.
+Stopping bpadmin.

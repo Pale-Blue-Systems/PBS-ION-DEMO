@@ -1,0 +1,85 @@
+{
+ "items": [
+  {
+   "at_s": 3.0,
+   "priority": 2,
+   "ttl_s": 1,
+   "text": "TLM TTL1",
+   "label": "S5-GW-TTL1"
+  },
+  {
+   "at_s": 3.5,
+   "priority": 2,
+   "ttl_s": 2,
+   "text": "TLM TTL2",
+   "label": "S5-GW-TTL2"
+  },
+  {
+   "at_s": 4.0,
+   "priority": 2,
+   "ttl_s": 3,
+   "text": "TLM TTL3",
+   "label": "S5-TTL3"
+  },
+  {
+   "at_s": 5.0,
+   "priority": 2,
+   "ttl_s": 1,
+   "text": "TLM INJECTED",
+   "lifespan_override_s": 60,
+   "label": "S5-INJECT-EXPIRED"
+  },
+  {
+   "at_s": 6.0,
+   "priority": 2,
+   "ttl_s": 60,
+   "text": "TLM BEFORE OUTAGE",
+   "label": "S5-PRE"
+  },
+  {
+   "at_s": 22.0,
+   "count": 4,
+   "interval_s": 1.0,
+   "priority": 2,
+   "ttl_s": 10,
+   "text": "TLM SHORT",
+   "label": "S5-TTL10-IN-OUTAGE"
+  },
+  {
+   "at_s": 22.5,
+   "count": 4,
+   "interval_s": 1.0,
+   "priority": 2,
+   "ttl_s": 20,
+   "text": "TLM SHORT",
+   "label": "S5-TTL20-IN-OUTAGE"
+  },
+  {
+   "at_s": 23.0,
+   "count": 4,
+   "interval_s": 1.0,
+   "priority": 2,
+   "ttl_s": 60,
+   "text": "TLM LONG",
+   "label": "S5-TTL60-IN-OUTAGE"
+  },
+  {
+   "at_s": 23.5,
+   "count": 2,
+   "interval_s": 2.0,
+   "priority": 0,
+   "ttl_s": 0,
+   "frame": "event",
+   "text": "EVT NO-EXPIRY",
+   "label": "S5-TTL0-IN-OUTAGE"
+  },
+  {
+   "at_s": 55.0,
+   "priority": 2,
+   "ttl_s": 60,
+   "text": "TLM AFTER OUTAGE",
+   "label": "S5-POST"
+  }
+ ],
+ "description": "Endpoint A plan for scenario S5"
+}

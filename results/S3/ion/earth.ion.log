@@ -1,136 +1,136 @@
-[2026/10/07-04:13:14] Stopping ionadmin.
-[2026/10/07-04:13:14] [i] rfxclock is running.
-[2026/10/07-04:13:14] [i] No congestion forecast; horizon reached.
-[2026/10/07-04:13:14] [i] ionwarn finished.
-[2026/10/07-04:13:14] Stopping ionadmin.
-[2026/10/07-04:13:14] [i] No congestion forecast; horizon reached.
-[2026/10/07-04:13:14] [i] ionwarn finished.
-[2026/10/07-04:13:14] Stopping ionsecadmin.
-[2026/10/07-04:13:14] [i] LTP CLOSED_EXPORTS_ENABLED enhancement active.
-[2026/10/07-04:13:14] [i] Span 50 initialized with global unified mode defaults: maxRetries=5, maxSegmentLossRate=0.0100
-[2026/10/07-04:13:14] [i] Span to engine 50 (explicit config, max xmit segment size 1024, max recv segment size 1): xmit segment loss rate 0.010000, recv segment loss rate 0.010000, max timeouts 5.
-[2026/10/07-04:13:14] [i] Total max export sessions does not exceed estimate.
-[2026/10/07-04:13:14] Stopping ltpadmin.
-[2026/10/07-04:13:14] [i] ltpdeliv is running.
-[2026/10/07-04:13:14] [i] ltpclock is running.
-[2026/10/07-04:13:14] [i] udplsi is running, listening on 127.0.0.1:12313 (IPv4).
-[2026/10/07-04:13:14] [i] LTP meter is running, rengine = 50
-[2026/10/07-04:13:14] [i] udplso is running, local=0.0.0.0:60549 (IPv4), peer=127.0.0.1:22350 (IPv4), rengine=50.
-[2026/10/07-04:13:14] [i] This node deploys bundle protocol version 7.
-[2026/10/07-04:13:14] [i] CBR/CT (Compressed Bundle Reporting and Custody Transfer) is enabled.
-[2026/10/07-04:13:14] [i] Bundle security is enabled.
-[2026/10/07-04:13:14] Stopping ipnadmin.
-[2026/10/07-04:13:14] [i] bpclm is running: ipn:50.0
-[2026/10/07-04:13:15] [i] No congestion forecast; horizon reached.
-[2026/10/07-04:13:15] [i] ionwarn finished.
-[2026/10/07-04:13:15] [i] Bundle security is enabled.
-[2026/10/07-04:13:15] Stopping bpadmin.
-[2026/10/07-04:13:15] [i] bptransit is running.
-[2026/10/07-04:13:15] [i] ltpclo is running, rengine = 50
-[2026/10/07-04:13:15] [i] Not configured for multicast; cpsd stopping.
-[2026/10/07-04:13:15] [i] bpclock is running.
-[2026/10/07-04:13:15] [i] ipnfw is running.
-[2026/10/07-04:13:15] [i] ltpcli is running.
-[2026/10/07-04:13:15] [i] ipnadminep is running.
-[2026/10/07-04:13:16] [x] src from 1970/01/01-00:00:00 to 2026/10/07-04:13:16: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
-[2026/10/07-04:13:16] [x] fwd from 1970/01/01-00:00:00 to 2026/10/07-04:13:16: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
-[2026/10/07-04:13:16] [x] xmt from 1970/01/01-00:00:00 to 2026/10/07-04:13:16: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
-[2026/10/07-04:13:16] [x] rcv from 1970/01/01-00:00:00 to 2026/10/07-04:13:16: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
-[2026/10/07-04:13:16] [x] dlv from 1970/01/01-00:00:00 to 2026/10/07-04:13:16: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
-[2026/10/07-04:13:16] [x] rfw from 1970/01/01-00:00:00 to 2026/10/07-04:13:16: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
-[2026/10/07-04:13:16] [x] exp from 1970/01/01-00:00:00 to 2026/10/07-04:13:16: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
-[2026/10/07-04:13:25] [i] Span to engine 50 (explicit config, max xmit segment size 1024, max recv segment size 157): xmit segment loss rate 0.010000, recv segment loss rate 0.010000, max timeouts 5.
-[2026/10/07-04:13:29] [i] Span to engine 50 (explicit config, max xmit segment size 1024, max recv segment size 1016): xmit segment loss rate 0.010000, recv segment loss rate 0.010000, max timeouts 5.
-[2026/10/07-04:15:12] [i] Start of statistics snapshot...
-[2026/10/07-04:15:12] [x] src from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: (0) 0 0 (1) 0 0 (2) 17 3179 (+) 17 3179
-[2026/10/07-04:15:12] [x] fwd from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: (0) 0 0 (1) 0 0 (2) 0 0 (+) 17 3179
-[2026/10/07-04:15:12] [x] xmt from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: (0) 0 0 (1) 0 0 (2) 17 3179 (+) 17 3179
-[2026/10/07-04:15:12] [x] rcv from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: (0) 34 52776 (1) 17 1096 (2) 51 3381 (+) 102 57253
-[2026/10/07-04:15:12] [x] dlv from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: (0) 0 0 (1) 0 0 (2) 0 0 (+) 102 57253
-[2026/10/07-04:15:12] [x] rfw from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
-[2026/10/07-04:15:12] [x] exp from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
-[2026/10/07-04:15:12] [i] ...end of statistics snapshot.
-[2026/10/07-04:15:12] [i] Start of LTP statistics snapshot...
-[2026/10/07-04:15:12] [x] span 50 out_seg_queued from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 17 4539
-[2026/10/07-04:15:12] [x] span 50 out_seg_popped from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 24 6408
-[2026/10/07-04:15:12] [x] span 50 ckpt_xmit from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 17 0
-[2026/10/07-04:15:12] [x] span 50 pos_rpt_recv from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 17 0
-[2026/10/07-04:15:12] [x] span 50 neg_rpt_recv from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 export_cancel_recv from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 1 0
-[2026/10/07-04:15:12] [x] span 50 ckpt_re_xmit from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 7 0
-[2026/10/07-04:15:12] [x] span 50 seg_re_xmit from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 export_cancel_xmit from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 export_complete from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 17 0
-[2026/10/07-04:15:12] [x] span 50 ckpt_recv from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 109 0
-[2026/10/07-04:15:12] [x] span 50 pos_rpt_xmit from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 102 0
-[2026/10/07-04:15:12] [x] span 50 neg_rpt_xmit from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 6 0
-[2026/10/07-04:15:12] [x] span 50 import_cancel_recv from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 rpt_re_xmit from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 37 0
-[2026/10/07-04:15:12] [x] span 50 import_cancel_xmit from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 6 0
-[2026/10/07-04:15:12] [x] span 50 import_complete from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 102 0
-[2026/10/07-04:15:12] [x] span 50 in_seg_recv_red from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 161 68202
-[2026/10/07-04:15:12] [x] span 50 in_seg_recv_green from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 in_seg_redundant from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 9 959
-[2026/10/07-04:15:12] [x] span 50 in_seg_malformed from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 in_seg_unk_sender from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 in_seg_unk_client from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 in_seg_screened from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 in_seg_miscolored from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 in_seg_ses_closed from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [x] span 50 in_seg_too_fast from 1970/01/01-00:00:00 to 2026/10/07-04:15:12: 0 0
-[2026/10/07-04:15:12] [i] ...end of LTP statistics snapshot.
-[2026/10/07-04:15:31] at line 565 of dtpc/library/libdtpcP.c, Can't find DTPC database.
-[2026/10/07-04:15:31] [i] bpStop: Starting BP shutdown sequence.
-[2026/10/07-04:15:31] [i] bpStop: Stopping schemes...
-[2026/10/07-04:15:31] [i] Endpoint has been stopped.
-[2026/10/07-04:15:31] [i] Administrative endpoint terminated.
-[2026/10/07-04:15:31] [i] bpStop: Schemes stopped.
-[2026/10/07-04:15:31] [i] ipnadminep has ended.
-[2026/10/07-04:15:31] [i] ipnfw forwarder has ended.
-[2026/10/07-04:15:31] [i] bpStop: Signaling inducts to stop...
-[2026/10/07-04:15:31] [i] bpStop: About to call sm_list_first on inducts
-[2026/10/07-04:15:31] [i] bpStop: sm_list_first returned
-[2026/10/07-04:15:31] [i] bpStop: Signaling induct: 23
-[2026/10/07-04:15:31] [i] bpStop: Inducts signaled.
-[2026/10/07-04:15:31] [i] bpStop: Stopping plans...
-[2026/10/07-04:15:31] [i] bpStop: Plans stopped.
-[2026/10/07-04:15:31] [i] bpStop: Stopping outducts...
-[2026/10/07-04:15:31] [i] Plan has been stopped: ipn:50.0
-[2026/10/07-04:15:31] [i] bpStop: Outducts stopped.
-[2026/10/07-04:15:31] [i] bpStop: Stopping BP daemons...
-[2026/10/07-04:15:31] [i] bpclm has ended: ipn:50.0
-[2026/10/07-04:15:31] [i] bpStop: BP daemons signaled.
-[2026/10/07-04:15:31] [i] bpStop: Waiting for schemes to terminate...
-[2026/10/07-04:15:31] [i] Outduct has been stopped: 50
-[2026/10/07-04:15:31] [i] ltpclo outduct closed, rengine = 50
-[2026/10/07-04:15:31] [i] ltpclo duct has ended, rengine = 50
-[2026/10/07-04:15:31] [i] ltpcli receiver thread has ended.
-[2026/10/07-04:15:31] [i] bpclock has ended.
-[2026/10/07-04:15:31] [i] ltpcli duct has ended.
-[2026/10/07-04:15:31] [i] bptransit has ended.
-[2026/10/07-04:15:33] [i] bpStop: All schemes terminated.
-[2026/10/07-04:15:33] [i] bpStop: Waiting for plans to terminate...
-[2026/10/07-04:15:33] [i] bpStop: All plans terminated.
-[2026/10/07-04:15:33] [i] bpStop: Waiting for inducts to terminate...
-[2026/10/07-04:15:33] [i] waitForInduct: Waiting for induct '23' (PID 1877) to terminate...
-[2026/10/07-04:15:33] [i] waitForInduct: Induct '23' terminated.
-[2026/10/07-04:15:33] [i] bpStop: All inducts terminated.
-[2026/10/07-04:15:33] [i] LTP meter to engine 50 is stopped.
-[2026/10/07-04:15:33] [i] LSO to engine 50 is stopped.
-[2026/10/07-04:15:33] [i] LTP meter has ended, rengine = 50
-[2026/10/07-04:15:33] [i] udplsi shutting down...
-[2026/10/07-04:15:33] [i] udplsa receiver thread has ended.
-[2026/10/07-04:15:33] [i] udplsa receiver thread has ended.
-[2026/10/07-04:15:33] [i] udplso has ended.
-[2026/10/07-04:15:33] [i] ltpclock has ended.
-[2026/10/07-04:15:33] [i] udplsi has ended.
-[2026/10/07-04:15:33] [i] ltpdeliv has ended.
-[2026/10/07-04:15:35] at line 969 of cfdp/library/libcfdpP.c, Can't find CFDP database.
-[2026/10/07-04:15:35] [i] rfx_stop: Starting ION shutdown sequence.
-[2026/10/07-04:15:35] [i] rfx_stop: Ending ZCO requisition semaphores.
-[2026/10/07-04:15:35] [i] rfx_stop: Unregistering ZCO callback.
-[2026/10/07-04:15:35] [i] rfx_stop: Stopping rfxclock daemon.
-[2026/10/07-04:15:35] [i] rfx_stop: Waiting for rfxclock to terminate...
-[2026/10/07-04:15:35] [i] rfxclock has ended.
-[2026/10/07-04:15:37] [i] rfx_stop: rfxclock terminated.
-[2026/10/07-04:15:37] [i] rfx_stop: ION shutdown sequence completed.
+[2026/10/07-05:50:42] Stopping ionadmin.
+[2026/10/07-05:50:42] [i] rfxclock is running.
+[2026/10/07-05:50:42] [i] No congestion forecast; horizon reached.
+[2026/10/07-05:50:42] [i] ionwarn finished.
+[2026/10/07-05:50:42] Stopping ionadmin.
+[2026/10/07-05:50:42] Stopping ionsecadmin.
+[2026/10/07-05:50:42] [i] No congestion forecast; horizon reached.
+[2026/10/07-05:50:42] [i] ionwarn finished.
+[2026/10/07-05:50:42] [i] LTP CLOSED_EXPORTS_ENABLED enhancement active.
+[2026/10/07-05:50:42] [i] Span 50 initialized with global unified mode defaults: maxRetries=5, maxSegmentLossRate=0.0100
+[2026/10/07-05:50:42] [i] Span to engine 50 (explicit config, max xmit segment size 1024, max recv segment size 1): xmit segment loss rate 0.010000, recv segment loss rate 0.010000, max timeouts 5.
+[2026/10/07-05:50:42] [i] Total max export sessions does not exceed estimate.
+[2026/10/07-05:50:42] Stopping ltpadmin.
+[2026/10/07-05:50:42] [i] This node deploys bundle protocol version 7.
+[2026/10/07-05:50:42] [i] CBR/CT (Compressed Bundle Reporting and Custody Transfer) is enabled.
+[2026/10/07-05:50:42] [i] ltpclock is running.
+[2026/10/07-05:50:42] [i] LTP meter is running, rengine = 50
+[2026/10/07-05:50:42] [i] udplsi is running, listening on 127.0.0.1:12313 (IPv4).
+[2026/10/07-05:50:42] [i] Bundle security is enabled.
+[2026/10/07-05:50:42] [i] udplso is running, local=0.0.0.0:52718 (IPv4), peer=127.0.0.1:22350 (IPv4), rengine=50.
+[2026/10/07-05:50:42] [i] ltpdeliv is running.
+[2026/10/07-05:50:42] Stopping ipnadmin.
+[2026/10/07-05:50:42] [i] bpclm is running: ipn:50.0
+[2026/10/07-05:50:43] [i] No congestion forecast; horizon reached.
+[2026/10/07-05:50:43] [i] ionwarn finished.
+[2026/10/07-05:50:43] [i] Bundle security is enabled.
+[2026/10/07-05:50:43] Stopping bpadmin.
+[2026/10/07-05:50:43] [i] bpclock is running.
+[2026/10/07-05:50:43] [i] Not configured for multicast; cpsd stopping.
+[2026/10/07-05:50:43] [i] bptransit is running.
+[2026/10/07-05:50:43] [i] ipnadminep is running.
+[2026/10/07-05:50:43] [i] ltpclo is running, rengine = 50
+[2026/10/07-05:50:43] [i] ipnfw is running.
+[2026/10/07-05:50:43] [i] ltpcli is running.
+[2026/10/07-05:50:44] [x] src from 1970/01/01-00:00:00 to 2026/10/07-05:50:44: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
+[2026/10/07-05:50:44] [x] fwd from 1970/01/01-00:00:00 to 2026/10/07-05:50:44: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
+[2026/10/07-05:50:44] [x] xmt from 1970/01/01-00:00:00 to 2026/10/07-05:50:44: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
+[2026/10/07-05:50:44] [x] rcv from 1970/01/01-00:00:00 to 2026/10/07-05:50:44: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
+[2026/10/07-05:50:44] [x] dlv from 1970/01/01-00:00:00 to 2026/10/07-05:50:44: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
+[2026/10/07-05:50:44] [x] rfw from 1970/01/01-00:00:00 to 2026/10/07-05:50:44: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
+[2026/10/07-05:50:44] [x] exp from 1970/01/01-00:00:00 to 2026/10/07-05:50:44: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
+[2026/10/07-05:50:53] [i] Span to engine 50 (explicit config, max xmit segment size 1024, max recv segment size 157): xmit segment loss rate 0.010000, recv segment loss rate 0.010000, max timeouts 5.
+[2026/10/07-05:50:57] [i] Span to engine 50 (explicit config, max xmit segment size 1024, max recv segment size 1016): xmit segment loss rate 0.010000, recv segment loss rate 0.010000, max timeouts 5.
+[2026/10/07-05:52:40] [i] Start of statistics snapshot...
+[2026/10/07-05:52:40] [x] src from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: (0) 0 0 (1) 0 0 (2) 17 3179 (+) 17 3179
+[2026/10/07-05:52:40] [x] fwd from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: (0) 0 0 (1) 0 0 (2) 0 0 (+) 17 3179
+[2026/10/07-05:52:40] [x] xmt from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: (0) 0 0 (1) 0 0 (2) 17 3179 (+) 17 3179
+[2026/10/07-05:52:40] [x] rcv from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: (0) 35 55820 (1) 17 1096 (2) 51 3381 (+) 103 60297
+[2026/10/07-05:52:40] [x] dlv from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: (0) 0 0 (1) 0 0 (2) 0 0 (+) 103 60297
+[2026/10/07-05:52:40] [x] rfw from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
+[2026/10/07-05:52:40] [x] exp from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: (0) 0 0 (1) 0 0 (2) 0 0 (+) 0 0
+[2026/10/07-05:52:40] [i] ...end of statistics snapshot.
+[2026/10/07-05:52:40] [i] Start of LTP statistics snapshot...
+[2026/10/07-05:52:40] [x] span 50 out_seg_queued from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 17 4539
+[2026/10/07-05:52:40] [x] span 50 out_seg_popped from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 23 6141
+[2026/10/07-05:52:40] [x] span 50 ckpt_xmit from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 17 0
+[2026/10/07-05:52:40] [x] span 50 pos_rpt_recv from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 17 0
+[2026/10/07-05:52:40] [x] span 50 neg_rpt_recv from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 export_cancel_recv from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 3 0
+[2026/10/07-05:52:40] [x] span 50 ckpt_re_xmit from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 6 0
+[2026/10/07-05:52:40] [x] span 50 seg_re_xmit from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 export_cancel_xmit from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 export_complete from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 17 0
+[2026/10/07-05:52:40] [x] span 50 ckpt_recv from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 115 0
+[2026/10/07-05:52:40] [x] span 50 pos_rpt_xmit from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 103 0
+[2026/10/07-05:52:40] [x] span 50 neg_rpt_xmit from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 10 0
+[2026/10/07-05:52:40] [x] span 50 import_cancel_recv from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 rpt_re_xmit from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 32 0
+[2026/10/07-05:52:40] [x] span 50 import_cancel_xmit from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 12 0
+[2026/10/07-05:52:40] [x] span 50 import_complete from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 102 0
+[2026/10/07-05:52:40] [x] span 50 in_seg_recv_red from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 170 73451
+[2026/10/07-05:52:40] [x] span 50 in_seg_recv_green from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 in_seg_redundant from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 10 919
+[2026/10/07-05:52:40] [x] span 50 in_seg_malformed from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 in_seg_unk_sender from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 in_seg_unk_client from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 in_seg_screened from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 in_seg_miscolored from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 in_seg_ses_closed from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [x] span 50 in_seg_too_fast from 1970/01/01-00:00:00 to 2026/10/07-05:52:40: 0 0
+[2026/10/07-05:52:40] [i] ...end of LTP statistics snapshot.
+[2026/10/07-05:52:59] at line 565 of dtpc/library/libdtpcP.c, Can't find DTPC database.
+[2026/10/07-05:52:59] [i] bpStop: Starting BP shutdown sequence.
+[2026/10/07-05:52:59] [i] bpStop: Stopping schemes...
+[2026/10/07-05:52:59] [i] ipnfw forwarder has ended.
+[2026/10/07-05:52:59] [i] bpStop: Schemes stopped.
+[2026/10/07-05:52:59] [i] Endpoint has been stopped.
+[2026/10/07-05:52:59] [i] Administrative endpoint terminated.
+[2026/10/07-05:52:59] [i] ipnadminep has ended.
+[2026/10/07-05:52:59] [i] bpStop: Signaling inducts to stop...
+[2026/10/07-05:52:59] [i] bpStop: About to call sm_list_first on inducts
+[2026/10/07-05:52:59] [i] bpStop: sm_list_first returned
+[2026/10/07-05:52:59] [i] bpStop: Signaling induct: 23
+[2026/10/07-05:52:59] [i] bpStop: Inducts signaled.
+[2026/10/07-05:52:59] [i] bpStop: Stopping plans...
+[2026/10/07-05:52:59] [i] bpStop: Plans stopped.
+[2026/10/07-05:52:59] [i] bpStop: Stopping outducts...
+[2026/10/07-05:52:59] [i] bpStop: Outducts stopped.
+[2026/10/07-05:52:59] [i] bpStop: Stopping BP daemons...
+[2026/10/07-05:52:59] [i] Plan has been stopped: ipn:50.0
+[2026/10/07-05:52:59] [i] bpStop: BP daemons signaled.
+[2026/10/07-05:52:59] [i] bpclm has ended: ipn:50.0
+[2026/10/07-05:52:59] [i] bpStop: Waiting for schemes to terminate...
+[2026/10/07-05:52:59] [i] Outduct has been stopped: 50
+[2026/10/07-05:52:59] [i] ltpclo outduct closed, rengine = 50
+[2026/10/07-05:52:59] [i] ltpclo duct has ended, rengine = 50
+[2026/10/07-05:52:59] [i] ltpcli receiver thread has ended.
+[2026/10/07-05:52:59] [i] bpclock has ended.
+[2026/10/07-05:52:59] [i] ltpcli duct has ended.
+[2026/10/07-05:52:59] [i] bptransit has ended.
+[2026/10/07-05:53:01] [i] bpStop: All schemes terminated.
+[2026/10/07-05:53:01] [i] bpStop: Waiting for plans to terminate...
+[2026/10/07-05:53:01] [i] bpStop: All plans terminated.
+[2026/10/07-05:53:01] [i] bpStop: Waiting for inducts to terminate...
+[2026/10/07-05:53:01] [i] waitForInduct: Waiting for induct '23' (PID 16936) to terminate...
+[2026/10/07-05:53:01] [i] waitForInduct: Induct '23' terminated.
+[2026/10/07-05:53:01] [i] bpStop: All inducts terminated.
+[2026/10/07-05:53:01] [i] LSO to engine 50 is stopped.
+[2026/10/07-05:53:01] [i] udplsi shutting down...
+[2026/10/07-05:53:01] [i] LTP meter to engine 50 is stopped.
+[2026/10/07-05:53:01] [i] LTP meter has ended, rengine = 50
+[2026/10/07-05:53:01] [i] udplsa receiver thread has ended.
+[2026/10/07-05:53:01] [i] udplsa receiver thread has ended.
+[2026/10/07-05:53:01] [i] udplso has ended.
+[2026/10/07-05:53:01] [i] udplsi has ended.
+[2026/10/07-05:53:01] [i] ltpclock has ended.
+[2026/10/07-05:53:01] [i] ltpdeliv has ended.
+[2026/10/07-05:53:03] at line 969 of cfdp/library/libcfdpP.c, Can't find CFDP database.
+[2026/10/07-05:53:03] [i] rfx_stop: Starting ION shutdown sequence.
+[2026/10/07-05:53:03] [i] rfx_stop: Ending ZCO requisition semaphores.
+[2026/10/07-05:53:03] [i] rfx_stop: Unregistering ZCO callback.
+[2026/10/07-05:53:03] [i] rfx_stop: Stopping rfxclock daemon.
+[2026/10/07-05:53:03] [i] rfx_stop: Waiting for rfxclock to terminate...
+[2026/10/07-05:53:03] [i] rfxclock has ended.
+[2026/10/07-05:53:05] [i] rfx_stop: rfxclock terminated.
+[2026/10/07-05:53:05] [i] rfx_stop: ION shutdown sequence completed.
