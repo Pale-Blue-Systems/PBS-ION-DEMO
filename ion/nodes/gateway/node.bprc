@@ -1,0 +1,14 @@
+# bpadmin(1) startup for the GATEWAY node, ipn:50 (BPv7).
+# Endpoints use 'q': bundles that arrive while no application has the
+# endpoint open are queued for later delivery, not discarded.
+1
+a scheme ipn 'ipnfw' 'ipnadminep'
+a endpoint ipn:50.0 q
+a endpoint ipn:50.1 q
+a endpoint ipn:50.2 q
+a protocol ltp
+a induct ltp 50 ltpcli
+a outduct ltp 99 ltpclo
+a outduct ltp 23 ltpclo
+r 'ipnadmin node.ipnrc'
+s

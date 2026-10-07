@@ -1,0 +1,3 @@
+# ipnadmin(1): egress plans to neighbouring nodes (LTP outduct = peer engine).
+# Non-neighbours are reached by contact graph routing over contacts.ionrc.
+a plan 50 ltp/50

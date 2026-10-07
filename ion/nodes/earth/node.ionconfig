@@ -1,0 +1,22 @@
+# ION node configuration (ionconfig(5)) for the EARTH node, ipn:23.
+# Values are decimal. Every key is unique per node so that three nodes can
+# share one host:
+#   wmKey     ION working memory                      0x20017
+#   sdrWmKey  SDR working memory ("Layout B" in the
+#             ION Shutdown Guide)                     0xff17
+#   heapKey   SDR heap (set explicitly so every SVR4
+#             shared-memory key is known in advance;
+#             ion/stop_nodes.sh checks they are gone) 0x30017
+# sdrWmSize is identical on all nodes, as the ION Deployment Guide recommends
+# for same-host nodes. configFlags 13 = SDR_IN_DRAM | SDR_REVERSIBLE |
+# SDR_BOUNDED (the ION default); the transaction log is a file in pathName.
+# @NODE_DIR@ is replaced by ion/start_nodes.sh with the node's working directory.
+sdrName ion23
+sdrWmKey 65303
+sdrWmSize 1000000
+wmKey 131095
+wmSize 20000000
+configFlags 13
+heapKey 196631
+heapWords 4000000
+pathName @NODE_DIR@

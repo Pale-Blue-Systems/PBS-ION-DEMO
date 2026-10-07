@@ -1,0 +1,13 @@
+# bpadmin(1) startup for the ROVER node, ipn:99 (BPv7).
+# Endpoints use 'q': bundles that arrive while no application has the
+# endpoint open are queued for later delivery, not discarded.
+1
+a scheme ipn 'ipnfw' 'ipnadminep'
+a endpoint ipn:99.0 q
+a endpoint ipn:99.1 q
+a endpoint ipn:99.2 q
+a protocol ltp
+a induct ltp 99 ltpcli
+a outduct ltp 50 ltpclo
+r 'ipnadmin node.ipnrc'
+s

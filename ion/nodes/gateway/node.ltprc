@@ -1,0 +1,17 @@
+# ltpadmin(1) startup for the LUNAR GATEWAY node: LTP engine 50.
+# Two spans. Each LSO sends to the link emulator port for that direction:
+#   gateway->rover  127.0.0.1:25099 -> rover udplsi 127.0.0.1:19913
+#   gateway->earth  127.0.0.1:25023 -> earth udplsi 127.0.0.1:12313
+#   a span <peer> <max export sessions> <max import sessions> <max segment size>
+#          <aggregation size threshold> <aggregation time limit> '<LSO cmd>' [<queuing latency>]
+# Aggregation size threshold 1 byte: every bundle is sent as its own LTP block
+# as soon as ltpclo dequeues it, so a small bundle never waits for the
+# aggregation time limit (1 s, checked once per second by ltpclock) at each
+# hop. Bundles not yet dequeued wait in the BP egress plan's queues (bulk,
+# standard, urgent). At most 32 blocks (export sessions) per span are open
+# at a time.
+1 64
+a span 99 32 32 1024 1 1 'udplso 127.0.0.1:25099' 1
+a span 23 32 32 1024 1 1 'udplso 127.0.0.1:25023' 1
+a seat 'udplsi 127.0.0.1:15013'
+s

@@ -1,0 +1,6 @@
+# ionadmin(1) startup: create node 99 from node.ionconfig, start rfxclock.
+# The contact plan is loaded separately from contacts.ionrc (ion/start_nodes.sh).
+# 'm horizon +0': congestion forecasts end now (no forecast alarms).
+1 99 node.ionconfig
+s
+m horizon +0

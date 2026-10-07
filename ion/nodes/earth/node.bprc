@@ -1,0 +1,13 @@
+# bpadmin(1) startup for the EARTH node, ipn:23 (BPv7).
+# Endpoints use 'q': bundles that arrive while no application has the
+# endpoint open are queued for later delivery, not discarded.
+1
+a scheme ipn 'ipnfw' 'ipnadminep'
+a endpoint ipn:23.0 q
+a endpoint ipn:23.1 q
+a endpoint ipn:23.2 q
+a protocol ltp
+a induct ltp 23 ltpcli
+a outduct ltp 50 ltpclo
+r 'ipnadmin node.ipnrc'
+s

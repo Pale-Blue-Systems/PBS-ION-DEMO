@@ -1,0 +1,4 @@
+# Build outputs and run-time state (recreated by ion/build_ion.sh and the scripts)
+/build/
+__pycache__/
+*.pyc

@@ -1,0 +1,3 @@
+# ionsecadmin(1): initialize the security database. No BPSec rules are
+# configured (ION is built with the NULL cipher suites).
+1
