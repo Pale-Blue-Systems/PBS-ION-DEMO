@@ -302,7 +302,8 @@ def scenario_section(run, verdict, chart_paths, results_rel, report_dir):
                      "info" if c["informative"] else ("PASS" if c["passed"] else "FAIL")])
     lines.append(table(["ID", "Criterion", "Measured", "Result"], rows))
     lines.append("")
-    details = [c for c in verdict["criteria"] if c["details"] and (c["check"] == "expect_by_label")]
+    details = [c for c in verdict["criteria"] if c["details"] and c["passed"] and
+               c["check"] in ("expect_by_label", "no_unknown")]
     for c in details:
         if sid == "S6":
             continue

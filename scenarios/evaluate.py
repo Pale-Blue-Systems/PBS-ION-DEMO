@@ -38,11 +38,15 @@ Checks:
   exec              accepted commands at the receiver: operations executed
                     equal "operations" (list, in order)
   no_unmatched      every recv record matches a send record
+  no_unknown        every recv record is a delivery of an envelope that was
+                    sent; repeated deliveries are counted and listed
   ttl_respected     no receiver accepted an envelope older than its TTL
   probe_holds       bplist probe "label": at least min_count bundles of the
                     selected envelopes held at the node; with
                     "max_count": at most that many
   ion_expired       final bpstats of "node": expired bundles >= min_count
+  ion_counter       final bpstats class "cls" (src, fwd, xmt, rcv, dlv, rfw,
+                    exp) of "node" >= min (and <= max)
   link_counter      emulator counter "counter" on links "links": sum >= min,
                     sum <= max, each link >= each_min
   ltp_counter       ION ltpstats counter "stat" of "node" on its span to
@@ -274,6 +278,31 @@ class Evaluator:
         n = sum(len(self.d.records(ep, "recv")) for ep in ("A", "B"))
         return not bad, "%d recv records, %d without a matching send record" % (n, len(bad)), bad
 
+    def c_no_unknown(self, c):
+        """Every recv record is a delivery of an envelope that was sent (same
+        identity and SHA-256); further deliveries of one envelope are counted
+        as duplicates and listed, not failed."""
+        sent = {}
+        for ep in ("A", "B"):
+            for r in self.d.records(ep, "send"):
+                if r.get("result") == "SENT":
+                    sent.setdefault((collect.PEER[ep], collect.identity(r)), set()).add(
+                        r.get("envelope_sha256"))
+        unknown, dups = [], []
+        for ep in ("A", "B"):
+            for r in self.d.unmatched[ep]:
+                desc = "receiver %s: %s seq %s %s %s, bundle created %s count %s, at %s" % (
+                    ep, r.get("source_id"), r.get("sequence"), r.get("result"), r.get("reason"),
+                    r.get("bundle_creation_ms"), r.get("bundle_creation_count"),
+                    fmt_s(self.d.t_s(r.get("t_us"))))
+                if r.get("envelope_sha256") in sent.get((ep, collect.identity(r)), set()):
+                    dups.append("duplicate delivery: " + desc)
+                else:
+                    unknown.append("unknown: " + desc)
+        n = sum(len(self.d.records(ep, "recv")) for ep in ("A", "B"))
+        return not unknown, "%d recv records; %d further deliveries of an envelope already " \
+            "received; %d unknown" % (n, len(dups), len(unknown)), unknown + dups
+
     def c_ttl_respected(self, c):
         bad = []
         n = 0
@@ -318,6 +347,12 @@ class Evaluator:
         ok = n is not None and n >= c.get("min_count", 1) and (
             "max_count" not in c or n <= c["max_count"])
         return ok, "%s node bpstats: %s bundles deleted at lifetime expiry" % (c["node"], n), []
+
+    def c_ion_counter(self, c):
+        st = self.d.ion_stats().get(c["node"], {})
+        n = st.get(c["cls"], {}).get("+")
+        ok = n is not None and n >= c.get("min", 0) and ("max" not in c or n <= c["max"])
+        return ok, "%s node bpstats %s: %s bundles" % (c["node"], c["cls"], n), []
 
     def c_link_counter(self, c):
         links = (self.d.emu.get("links") or {})
