@@ -1,0 +1,2554 @@
+{
+ "title": "PBS ION demo test vectors",
+ "description": "Envelope, MUX, PBS-AUTH-01 and PBS-SEC-B-01 vectors for the PBS ION demo. Rules: docs/SPEC-DIGEST.md. All byte strings are lowercase hex. Times are Unix epoch microseconds unless a field name says otherwise. Keys in sec_b.test_keys are TEST KEYS, derived from public labels, and must not be used outside this demo.",
+ "generator": "docs/gen_test_vectors.py",
+ "sources": {
+  "pbs": "PBS-PROTOCOL-OPEN main, PBS v1.5.0, commit f18957b8fd96eb7955ffa8b55081f8f5fd352ce1",
+  "pbs_link": {
+   "version": "0.1.4",
+   "path_commit": "54ae20ee650be9b31601f824a7cdecf4bce2dfb2"
+  },
+  "python": "3.13.16",
+  "cryptography": "50.0.1"
+ },
+ "constants": {
+  "header_size": 44,
+  "max_payload_size": 65536,
+  "mux_version": 1,
+  "replay_window": 64,
+  "ion_no_expiry_lifetime_s": 2147483647,
+  "lifetime_margin_us": 1000000,
+  "dtn_epoch_offset_ms": 946684800000,
+  "creation_time_example": {
+   "creation_time_ms": 820540800000,
+   "c_us": 1767225600000000
+  }
+ },
+ "crc32_check": {
+  "input_ascii": "123456789",
+  "crc32": "0xCBF43926",
+  "parameters": "CRC-32/ISO-HDLC (zlib): poly 0x04C11DB7 (reflected 0xEDB88320), init 0xFFFFFFFF, refin true, refout true, xorout 0xFFFFFFFF"
+ },
+ "envelopes": [
+  {
+   "id": "ENV-01",
+   "purpose": "PBS-ENV-01 Section 13.2 test vector (header-only)",
+   "spec_refs": [
+    "PBS-ENV-01 13.2"
+   ],
+   "inputs": {
+    "source_id": "Rover-A",
+    "source_id_hex": "526f7665722d41000000000000000000",
+    "priority": 0,
+    "flags": 1,
+    "sequence": 1,
+    "timestamp_us": 1767225600000000,
+    "ttl_s": 30,
+    "payload_hex": "",
+    "payload_description": "empty (Size 0)"
+   },
+   "size": 0,
+   "header_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000001e588721ed",
+   "crc32": "0x588721ED",
+   "envelope_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000001e588721ed",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build"
+  },
+  {
+   "id": "ENV-02",
+   "purpose": "PBS-ENV-01 Section 12.5 TTL 0 vector",
+   "spec_refs": [
+    "PBS-ENV-01 12.5",
+    "PBS-ENV-01 12.1"
+   ],
+   "inputs": {
+    "source_id": "Rover-A",
+    "source_id_hex": "526f7665722d41000000000000000000",
+    "priority": 0,
+    "flags": 1,
+    "sequence": 1,
+    "timestamp_us": 1767225600000000,
+    "ttl_s": 0,
+    "payload_hex": "",
+    "payload_description": "empty (Size 0)"
+   },
+   "size": 0,
+   "header_hex": "1000010000010000526f7665722d41000000000000000000000647484620400000000000000000008757080e",
+   "crc32": "0x8757080E",
+   "envelope_hex": "1000010000010000526f7665722d41000000000000000000000647484620400000000000000000008757080e",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build"
+  },
+  {
+   "id": "ENV-03",
+   "purpose": "PBS-ENV-01 Section 12.5 counter-example: the Section 13.2 header with TTL 10, as a v1.4.1 decrementing relay would have forwarded it. A valid envelope that expires at T+10 s.",
+   "spec_refs": [
+    "PBS-ENV-01 12.5",
+    "PBS-ENV-01 12.3"
+   ],
+   "inputs": {
+    "source_id": "Rover-A",
+    "source_id_hex": "526f7665722d41000000000000000000",
+    "priority": 0,
+    "flags": 1,
+    "sequence": 1,
+    "timestamp_us": 1767225600000000,
+    "ttl_s": 10,
+    "payload_hex": "",
+    "payload_description": "empty (Size 0)"
+   },
+   "size": 0,
+   "header_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000000acde710af",
+   "crc32": "0xCDE710AF",
+   "envelope_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000000acde710af",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build"
+  },
+  {
+   "id": "ENV-04",
+   "purpose": "Rover telemetry, priority 0 (CRITICAL alert, TTL 0 (PBS-ENV-01 12.4))",
+   "spec_refs": [
+    "PBS-ENV-01 4",
+    "PBS-PRIO-01 4",
+    "PBS-MUX-01 4"
+   ],
+   "inputs": {
+    "source_id": "Rover-Alpha",
+    "source_id_hex": "526f7665722d416c7068610000000000",
+    "priority": 0,
+    "flags": 0,
+    "sequence": 1,
+    "timestamp_us": 1767225600100000,
+    "ttl_s": 0,
+    "payload_hex": "0101010017455654204d4f544f525f5354414c4c20574845454c3d33",
+    "payload_description": "MUX container, one Telemetry frame (0x01), ASCII"
+   },
+   "size": 28,
+   "header_hex": "1000000000010000526f7665722d416c7068610000000000000647484621c6a00000001c00000000d462c634",
+   "crc32": "0xD462C634",
+   "envelope_hex": "1000000000010000526f7665722d416c7068610000000000000647484621c6a00000001c00000000d462c6340101010017455654204d4f544f525f5354414c4c20574845454c3d33",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build",
+   "mux_frames": [
+    {
+     "type": "0x01",
+     "value_hex": "455654204d4f544f525f5354414c4c20574845454c3d33"
+    }
+   ]
+  },
+  {
+   "id": "ENV-05",
+   "purpose": "Rover telemetry, priority 1 (HIGH telemetry, TTL 60)",
+   "spec_refs": [
+    "PBS-ENV-01 4",
+    "PBS-PRIO-01 4",
+    "PBS-MUX-01 4"
+   ],
+   "inputs": {
+    "source_id": "Rover-Alpha",
+    "source_id_hex": "526f7665722d416c7068610000000000",
+    "priority": 1,
+    "flags": 0,
+    "sequence": 2,
+    "timestamp_us": 1767225600200000,
+    "ttl_s": 60,
+    "payload_hex": "010101001c544c4d20504f57455220424154543d32372e395620534f433d383125",
+    "payload_description": "MUX container, one Telemetry frame (0x01), ASCII"
+   },
+   "size": 33,
+   "header_hex": "1001000000020000526f7665722d416c70686100000000000006474846234d40000000210000003c3111c4e1",
+   "crc32": "0x3111C4E1",
+   "envelope_hex": "1001000000020000526f7665722d416c70686100000000000006474846234d40000000210000003c3111c4e1010101001c544c4d20504f57455220424154543d32372e395620534f433d383125",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build",
+   "mux_frames": [
+    {
+     "type": "0x01",
+     "value_hex": "544c4d20504f57455220424154543d32372e395620534f433d383125"
+    }
+   ]
+  },
+  {
+   "id": "ENV-06",
+   "purpose": "Rover telemetry, priority 2 (NORMAL telemetry, TTL 60)",
+   "spec_refs": [
+    "PBS-ENV-01 4",
+    "PBS-PRIO-01 4",
+    "PBS-MUX-01 4"
+   ],
+   "inputs": {
+    "source_id": "Rover-Alpha",
+    "source_id_hex": "526f7665722d416c7068610000000000",
+    "priority": 2,
+    "flags": 0,
+    "sequence": 3,
+    "timestamp_us": 1767225600300000,
+    "ttl_s": 60,
+    "payload_hex": "0101010016544c4d20544845524d414c204350553d2d31322e3543",
+    "payload_description": "MUX container, one Telemetry frame (0x01), ASCII"
+   },
+   "size": 27,
+   "header_hex": "1002000000030000526f7665722d416c7068610000000000000647484624d3e00000001b0000003cabfc79ff",
+   "crc32": "0xABFC79FF",
+   "envelope_hex": "1002000000030000526f7665722d416c7068610000000000000647484624d3e00000001b0000003cabfc79ff0101010016544c4d20544845524d414c204350553d2d31322e3543",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build",
+   "mux_frames": [
+    {
+     "type": "0x01",
+     "value_hex": "544c4d20544845524d414c204350553d2d31322e3543"
+    }
+   ]
+  },
+  {
+   "id": "ENV-07",
+   "purpose": "Rover telemetry, priority 3 (LOW science, TTL 3600)",
+   "spec_refs": [
+    "PBS-ENV-01 4",
+    "PBS-PRIO-01 4",
+    "PBS-MUX-01 4"
+   ],
+   "inputs": {
+    "source_id": "Rover-Alpha",
+    "source_id_hex": "526f7665722d416c7068610000000000",
+    "priority": 3,
+    "flags": 0,
+    "sequence": 4,
+    "timestamp_us": 1767225600400000,
+    "ttl_s": 3600,
+    "payload_hex": "0101010011544c4d20454e5620445553543d302e3032",
+    "payload_description": "MUX container, one Telemetry frame (0x01), ASCII"
+   },
+   "size": 22,
+   "header_hex": "1003000000040000526f7665722d416c70686100000000000006474846265a800000001600000e109a058455",
+   "crc32": "0x9A058455",
+   "envelope_hex": "1003000000040000526f7665722d416c70686100000000000006474846265a800000001600000e109a0584550101010011544c4d20454e5620445553543d302e3032",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build",
+   "mux_frames": [
+    {
+     "type": "0x01",
+     "value_hex": "544c4d20454e5620445553543d302e3032"
+    }
+   ]
+  },
+  {
+   "id": "ENV-08",
+   "purpose": "Rover bulk data, priority 4 (BULK), TTL 86400, 256 binary bytes",
+   "spec_refs": [
+    "PBS-ENV-01 4",
+    "PBS-PRIO-01 4",
+    "PBS-MUX-01 4"
+   ],
+   "inputs": {
+    "source_id": "Rover-Alpha",
+    "source_id_hex": "526f7665722d416c7068610000000000",
+    "priority": 4,
+    "flags": 0,
+    "sequence": 5,
+    "timestamp_us": 1767225600500000,
+    "ttl_s": 86400,
+    "payload_hex": "0101010100000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff",
+    "payload_description": "MUX container, one Telemetry frame (0x01) with bytes 0x00..0xFF"
+   },
+   "size": 261,
+   "header_hex": "1004000000050000526f7665722d416c7068610000000000000647484627e1200000010500015180e7d2efe1",
+   "crc32": "0xE7D2EFE1",
+   "envelope_hex": "1004000000050000526f7665722d416c7068610000000000000647484627e1200000010500015180e7d2efe10101010100000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build",
+   "mux_frames": [
+    {
+     "type": "0x01",
+     "value_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"
+    }
+   ]
+  },
+  {
+   "id": "ENV-09",
+   "purpose": "Source ID of exactly 16 ASCII bytes (no null terminator)",
+   "spec_refs": [
+    "PBS-ENV-01 9"
+   ],
+   "inputs": {
+    "source_id": "LUNAR-ROVER-0016",
+    "source_id_hex": "4c554e41522d524f5645522d30303136",
+    "priority": 2,
+    "flags": 0,
+    "sequence": 1,
+    "timestamp_us": 1767225600000000,
+    "ttl_s": 60,
+    "payload_hex": "0101030009535441545553204f4b",
+    "payload_description": "MUX container, one Status frame (0x03)"
+   },
+   "size": 14,
+   "header_hex": "10020000000100004c554e41522d524f5645522d3030313600064748462040000000000e0000003cfd45e83f",
+   "crc32": "0xFD45E83F",
+   "envelope_hex": "10020000000100004c554e41522d524f5645522d3030313600064748462040000000000e0000003cfd45e83f0101030009535441545553204f4b",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build",
+   "mux_frames": [
+    {
+     "type": "0x03",
+     "value_hex": "535441545553204f4b"
+    }
+   ]
+  },
+  {
+   "id": "ENV-10",
+   "purpose": "Source ID of exactly 16 UTF-8 bytes with multi-byte characters",
+   "spec_refs": [
+    "PBS-ENV-01 9"
+   ],
+   "inputs": {
+    "source_id": "Rover-Ü-Mond-Ä",
+    "source_id_hex": "526f7665722dc39c2d4d6f6e642dc384",
+    "priority": 2,
+    "flags": 0,
+    "sequence": 1,
+    "timestamp_us": 1767225600000000,
+    "ttl_s": 60,
+    "payload_hex": "0101030009535441545553204f4b",
+    "payload_description": "MUX container, one Status frame (0x03)"
+   },
+   "size": 14,
+   "header_hex": "1002000000010000526f7665722dc39c2d4d6f6e642dc38400064748462040000000000e0000003cb246bee6",
+   "crc32": "0xB246BEE6",
+   "envelope_hex": "1002000000010000526f7665722dc39c2d4d6f6e642dc38400064748462040000000000e0000003cb246bee60101030009535441545553204f4b",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build",
+   "mux_frames": [
+    {
+     "type": "0x03",
+     "value_hex": "535441545553204f4b"
+    }
+   ]
+  },
+  {
+   "id": "ENV-11",
+   "purpose": "Sequence 65535 (last value before rollover), header-only heartbeat",
+   "spec_refs": [
+    "PBS-ENV-01 8"
+   ],
+   "inputs": {
+    "source_id": "Rover-Alpha",
+    "source_id_hex": "526f7665722d416c7068610000000000",
+    "priority": 3,
+    "flags": 0,
+    "sequence": 65535,
+    "timestamp_us": 1767225600000000,
+    "ttl_s": 60,
+    "payload_hex": "",
+    "payload_description": "empty (Size 0)"
+   },
+   "size": 0,
+   "header_hex": "10030000ffff0000526f7665722d416c70686100000000000006474846204000000000000000003cb2e0064f",
+   "crc32": "0xB2E0064F",
+   "envelope_hex": "10030000ffff0000526f7665722d416c70686100000000000006474846204000000000000000003cb2e0064f",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build"
+  },
+  {
+   "id": "ENV-12",
+   "purpose": "Sequence 0 (after rollover from 65535), header-only heartbeat",
+   "spec_refs": [
+    "PBS-ENV-01 8",
+    "PBS-CONFORMANCE-01 7"
+   ],
+   "inputs": {
+    "source_id": "Rover-Alpha",
+    "source_id_hex": "526f7665722d416c7068610000000000",
+    "priority": 3,
+    "flags": 0,
+    "sequence": 0,
+    "timestamp_us": 1767225600000001,
+    "ttl_s": 60,
+    "payload_hex": "",
+    "payload_description": "empty (Size 0)"
+   },
+   "size": 0,
+   "header_hex": "1003000000000000526f7665722d416c70686100000000000006474846204001000000000000003c7132faa9",
+   "crc32": "0x7132FAA9",
+   "envelope_hex": "1003000000000000526f7665722d416c70686100000000000006474846204001000000000000003c7132faa9",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build"
+  },
+  {
+   "id": "ENV-13",
+   "purpose": "Header-only, priority 4, TTL 0, Flags 0x00",
+   "spec_refs": [
+    "PBS-ENV-01 11",
+    "PBS-ENV-01 12.1"
+   ],
+   "inputs": {
+    "source_id": "Rover-Alpha",
+    "source_id_hex": "526f7665722d416c7068610000000000",
+    "priority": 4,
+    "flags": 0,
+    "sequence": 7,
+    "timestamp_us": 1767225600000000,
+    "ttl_s": 0,
+    "payload_hex": "",
+    "payload_description": "empty (Size 0)"
+   },
+   "size": 0,
+   "header_hex": "1004000000070000526f7665722d416c706861000000000000064748462040000000000000000000f4b18415",
+   "crc32": "0xF4B18415",
+   "envelope_hex": "1004000000070000526f7665722d416c706861000000000000064748462040000000000000000000f4b18415",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build"
+  },
+  {
+   "id": "ENV-14",
+   "purpose": "TTL 4294967295 (maximum u32), Timestamp with a microsecond fraction",
+   "spec_refs": [
+    "PBS-ENV-01 4",
+    "PBS-ENV-01 10"
+   ],
+   "inputs": {
+    "source_id": "Rover-Alpha",
+    "source_id_hex": "526f7665722d416c7068610000000000",
+    "priority": 2,
+    "flags": 0,
+    "sequence": 8,
+    "timestamp_us": 1767225600123456,
+    "ttl_s": 4294967295,
+    "payload_hex": "",
+    "payload_description": "empty (Size 0)"
+   },
+   "size": 0,
+   "header_hex": "1002000000080000526f7665722d416c7068610000000000000647484622224000000000ffffffff74d89cf3",
+   "crc32": "0x74D89CF3",
+   "envelope_hex": "1002000000080000526f7665722d416c7068610000000000000647484622224000000000ffffffff74d89cf3",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build"
+  },
+  {
+   "id": "ENV-15",
+   "purpose": "Earth-side envelope with ACK_REQ set (Flags 0x01), non-empty payload",
+   "spec_refs": [
+    "PBS-ENV-01 7"
+   ],
+   "inputs": {
+    "source_id": "Earth-MCC",
+    "source_id_hex": "45617274682d4d434300000000000000",
+    "priority": 2,
+    "flags": 1,
+    "sequence": 1,
+    "timestamp_us": 1767225602000000,
+    "ttl_s": 60,
+    "payload_hex": "010101000e544c4d2050494e472d5245504c59",
+    "payload_description": "MUX container, one Telemetry frame (0x01), ASCII"
+   },
+   "size": 19,
+   "header_hex": "100201000001000045617274682d4d43430000000000000000064748463ec480000000130000003c1e7e9190",
+   "crc32": "0x1E7E9190",
+   "envelope_hex": "100201000001000045617274682d4d43430000000000000000064748463ec480000000130000003c1e7e9190010101000e544c4d2050494e472d5245504c59",
+   "built_with": "PBS_LINK 0.1.4 PBSLink.send (fixed clock); equal to independent struct/zlib build",
+   "mux_frames": [
+    {
+     "type": "0x01",
+     "value_hex": "544c4d2050494e472d5245504c59"
+    }
+   ]
+  }
+ ],
+ "receiver_cases": [
+  {
+   "id": "RX-01",
+   "description": "ENV-01 received at T+5 s (C01 Section 8 statement 1, receipt)",
+   "spec_refs": [
+    "PBS-ENV-01 12.2",
+    "PBS-CONFORMANCE-01 8"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000001e588721ed",
+   "now_us": 1767225605000000,
+   "expected": {
+    "result": "ACCEPT",
+    "reason": "OK"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=0, payload bytes returned=0)"
+  },
+  {
+   "id": "RX-02",
+   "description": "ENV-01 at T+30 s: age equals TTL, not expired",
+   "spec_refs": [
+    "PBS-ENV-01 12.2",
+    "PBS-ENV-01 12.5",
+    "PBS-CONFORMANCE-01 8"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000001e588721ed",
+   "now_us": 1767225630000000,
+   "expected": {
+    "result": "ACCEPT",
+    "reason": "OK"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=0, payload bytes returned=0)"
+  },
+  {
+   "id": "RX-03",
+   "description": "ENV-01 at T+30.000001 s: age exceeds TTL by 1 us (integer-microsecond rule, A6)",
+   "spec_refs": [
+    "PBS-ENV-01 12.2"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000001e588721ed",
+   "now_us": 1767225630000001,
+   "expected": {
+    "result": "REJECT",
+    "reason": "TTL_EXPIRED"
+   },
+   "pbs_link_0_1_4_parse": "PBSTTLError: TTL expired: message age 30.0s > TTL 30s"
+  },
+  {
+   "id": "RX-04",
+   "description": "ENV-01 at T+31 s: expired",
+   "spec_refs": [
+    "PBS-ENV-01 12.2",
+    "PBS-ENV-01 12.5",
+    "PBS-CONFORMANCE-01 8"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000001e588721ed",
+   "now_us": 1767225631000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "TTL_EXPIRED"
+   },
+   "pbs_link_0_1_4_parse": "PBSTTLError: TTL expired: message age 31.0s > TTL 30s"
+  },
+  {
+   "id": "RX-05",
+   "description": "ENV-02 (TTL 0) at current_time 1798761600 (365 days after Timestamp)",
+   "spec_refs": [
+    "PBS-ENV-01 12.1",
+    "PBS-ENV-01 12.5",
+    "PBS-CONFORMANCE-01 8"
+   ],
+   "derived_from": "ENV-02",
+   "input_hex": "1000010000010000526f7665722d41000000000000000000000647484620400000000000000000008757080e",
+   "now_us": 1798761600000000,
+   "expected": {
+    "result": "ACCEPT",
+    "reason": "OK"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=0, payload bytes returned=0)"
+  },
+  {
+   "id": "RX-06",
+   "description": "ENV-03 (TTL 10) at T+26 s: expired",
+   "spec_refs": [
+    "PBS-ENV-01 12.5"
+   ],
+   "derived_from": "ENV-03",
+   "input_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000000acde710af",
+   "now_us": 1767225626000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "TTL_EXPIRED"
+   },
+   "pbs_link_0_1_4_parse": "PBSTTLError: TTL expired: message age 26.0s > TTL 10s"
+  },
+  {
+   "id": "RX-07",
+   "description": "Magic 0x11 with CRC32 recomputed over the modified header",
+   "spec_refs": [
+    "PBS-ENV-01 5",
+    "PBS-ENV-01 14"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1100010000010000526f7665722d410000000000000000000006474846204000000000000000001e72af198f",
+   "now_us": 1767225605000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "MAGIC"
+   },
+   "pbs_link_0_1_4_parse": "PBSMagicError: Invalid magic byte: 0x11, expected 0x10"
+  },
+  {
+   "id": "RX-08",
+   "description": "Priority byte changed 0 -> 1, CRC32 not updated",
+   "spec_refs": [
+    "PBS-ENV-01 13",
+    "PBS-PRIO-01 10"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1001010000010000526f7665722d410000000000000000000006474846204000000000000000001e588721ed",
+   "now_us": 1767225605000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "CRC"
+   },
+   "pbs_link_0_1_4_parse": "PBSCRCError: CRC32 verification failed - data corrupted"
+  },
+  {
+   "id": "RX-09",
+   "description": "CRC32 computed over bytes 0x00-0x27 only (0x019507AC)",
+   "spec_refs": [
+    "PBS-ENV-01 13.2"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000001e019507ac",
+   "now_us": 1767225605000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "CRC"
+   },
+   "pbs_link_0_1_4_parse": "PBSCRCError: CRC32 verification failed - data corrupted"
+  },
+  {
+   "id": "RX-10",
+   "description": "Priority 5 with valid CRC32",
+   "spec_refs": [
+    "PBS-ENV-01 6",
+    "PBS-PRIO-01 5.1"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1005010000010000526f7665722d410000000000000000000006474846204000000000000000001ed8aa0abb",
+   "now_us": 1767225605000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "PRIORITY"
+   },
+   "pbs_link_0_1_4_parse": "PBSPriorityError: Reserved priority value: 5"
+  },
+  {
+   "id": "RX-11",
+   "description": "Priority 255 with valid CRC32",
+   "spec_refs": [
+    "PBS-ENV-01 6",
+    "PBS-PRIO-01 5.1"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "10ff010000010000526f7665722d410000000000000000000006474846204000000000000000001eb3b1f221",
+   "now_us": 1767225605000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "PRIORITY"
+   },
+   "pbs_link_0_1_4_parse": "PBSPriorityError: Reserved priority value: 255"
+  },
+  {
+   "id": "RX-12",
+   "description": "Reserved bytes 0x03 = 0xA5 and 0x06-0x07 = 0x5A5A with valid CRC32: accepted, reserved fields ignored",
+   "spec_refs": [
+    "PBS-ENV-01 4",
+    "PBS-ENV-01 18"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "100001a500015a5a526f7665722d410000000000000000000006474846204000000000000000001ee7b4db79",
+   "now_us": 1767225605000000,
+   "expected": {
+    "result": "ACCEPT",
+    "reason": "OK"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=0, payload bytes returned=0)"
+  },
+  {
+   "id": "RX-13",
+   "description": "Flags 0xFF (reserved bits 1-7 set) with valid CRC32: accepted, ACK_REQ = 1, reserved bits ignored",
+   "spec_refs": [
+    "PBS-ENV-01 7",
+    "PBS-ENV-01 18"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1000ff0000010000526f7665722d410000000000000000000006474846204000000000000000001ec15b56c6",
+   "now_us": 1767225605000000,
+   "expected": {
+    "result": "ACCEPT",
+    "reason": "OK"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=0, payload bytes returned=0)"
+  },
+  {
+   "id": "RX-14",
+   "description": "ENV-04 with its last payload byte missing (fewer than Size bytes)",
+   "spec_refs": [
+    "PBS-ENV-01 11",
+    "PBS-ENV-01 14"
+   ],
+   "derived_from": "ENV-04",
+   "input_hex": "1000000000010000526f7665722d416c7068610000000000000647484621c6a00000001c00000000d462c6340101010017455654204d4f544f525f5354414c4c20574845454c3d",
+   "now_us": 1767225601000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "LENGTH"
+   },
+   "pbs_link_0_1_4_parse": "PBSValidationError: Incomplete payload: expected 28 bytes, got 27"
+  },
+  {
+   "id": "RX-15",
+   "description": "ENV-04 with one byte appended after the payload (bundle payload longer than 44 + Size, A8)",
+   "spec_refs": [
+    "PBS-DTN-MAP-01 6.2"
+   ],
+   "derived_from": "ENV-04",
+   "input_hex": "1000000000010000526f7665722d416c7068610000000000000647484621c6a00000001c00000000d462c6340101010017455654204d4f544f525f5354414c4c20574845454c3d3300",
+   "now_us": 1767225601000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "LENGTH"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=28, payload bytes returned=28)"
+  },
+  {
+   "id": "RX-16",
+   "description": "43 bytes (shorter than the header)",
+   "spec_refs": [
+    "PBS-ENV-01 4"
+   ],
+   "derived_from": "ENV-01",
+   "input_hex": "1000010000010000526f7665722d410000000000000000000006474846204000000000000000001e588721",
+   "now_us": 1767225605000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "LENGTH"
+   },
+   "pbs_link_0_1_4_parse": "PBSValidationError: Data too short: 43 bytes, need at least 44"
+  },
+  {
+   "id": "RX-17",
+   "description": "MUX container with mux_version 0x02",
+   "spec_refs": [
+    "PBS-MUX-01 4.1"
+   ],
+   "derived_from": null,
+   "input_hex": "1002000000140000526f7665722d416c70686100000000000006474846204000000000070000003c5d353fed02010100024f4b",
+   "now_us": 1767225601000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "MUX_VERSION"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=7, payload bytes returned=7)"
+  },
+  {
+   "id": "RX-18",
+   "description": "MUX frame length runs past the end of the payload",
+   "spec_refs": [
+    "PBS-MUX-01 4.2",
+    "PBS-MUX-01 9"
+   ],
+   "derived_from": null,
+   "input_hex": "1002000000140000526f7665722d416c70686100000000000006474846204000000000070000003c5d353fed01010100094f4b",
+   "now_us": 1767225601000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "MUX_MALFORMED"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=7, payload bytes returned=7)"
+  },
+  {
+   "id": "RX-19",
+   "description": "frame_count 2 with one frame present",
+   "spec_refs": [
+    "PBS-MUX-01 4.2"
+   ],
+   "derived_from": null,
+   "input_hex": "1002000000140000526f7665722d416c70686100000000000006474846204000000000070000003c5d353fed01020100024f4b",
+   "now_us": 1767225601000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "MUX_MALFORMED"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=7, payload bytes returned=7)"
+  },
+  {
+   "id": "RX-20",
+   "description": "Two padding bytes after the last frame of an unprotected container: accepted, padding ignored",
+   "spec_refs": [
+    "PBS-MUX-01 4.3"
+   ],
+   "derived_from": null,
+   "input_hex": "1002000000140000526f7665722d416c70686100000000000006474846204000000000090000003c95f7e47f01010100024f4bffff",
+   "now_us": 1767225601000000,
+   "expected": {
+    "result": "ACCEPT",
+    "reason": "OK"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=9, payload bytes returned=9)"
+  },
+  {
+   "id": "RX-21",
+   "description": "Unknown frame type 0x55 before a Telemetry frame: accepted, 0x55 skipped",
+   "spec_refs": [
+    "PBS-MUX-01 4.2",
+    "PBS-MUX-01 10",
+    "PBS-CONFORMANCE-02 T014"
+   ],
+   "derived_from": null,
+   "input_hex": "1002000000140000526f7665722d416c706861000000000000064748462040000000000d0000003cc81bb57301025500030001020100024f4b",
+   "now_us": 1767225601000000,
+   "expected": {
+    "result": "ACCEPT",
+    "reason": "OK"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=13, payload bytes returned=13)"
+  },
+  {
+   "id": "RX-22",
+   "description": "MUX container with frame_count 0 (2-byte payload): accepted, no frames",
+   "spec_refs": [
+    "PBS-MUX-01 4.1"
+   ],
+   "derived_from": null,
+   "input_hex": "1002000000140000526f7665722d416c70686100000000000006474846204000000000020000003c17a27aa20100",
+   "now_us": 1767225601000000,
+   "expected": {
+    "result": "ACCEPT",
+    "reason": "OK"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=2, payload bytes returned=2)"
+  }
+ ],
+ "ttl_note": "Expired iff TTL > 0 and now_us - Timestamp > TTL * 1000000 (SPEC-DIGEST.md 2.4). RX-01..RX-06 cover PBS-ENV-01 12.5 and PBS-CONFORMANCE-01 Section 8.",
+ "lifetime_cases": [
+  {
+   "id": "LT-01",
+   "description": "TTL 30, handed to the BPA at its Timestamp",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 30,
+   "clock_us": 1767225600000000,
+   "c_us": 1767225601000000,
+   "spec_bound_ms": 29000,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": 29,
+   "outcome": "OK"
+  },
+  {
+   "id": "LT-02",
+   "description": "TTL 30, handed to the BPA 5 s after Timestamp",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 30,
+   "clock_us": 1767225605000000,
+   "c_us": 1767225606000000,
+   "spec_bound_ms": 24000,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": 24,
+   "outcome": "OK"
+  },
+  {
+   "id": "LT-03",
+   "description": "TTL 30, gateway clock 2 s behind Timestamp (max(0, ...) term)",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 30,
+   "clock_us": 1767225598000000,
+   "c_us": 1767225599000000,
+   "spec_bound_ms": 30000,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": 30,
+   "outcome": "OK"
+  },
+  {
+   "id": "LT-04",
+   "description": "TTL 30, 1.001 s remaining at the clock reading",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 30,
+   "clock_us": 1767225628999000,
+   "c_us": 1767225629999000,
+   "spec_bound_ms": 1,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": null,
+   "outcome": "GW_LIFETIME_UNDER_1S"
+  },
+  {
+   "id": "LT-05",
+   "description": "TTL 30, 1 s remaining at the clock reading, 0 ms remaining at c_us (clock + margin)",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 30,
+   "clock_us": 1767225629000000,
+   "c_us": 1767225630000000,
+   "spec_bound_ms": 0,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": null,
+   "outcome": "GW_EXPIRED"
+  },
+  {
+   "id": "LT-06",
+   "description": "TTL 30, 1 ms remaining at the clock reading",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 30,
+   "clock_us": 1767225629999000,
+   "c_us": 1767225630999000,
+   "spec_bound_ms": -999,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": null,
+   "outcome": "GW_EXPIRED"
+  },
+  {
+   "id": "LT-07",
+   "description": "TTL 30, expired at the clock reading",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 30,
+   "clock_us": 1767225631000000,
+   "c_us": 1767225632000000,
+   "spec_bound_ms": -2000,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": null,
+   "outcome": "GW_EXPIRED"
+  },
+  {
+   "id": "LT-08",
+   "description": "TTL 0, any age: no-expiry lifetime",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 0,
+   "clock_us": 1801785600000000,
+   "c_us": null,
+   "spec_bound_ms": null,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": 2147483647,
+   "outcome": "NO_EXPIRY"
+  },
+  {
+   "id": "LT-09",
+   "description": "TTL 4294967295: bound exceeds INT_MAX s, clamped to the no-expiry lifetime",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 4294967295,
+   "clock_us": 1767225600000000,
+   "c_us": 1767225601000000,
+   "spec_bound_ms": 4294967294000,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": 2147483647,
+   "outcome": "OK"
+  },
+  {
+   "id": "LT-10",
+   "description": "TTL 5 (short-TTL S5 envelope) handed over 2 s after Timestamp",
+   "timestamp_us": 1767225600000000,
+   "ttl_s": 5,
+   "clock_us": 1767225602000000,
+   "c_us": 1767225603000000,
+   "spec_bound_ms": 2000,
+   "spec_bound_formula": "floor((TTL*1000000 - max(0, c_us - Timestamp)) / 1000)",
+   "ion_lifespan_s": 2,
+   "outcome": "OK"
+  }
+ ],
+ "cos_map": [
+  {
+   "priority": 0,
+   "name": "CRITICAL",
+   "dtn_class": "Expedited",
+   "ion_class_of_service": 2,
+   "ion_ordinal": 0
+  },
+  {
+   "priority": 1,
+   "name": "HIGH",
+   "dtn_class": "Expedited",
+   "ion_class_of_service": 2,
+   "ion_ordinal": 0
+  },
+  {
+   "priority": 2,
+   "name": "NORMAL",
+   "dtn_class": "Normal",
+   "ion_class_of_service": 1,
+   "ion_ordinal": 0
+  },
+  {
+   "priority": 3,
+   "name": "LOW",
+   "dtn_class": "Bulk",
+   "ion_class_of_service": 0,
+   "ion_ordinal": 0
+  },
+  {
+   "priority": 4,
+   "name": "BULK",
+   "dtn_class": "Bulk",
+   "ion_class_of_service": 0,
+   "ion_ordinal": 0
+  }
+ ],
+ "sec_b": {
+  "suites": {
+   "0xFF01": {
+    "name": "PBS-DEMO-TEST-HMAC-SHA256",
+    "algorithm": "HMAC-SHA-256 (RFC 2104, FIPS 180-4)",
+    "key_bytes": 32,
+    "auth_len": 32,
+    "nonce_len": 0,
+    "flags": "0x01",
+    "registered": false
+   },
+   "0xFF02": {
+    "name": "PBS-DEMO-TEST-ED25519",
+    "algorithm": "Ed25519 (RFC 8032, pure, no context)",
+    "key_bytes": 32,
+    "auth_len": 64,
+    "nonce_len": 0,
+    "flags": "0x01",
+    "registered": false
+   }
+  },
+  "canonical_input": "envelope[0 : 44 + Size - auth_len] (all 44 header bytes and the payload up to auth_data)",
+  "test_keys": {
+   "TEST-HMAC-01": {
+    "suite": "0xFF01",
+    "key_hex": "18153f8a4d36b10546eb14d5a06da99ed25f6c51f86a8c00ece7ffb8c5a842e6",
+    "derivation": "SHA-256(\"PBS-ION-DEMO TEST KEY TEST-HMAC-01 (NOT FOR OPERATIONAL USE)\")",
+    "provisioned_at_rover": true,
+    "bound_source_id": "Earth-MCC",
+    "bound_authority": "PBS-DEMO-MCC"
+   },
+   "TEST-ED25519-01": {
+    "suite": "0xFF02",
+    "seed_hex": "b4576be046720e986a4334608797d288fcd4544352d898cdaae5f05311de56a5",
+    "public_key_hex": "462d874ceff2700bf1e04fc01405357c2980f342b26665c3755f5d016677f01f",
+    "derivation": "seed = SHA-256(\"PBS-ION-DEMO TEST KEY TEST-ED25519-01 (NOT FOR OPERATIONAL USE)\")",
+    "provisioned_at_rover": true,
+    "bound_source_id": "Earth-MCC",
+    "bound_authority": "PBS-DEMO-MCC"
+   },
+   "TEST-HMAC-ROGUE": {
+    "suite": "0xFF01",
+    "key_hex": "baaf45d5c0706468b31699d42cb4b9d6d755277cac720cc049602f2ca26d6059",
+    "derivation": "SHA-256(\"PBS-ION-DEMO TEST KEY TEST-HMAC-ROGUE (NOT FOR OPERATIONAL USE)\")",
+    "provisioned_at_rover": false
+   },
+   "TEST-ED25519-ROGUE": {
+    "suite": "0xFF02",
+    "seed_hex": "afcedfa48f358fcce738991095abff072715028c206fa5ec91e25f70cff0d036",
+    "public_key_hex": "e87008de66712341162ba6a5f3f027cf9d3f447dd4466d82552c775f20f7a08d",
+    "derivation": "seed = SHA-256(\"PBS-ION-DEMO TEST KEY TEST-ED25519-ROGUE (NOT FOR OPERATIONAL USE)\")",
+    "provisioned_at_rover": false
+   }
+  },
+  "rover_policy": {
+   "authority_id_type": 3,
+   "authority_id": "PBS-DEMO-MCC",
+   "policy_epoch": 1,
+   "roles": {
+    "FLIGHT-OPS": [
+     "PING",
+     "SET_HEATER",
+     "DRIVE",
+     "CAPTURE_IMAGE",
+     "SET_MODE"
+    ],
+    "SCIENCE-OPS": [
+     "CAPTURE_IMAGE"
+    ]
+   },
+   "replay_window": 64,
+   "replay_state_key": "(Source ID 16 raw bytes, key_id)"
+  },
+  "messages": [
+   {
+    "id": "CMD-01",
+    "description": "Valid command, suite 0xFF02 (Ed25519), role FLIGHT-OPS, DRIVE 10",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-AUTH-01 2",
+     "PBS-SEC-B-01 6 (REQ-005, REQ-006)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 1,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03",
+    "header_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49",
+    "crc32": "0x010E8C49",
+    "size": 144,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000001544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 124,
+     "auth_input_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031",
+     "auth_data_hex": "dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03"
+    }
+   },
+   {
+    "id": "CMD-02",
+    "description": "Valid command, suite 0xFF01 (HMAC-SHA-256), SET_HEATER ON",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-AUTH-01 2"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 2,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "5345545f484541544552204f4e"
+      }
+     ]
+    },
+    "envelope_hex": "100100000002000045617274682d4d4343000000000000000006474846204000000000720000001ec65539df010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000d5345545f484541544552204f4e0a003c01ff01010c0000200000000000000001544553542d484d41432d3031730748699f852e52447a362b88d071f144b0fe2dca74bfed99b3c859de7fb5b1",
+    "header_hex": "100100000002000045617274682d4d4343000000000000000006474846204000000000720000001ec65539df",
+    "crc32": "0xC65539DF",
+    "size": 114,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "5345545f484541544552204f4e"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff01010c0000200000000000000001544553542d484d41432d3031730748699f852e52447a362b88d071f144b0fe2dca74bfed99b3c859de7fb5b1"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF01",
+     "flags": "0x01",
+     "key_id": "TEST-HMAC-01",
+     "nonce_hex": "",
+     "auth_len": 32,
+     "security_sequence": 1,
+     "signing_key": "TEST-HMAC-01",
+     "auth_input_len": 126,
+     "auth_input_hex": "100100000002000045617274682d4d4343000000000000000006474846204000000000720000001ec65539df010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000d5345545f484541544552204f4e0a003c01ff01010c0000200000000000000001544553542d484d41432d3031",
+     "auth_data_hex": "730748699f852e52447a362b88d071f144b0fe2dca74bfed99b3c859de7fb5b1"
+    }
+   },
+   {
+    "id": "CMD-03",
+    "description": "CMD-01 with command byte changed (DRIVE 10 -> DRIVE 90); header and CRC32 unchanged",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-CONFORMANCE-02 T006"
+    ],
+    "derived_from": "CMD-01",
+    "envelope_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452039300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03",
+    "header_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49",
+    "crc32": "0x010E8C49"
+   },
+   {
+    "id": "CMD-04",
+    "description": "CMD-01 with Priority raised 1 -> 0 and CRC32 recomputed",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-SEC-B-01 6 (REQ-004)",
+     "PBS-PRIO-01 10"
+    ],
+    "derived_from": "CMD-01",
+    "envelope_hex": "100000000001000045617274682d4d4343000000000000000006474846204000000000900000001e461d7ab2010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03",
+    "header_hex": "100000000001000045617274682d4d4343000000000000000006474846204000000000900000001e461d7ab2",
+    "crc32": "0x461D7AB2"
+   },
+   {
+    "id": "CMD-05",
+    "description": "CMD-01 with TTL raised 30 -> 3600 and CRC32 recomputed",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-SEC-B-01 5"
+    ],
+    "derived_from": "CMD-01",
+    "envelope_hex": "100100000001000045617274682d4d43430000000000000000064748462040000000009000000e1084345358010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03",
+    "header_hex": "100100000001000045617274682d4d43430000000000000000064748462040000000009000000e1084345358",
+    "crc32": "0x84345358"
+   },
+   {
+    "id": "CMD-06",
+    "description": "CMD-01 with security_sequence changed 1 -> 2 (replay evasion attempt)",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-SEC-B-01 6 (REQ-003)"
+    ],
+    "derived_from": "CMD-01",
+    "envelope_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000002544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03",
+    "header_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49",
+    "crc32": "0x010E8C49"
+   },
+   {
+    "id": "CMD-07",
+    "description": "Signed with a key not provisioned at the rover (TEST-ED25519-ROGUE seed) but labelled key_id TEST-ED25519-01",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SEC-B-01 6 (REQ-001, REQ-002)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 3,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "100100000003000045617274682d4d4343000000000000000006474846204000000000900000001e9c1c9b1b010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d303129969c7f2fc1d21a8a6a894874fdd7c96c9991a8db1adde1b5499bd7f7d886120bafc17cfac4adc368a5bbd0a859afed290d0558b5f8437a29bf5ad7f6eddd09",
+    "header_hex": "100100000003000045617274682d4d4343000000000000000006474846204000000000900000001e9c1c9b1b",
+    "crc32": "0x9C1C9B1B",
+    "size": 144,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000001544553542d454432353531392d303129969c7f2fc1d21a8a6a894874fdd7c96c9991a8db1adde1b5499bd7f7d886120bafc17cfac4adc368a5bbd0a859afed290d0558b5f8437a29bf5ad7f6eddd09"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-ROGUE",
+     "auth_input_len": 124,
+     "auth_input_hex": "100100000003000045617274682d4d4343000000000000000006474846204000000000900000001e9c1c9b1b010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031",
+     "auth_data_hex": "29969c7f2fc1d21a8a6a894874fdd7c96c9991a8db1adde1b5499bd7f7d886120bafc17cfac4adc368a5bbd0a859afed290d0558b5f8437a29bf5ad7f6eddd09"
+    }
+   },
+   {
+    "id": "CMD-08",
+    "description": "Suite 0xFF01, signed with TEST-HMAC-ROGUE key but labelled key_id TEST-HMAC-01",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SEC-B-01 6 (REQ-001, REQ-002)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 4,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "100100000004000045617274682d4d43430000000000000000064748462040000000006d0000001ec96b8bc8010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a003c01ff01010c0000200000000000000001544553542d484d41432d30318162b92dfb9cc0ef0afb888671277b5b33184c2115e1ff70593fbc8c4d2ddabc",
+    "header_hex": "100100000004000045617274682d4d43430000000000000000064748462040000000006d0000001ec96b8bc8",
+    "crc32": "0xC96B8BC8",
+    "size": 109,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff01010c0000200000000000000001544553542d484d41432d30318162b92dfb9cc0ef0afb888671277b5b33184c2115e1ff70593fbc8c4d2ddabc"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF01",
+     "flags": "0x01",
+     "key_id": "TEST-HMAC-01",
+     "nonce_hex": "",
+     "auth_len": 32,
+     "security_sequence": 1,
+     "signing_key": "TEST-HMAC-ROGUE",
+     "auth_input_len": 121,
+     "auth_input_hex": "100100000004000045617274682d4d43430000000000000000064748462040000000006d0000001ec96b8bc8010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a003c01ff01010c0000200000000000000001544553542d484d41432d3031",
+     "auth_data_hex": "8162b92dfb9cc0ef0afb888671277b5b33184c2115e1ff70593fbc8c4d2ddabc"
+    }
+   },
+   {
+    "id": "CMD-09",
+    "description": "key_id TEST-ED25519-ROGUE, not provisioned at the rover",
+    "spec_refs": [
+     "PBS-SEC-B-01 7"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 5,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "100100000005000045617274682d4d4343000000000000000006474846204000000000930000001ed9d69869010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a006201ff0201120000400000000000000001544553542d454432353531392d524f4755454cf5de14eaef5a5ba0538c3317e3c7e6ade3d447d64ad48b543874e701a440d3ef2eb480f52092fa2afe13be1b260af0b8b119ea105a2a786c6e8154d06fb809",
+    "header_hex": "100100000005000045617274682d4d4343000000000000000006474846204000000000930000001ed9d69869",
+    "crc32": "0xD9D69869",
+    "size": 147,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff0201120000400000000000000001544553542d454432353531392d524f4755454cf5de14eaef5a5ba0538c3317e3c7e6ade3d447d64ad48b543874e701a440d3ef2eb480f52092fa2afe13be1b260af0b8b119ea105a2a786c6e8154d06fb809"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-ROGUE",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-ROGUE",
+     "auth_input_len": 127,
+     "auth_input_hex": "100100000005000045617274682d4d4343000000000000000006474846204000000000930000001ed9d69869010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a006201ff0201120000400000000000000001544553542d454432353531392d524f475545",
+     "auth_data_hex": "4cf5de14eaef5a5ba0538c3317e3c7e6ade3d447d64ad48b543874e701a440d3ef2eb480f52092fa2afe13be1b260af0b8b119ea105a2a786c6e8154d06fb809"
+    }
+   },
+   {
+    "id": "CMD-10",
+    "description": "Role SCIENCE-OPS issuing DRIVE 10 (operation not permitted for the role)",
+    "spec_refs": [
+     "PBS-AUTH-01 3 (REQ-003, REQ-006)",
+     "PBS-CONFORMANCE-02 T008"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 6,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0b000000015042532d44454d4f2d4d4343534349454e43452d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "100100000006000045617274682d4d4343000000000000000006474846204000000000910000001e24bbac14010308001f01030c0b000000015042532d44454d4f2d4d4343534349454e43452d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d30314fee3d9b44506f541b0085957900c302c0d326045b4ea21ebcfcce117eac8e7f8c5b64a50a8aa05e6e3356d06e81338a835bec9de90e0798580cccb84dfe4a0f",
+    "header_hex": "100100000006000045617274682d4d4343000000000000000006474846204000000000910000001e24bbac14",
+    "crc32": "0x24BBAC14",
+    "size": 145,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0b000000015042532d44454d4f2d4d4343534349454e43452d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000001544553542d454432353531392d30314fee3d9b44506f541b0085957900c302c0d326045b4ea21ebcfcce117eac8e7f8c5b64a50a8aa05e6e3356d06e81338a835bec9de90e0798580cccb84dfe4a0f"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 125,
+     "auth_input_hex": "100100000006000045617274682d4d4343000000000000000006474846204000000000910000001e24bbac14010308001f01030c0b000000015042532d44454d4f2d4d4343534349454e43452d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031",
+     "auth_data_hex": "4fee3d9b44506f541b0085957900c302c0d326045b4ea21ebcfcce117eac8e7f8c5b64a50a8aa05e6e3356d06e81338a835bec9de90e0798580cccb84dfe4a0f"
+    }
+   },
+   {
+    "id": "CMD-11",
+    "description": "Role SCIENCE-OPS issuing CAPTURE_IMAGE NAVCAM (permitted)",
+    "spec_refs": [
+     "PBS-AUTH-01 3",
+     "PBS-CONFORMANCE-02 T008"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 7,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0b000000015042532d44454d4f2d4d4343534349454e43452d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "434150545552455f494d414745204e415643414d"
+      }
+     ]
+    },
+    "envelope_hex": "100100000007000045617274682d4d43430000000000000000064748462040000000009d0000001e8c0654a9010308001f01030c0b000000015042532d44454d4f2d4d4343534349454e43452d4f5053020014434150545552455f494d414745204e415643414d0a005f01ff02010f0000400000000000000001544553542d454432353531392d30310b75c924e19a4d7dbae36685110d9d9f3188b0345e7187fafa35376c834b49bd37c206f4383851c89f47d024f8c0e362f4f6aac2df6682735ec47c4212993505",
+    "header_hex": "100100000007000045617274682d4d43430000000000000000064748462040000000009d0000001e8c0654a9",
+    "crc32": "0x8C0654A9",
+    "size": 157,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0b000000015042532d44454d4f2d4d4343534349454e43452d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "434150545552455f494d414745204e415643414d"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000001544553542d454432353531392d30310b75c924e19a4d7dbae36685110d9d9f3188b0345e7187fafa35376c834b49bd37c206f4383851c89f47d024f8c0e362f4f6aac2df6682735ec47c4212993505"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 137,
+     "auth_input_hex": "100100000007000045617274682d4d43430000000000000000064748462040000000009d0000001e8c0654a9010308001f01030c0b000000015042532d44454d4f2d4d4343534349454e43452d4f5053020014434150545552455f494d414745204e415643414d0a005f01ff02010f0000400000000000000001544553542d454432353531392d3031",
+     "auth_data_hex": "0b75c924e19a4d7dbae36685110d9d9f3188b0345e7187fafa35376c834b49bd37c206f4383851c89f47d024f8c0e362f4f6aac2df6682735ec47c4212993505"
+    }
+   },
+   {
+    "id": "CMD-12",
+    "description": "policy_epoch 2 (rover policy epoch is 1)",
+    "spec_refs": [
+     "PBS-AUTH-01 3 (REQ-005)",
+     "PBS-CONFORMANCE-02 T008"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 8,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000025042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "100100000008000045617274682d4d4343000000000000000006474846204000000000900000001e565cd06b010308001e01030c0a000000025042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031ec7632c495501b504d85bae71e773d5634c42acfb6d18f44a3ed2798de167a3c4aec0f5e01cdda341e8047f61395bc3df515eb93d472274b2f0f6fea90096f01",
+    "header_hex": "100100000008000045617274682d4d4343000000000000000006474846204000000000900000001e565cd06b",
+    "crc32": "0x565CD06B",
+    "size": 144,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000025042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000001544553542d454432353531392d3031ec7632c495501b504d85bae71e773d5634c42acfb6d18f44a3ed2798de167a3c4aec0f5e01cdda341e8047f61395bc3df515eb93d472274b2f0f6fea90096f01"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 124,
+     "auth_input_hex": "100100000008000045617274682d4d4343000000000000000006474846204000000000900000001e565cd06b010308001e01030c0a000000025042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031",
+     "auth_data_hex": "ec7632c495501b504d85bae71e773d5634c42acfb6d18f44a3ed2798de167a3c4aec0f5e01cdda341e8047f61395bc3df515eb93d472274b2f0f6fea90096f01"
+    }
+   },
+   {
+    "id": "CMD-13",
+    "description": "Command with Authority Context and no Security frame",
+    "spec_refs": [
+     "PBS-SEC-B-01 6 (REQ-005)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 9,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "100100000009000045617274682d4d43430000000000000000064748462040000000002e0000001e9873c0cd010208001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f50530200084452495645203130",
+    "header_hex": "100100000009000045617274682d4d43430000000000000000064748462040000000002e0000001e9873c0cd",
+    "crc32": "0x9873C0CD",
+    "size": 46,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     }
+    ]
+   },
+   {
+    "id": "CMD-14",
+    "description": "Signed command with no Authority Context frame",
+    "spec_refs": [
+     "PBS-SEC-B-01 6 (REQ-005)",
+     "PBS-AUTH-01 3 (REQ-002)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 10,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "10010000000a000045617274682d4d43430000000000000000064748462040000000006f0000001e8201cb72010202000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d303165d73c3843a5fd95fe371ef28ae348264346e7000a2a07dbb6a2e975e29481e6110b74a0e79a18c03b20f54ef65c922fa68288611e9a2680acb904b772b5db07",
+    "header_hex": "10010000000a000045617274682d4d43430000000000000000064748462040000000006f0000001e8201cb72",
+    "crc32": "0x8201CB72",
+    "size": 111,
+    "mux_frames": [
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000001544553542d454432353531392d303165d73c3843a5fd95fe371ef28ae348264346e7000a2a07dbb6a2e975e29481e6110b74a0e79a18c03b20f54ef65c922fa68288611e9a2680acb904b772b5db07"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 91,
+     "auth_input_hex": "10010000000a000045617274682d4d43430000000000000000064748462040000000006f0000001e8201cb72010202000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031",
+     "auth_data_hex": "65d73c3843a5fd95fe371ef28ae348264346e7000a2a07dbb6a2e975e29481e6110b74a0e79a18c03b20f54ef65c922fa68288611e9a2680acb904b772b5db07"
+    }
+   },
+   {
+    "id": "CMD-15",
+    "description": "suite_id 0xFF7F (not defined in the demo profile), HMAC tag",
+    "spec_refs": [
+     "PBS-SEC-B-01 3"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 11,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "10010000000b000045617274682d4d43430000000000000000064748462040000000006d0000001ee27ee85d010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a003c01ff7f010c0000200000000000000001544553542d484d41432d30310291ec1af3fa1d203a471d45336791970932282ea5462f39dac2879d5441fb51",
+    "header_hex": "10010000000b000045617274682d4d43430000000000000000064748462040000000006d0000001ee27ee85d",
+    "crc32": "0xE27EE85D",
+    "size": 109,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff7f010c0000200000000000000001544553542d484d41432d30310291ec1af3fa1d203a471d45336791970932282ea5462f39dac2879d5441fb51"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF7F",
+     "flags": "0x01",
+     "key_id": "TEST-HMAC-01",
+     "nonce_hex": "",
+     "auth_len": 32,
+     "security_sequence": 1,
+     "signing_key": "TEST-HMAC-01",
+     "auth_input_len": 121,
+     "auth_input_hex": "10010000000b000045617274682d4d43430000000000000000064748462040000000006d0000001ee27ee85d010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a003c01ff7f010c0000200000000000000001544553542d484d41432d3031",
+     "auth_data_hex": "0291ec1af3fa1d203a471d45336791970932282ea5462f39dac2879d5441fb51"
+    }
+   },
+   {
+    "id": "CMD-16",
+    "description": "Valid command carrying an application-defined frame 0x80 before the command frame",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-MUX-01 5.9",
+     "PBS-CONFORMANCE-02 T014"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 12,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x80",
+       "value_hex": "deadbeef"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "50494e47"
+      }
+     ]
+    },
+    "envelope_hex": "10010000000c000045617274682d4d4343000000000000000006474846204000000000930000001e8e84c44b010408001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053800004deadbeef02000450494e470a005f01ff02010f0000400000000000000001544553542d454432353531392d3031e480f5e2ab048cf3a986da2e9103a7937dc06204d48c59537b69dc6675edc3bf02171e1e2bec47cd22709376d23e74fa052491049128518031c99669e5f45001",
+    "header_hex": "10010000000c000045617274682d4d4343000000000000000006474846204000000000930000001e8e84c44b",
+    "crc32": "0x8E84C44B",
+    "size": 147,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x80",
+      "value_hex": "deadbeef"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "50494e47"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000001544553542d454432353531392d3031e480f5e2ab048cf3a986da2e9103a7937dc06204d48c59537b69dc6675edc3bf02171e1e2bec47cd22709376d23e74fa052491049128518031c99669e5f45001"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 127,
+     "auth_input_hex": "10010000000c000045617274682d4d4343000000000000000006474846204000000000930000001e8e84c44b010408001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053800004deadbeef02000450494e470a005f01ff02010f0000400000000000000001544553542d454432353531392d3031",
+     "auth_data_hex": "e480f5e2ab048cf3a986da2e9103a7937dc06204d48c59537b69dc6675edc3bf02171e1e2bec47cd22709376d23e74fa052491049128518031c99669e5f45001"
+    }
+   },
+   {
+    "id": "CMD-17",
+    "description": "Validly signed with the Earth key, Source ID Rover-Alpha (key bound to Earth-MCC)",
+    "spec_refs": [
+     "PBS-AUTH-01 3 (REQ-003)"
+    ],
+    "inputs": {
+     "source_id": "Rover-Alpha",
+     "source_id_hex": "526f7665722d416c7068610000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 13,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "4452495645203130"
+      }
+     ]
+    },
+    "envelope_hex": "10010000000d0000526f7665722d416c70686100000000000006474846204000000000900000001ee5108447010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031500e2a58f21597051d41b93df4df0df6bae720f53cef014609b77f43449e93fe2aaef29ca536d99b556b05fec8d789dce44c3e06568d50192ea508044136c40d",
+    "header_hex": "10010000000d0000526f7665722d416c70686100000000000006474846204000000000900000001ee5108447",
+    "crc32": "0xE5108447",
+    "size": 144,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "4452495645203130"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000001544553542d454432353531392d3031500e2a58f21597051d41b93df4df0df6bae720f53cef014609b77f43449e93fe2aaef29ca536d99b556b05fec8d789dce44c3e06568d50192ea508044136c40d"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 124,
+     "auth_input_hex": "10010000000d0000526f7665722d416c70686100000000000006474846204000000000900000001ee5108447010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031",
+     "auth_data_hex": "500e2a58f21597051d41b93df4df0df6bae720f53cef014609b77f43449e93fe2aaef29ca536d99b556b05fec8d789dce44c3e06568d50192ea508044136c40d"
+    }
+   },
+   {
+    "id": "CMD-18",
+    "description": "CMD-01 with two 0x00 padding bytes appended and Size and CRC32 updated (Security frame no longer ends the payload)",
+    "spec_refs": [
+     "PBS-SEC-B-01 5",
+     "PBS-MUX-01 4.3"
+    ],
+    "derived_from": "CMD-01",
+    "envelope_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000920000001e2ff8a4cf010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc030000",
+    "header_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000920000001e2ff8a4cf",
+    "crc32": "0x2FF8A4CF"
+   },
+   {
+    "id": "CMD-W05",
+    "description": "Valid command, security_sequence 5 (replay-window case)",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 6 (REQ-003)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 14,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "50494e47"
+      }
+     ]
+    },
+    "envelope_hex": "10010000000e000045617274682d4d43430000000000000000064748462040000000008c0000001e60ef5eb9010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000005544553542d454432353531392d303170230fd8acc19843736bcf71cb78489417d8a9869179a5085842ad9091c6254f9df161e84a67e27f072240a4333e85b66b2ddf89d4427b5442f476fc4051260e",
+    "header_hex": "10010000000e000045617274682d4d43430000000000000000064748462040000000008c0000001e60ef5eb9",
+    "crc32": "0x60EF5EB9",
+    "size": 140,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "50494e47"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000005544553542d454432353531392d303170230fd8acc19843736bcf71cb78489417d8a9869179a5085842ad9091c6254f9df161e84a67e27f072240a4333e85b66b2ddf89d4427b5442f476fc4051260e"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 5,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 120,
+     "auth_input_hex": "10010000000e000045617274682d4d43430000000000000000064748462040000000008c0000001e60ef5eb9010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000005544553542d454432353531392d3031",
+     "auth_data_hex": "70230fd8acc19843736bcf71cb78489417d8a9869179a5085842ad9091c6254f9df161e84a67e27f072240a4333e85b66b2ddf89d4427b5442f476fc4051260e"
+    }
+   },
+   {
+    "id": "CMD-W03",
+    "description": "Valid command, security_sequence 3 (replay-window case)",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 6 (REQ-003)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 15,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "50494e47"
+      }
+     ]
+    },
+    "envelope_hex": "10010000000f000045617274682d4d43430000000000000000064748462040000000008c0000001e2e665510010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000003544553542d454432353531392d3031c726bdbbb6730002bf1e8f64ef88055a215e6242ef28ecd74eb73cc332e3430d2bdc4e857ad23b31e3326a848d34347547a71348841ef6250bd1445b3945ce0f",
+    "header_hex": "10010000000f000045617274682d4d43430000000000000000064748462040000000008c0000001e2e665510",
+    "crc32": "0x2E665510",
+    "size": 140,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "50494e47"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000003544553542d454432353531392d3031c726bdbbb6730002bf1e8f64ef88055a215e6242ef28ecd74eb73cc332e3430d2bdc4e857ad23b31e3326a848d34347547a71348841ef6250bd1445b3945ce0f"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 3,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 120,
+     "auth_input_hex": "10010000000f000045617274682d4d43430000000000000000064748462040000000008c0000001e2e665510010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000003544553542d454432353531392d3031",
+     "auth_data_hex": "c726bdbbb6730002bf1e8f64ef88055a215e6242ef28ecd74eb73cc332e3430d2bdc4e857ad23b31e3326a848d34347547a71348841ef6250bd1445b3945ce0f"
+    }
+   },
+   {
+    "id": "CMD-W70",
+    "description": "Valid command, security_sequence 70 (replay-window case)",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 6 (REQ-003)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 16,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "50494e47"
+      }
+     ]
+    },
+    "envelope_hex": "100100000010000045617274682d4d43430000000000000000064748462040000000008c0000001e36c59993010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000046544553542d454432353531392d30310e0028f52f8bc9d1c037dfe33d45db0b66f4e5f859ee59666eeb86f0e125e7b9fbfeb96b4b8b1bc351694b2459adab8654d7f15426b0d648ab1abe7b192ee407",
+    "header_hex": "100100000010000045617274682d4d43430000000000000000064748462040000000008c0000001e36c59993",
+    "crc32": "0x36C59993",
+    "size": 140,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "50494e47"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000046544553542d454432353531392d30310e0028f52f8bc9d1c037dfe33d45db0b66f4e5f859ee59666eeb86f0e125e7b9fbfeb96b4b8b1bc351694b2459adab8654d7f15426b0d648ab1abe7b192ee407"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 70,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 120,
+     "auth_input_hex": "100100000010000045617274682d4d43430000000000000000064748462040000000008c0000001e36c59993010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000046544553542d454432353531392d3031",
+     "auth_data_hex": "0e0028f52f8bc9d1c037dfe33d45db0b66f4e5f859ee59666eeb86f0e125e7b9fbfeb96b4b8b1bc351694b2459adab8654d7f15426b0d648ab1abe7b192ee407"
+    }
+   },
+   {
+    "id": "CMD-W07",
+    "description": "Valid command, security_sequence 7 (replay-window case)",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 6 (REQ-003)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 17,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "50494e47"
+      }
+     ]
+    },
+    "envelope_hex": "100100000011000045617274682d4d43430000000000000000064748462040000000008c0000001e784c923a010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000007544553542d454432353531392d3031c8d4c4c3852e03a1620062a04ae2e73c64fce23048ee3fdd0169d38ed1d21d22adcc670a6e836971c9893fc52c1971997285220d5d47a495ada09b30ecd9760c",
+    "header_hex": "100100000011000045617274682d4d43430000000000000000064748462040000000008c0000001e784c923a",
+    "crc32": "0x784C923A",
+    "size": 140,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "50494e47"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000007544553542d454432353531392d3031c8d4c4c3852e03a1620062a04ae2e73c64fce23048ee3fdd0169d38ed1d21d22adcc670a6e836971c9893fc52c1971997285220d5d47a495ada09b30ecd9760c"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 7,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 120,
+     "auth_input_hex": "100100000011000045617274682d4d43430000000000000000064748462040000000008c0000001e784c923a010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000007544553542d454432353531392d3031",
+     "auth_data_hex": "c8d4c4c3852e03a1620062a04ae2e73c64fce23048ee3fdd0169d38ed1d21d22adcc670a6e836971c9893fc52c1971997285220d5d47a495ada09b30ecd9760c"
+    }
+   },
+   {
+    "id": "CMD-W06",
+    "description": "Valid command, security_sequence 6 (replay-window case)",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 6 (REQ-003)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 18,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "50494e47"
+      }
+     ]
+    },
+    "envelope_hex": "100100000012000045617274682d4d43430000000000000000064748462040000000008c0000001eabd78ec1010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000006544553542d454432353531392d3031cde291b8d1c7d84ef00998efa28624413c30d25401bdc465af3e396a0eb21dd5a5b19ef946aa0be49662906b57cb2b3485aa25addbce798798749ea681ae040d",
+    "header_hex": "100100000012000045617274682d4d43430000000000000000064748462040000000008c0000001eabd78ec1",
+    "crc32": "0xABD78EC1",
+    "size": 140,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "50494e47"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000006544553542d454432353531392d3031cde291b8d1c7d84ef00998efa28624413c30d25401bdc465af3e396a0eb21dd5a5b19ef946aa0be49662906b57cb2b3485aa25addbce798798749ea681ae040d"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 6,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 120,
+     "auth_input_hex": "100100000012000045617274682d4d43430000000000000000064748462040000000008c0000001eabd78ec1010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000006544553542d454432353531392d3031",
+     "auth_data_hex": "cde291b8d1c7d84ef00998efa28624413c30d25401bdc465af3e396a0eb21dd5a5b19ef946aa0be49662906b57cb2b3485aa25addbce798798749ea681ae040d"
+    }
+   },
+   {
+    "id": "CMD-W00",
+    "description": "Valid signature, security_sequence 0",
+    "spec_refs": [
+     "PBS-SEC-B-01 6 (REQ-003)"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 1,
+     "flags": 0,
+     "sequence": 19,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 30,
+     "frames_before_security_frame": [
+      {
+       "type": "0x08",
+       "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+      },
+      {
+       "type": "0x02",
+       "value_hex": "50494e47"
+      }
+     ]
+    },
+    "envelope_hex": "100100000013000045617274682d4d43430000000000000000064748462040000000008c0000001ee55e8568010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000000544553542d454432353531392d3031eb59ac5010db5e67ea845404cc053db4800daf2cde85ada1f36e063d39b4308eee3a8e863bc1e846e90ece68167eba38f5a91cf88ab9fdf01301e9cd0db5a40a",
+    "header_hex": "100100000013000045617274682d4d43430000000000000000064748462040000000008c0000001ee55e8568",
+    "crc32": "0xE55E8568",
+    "size": 140,
+    "mux_frames": [
+     {
+      "type": "0x08",
+      "value_hex": "01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f5053"
+     },
+     {
+      "type": "0x02",
+      "value_hex": "50494e47"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000000544553542d454432353531392d3031eb59ac5010db5e67ea845404cc053db4800daf2cde85ada1f36e063d39b4308eee3a8e863bc1e846e90ece68167eba38f5a91cf88ab9fdf01301e9cd0db5a40a"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 0,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 120,
+     "auth_input_hex": "100100000013000045617274682d4d43430000000000000000064748462040000000008c0000001ee55e8568010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000000544553542d454432353531392d3031",
+     "auth_data_hex": "eb59ac5010db5e67ea845404cc053db4800daf2cde85ada1f36e063d39b4308eee3a8e863bc1e846e90ece68167eba38f5a91cf88ab9fdf01301e9cd0db5a40a"
+    }
+   }
+  ],
+  "cases": [
+   {
+    "id": "SB-01",
+    "description": "Valid Ed25519 command",
+    "deliveries": [
+     {
+      "message": "CMD-01",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-02",
+    "description": "Valid HMAC-SHA-256 command",
+    "deliveries": [
+     {
+      "message": "CMD-02",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-03",
+    "description": "Tampered command payload",
+    "deliveries": [
+     {
+      "message": "CMD-03",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_AUTH_FAIL"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-04",
+    "description": "Tampered priority",
+    "deliveries": [
+     {
+      "message": "CMD-04",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_AUTH_FAIL"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-05",
+    "description": "Tampered TTL",
+    "deliveries": [
+     {
+      "message": "CMD-05",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_AUTH_FAIL"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-06",
+    "description": "Tampered security_sequence",
+    "deliveries": [
+     {
+      "message": "CMD-06",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_AUTH_FAIL"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-07",
+    "description": "Wrong key (Ed25519)",
+    "deliveries": [
+     {
+      "message": "CMD-07",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_AUTH_FAIL"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-08",
+    "description": "Wrong key (HMAC)",
+    "deliveries": [
+     {
+      "message": "CMD-08",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_AUTH_FAIL"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-09",
+    "description": "Unknown key_id",
+    "deliveries": [
+     {
+      "message": "CMD-09",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_KEY_UNKNOWN"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-10",
+    "description": "Replay of an accepted command",
+    "deliveries": [
+     {
+      "message": "CMD-01",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     },
+     {
+      "message": "CMD-01",
+      "now_us": 1767225603000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_REPLAY"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-11",
+    "description": "Expired command: CMD-01 at T+31 s is rejected at the TTL step, before authentication, and does not consume its security_sequence; the same bytes at T+30 s are accepted",
+    "deliveries": [
+     {
+      "message": "CMD-01",
+      "now_us": 1767225631000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "TTL_EXPIRED"
+      }
+     },
+     {
+      "message": "CMD-01",
+      "now_us": 1767225630000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-12",
+    "description": "Unauthorized operation for role",
+    "deliveries": [
+     {
+      "message": "CMD-10",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "AUTHZ_DENIED"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-13",
+    "description": "Authorized operation for role SCIENCE-OPS",
+    "deliveries": [
+     {
+      "message": "CMD-11",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-14",
+    "description": "Wrong policy epoch",
+    "deliveries": [
+     {
+      "message": "CMD-12",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "AUTHZ_DENIED"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-15",
+    "description": "Unprotected command",
+    "deliveries": [
+     {
+      "message": "CMD-13",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_MISSING"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-16",
+    "description": "Protected command without Authority Context",
+    "deliveries": [
+     {
+      "message": "CMD-14",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "AUTH_CTX_MISSING"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-17",
+    "description": "Unknown suite",
+    "deliveries": [
+     {
+      "message": "CMD-15",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_SUITE_UNKNOWN"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-18",
+    "description": "Unknown application-defined frame inside a protected command",
+    "deliveries": [
+     {
+      "message": "CMD-16",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-19",
+    "description": "Source ID not bound to the key",
+    "deliveries": [
+     {
+      "message": "CMD-17",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "AUTHZ_DENIED"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-20",
+    "description": "Padding after the Security frame",
+    "deliveries": [
+     {
+      "message": "CMD-18",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_MALFORMED"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-21",
+    "description": "Replay window of 64 (deliveries in order, one receiver state)",
+    "deliveries": [
+     {
+      "message": "CMD-W05",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     },
+     {
+      "message": "CMD-W03",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     },
+     {
+      "message": "CMD-W03",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_REPLAY"
+      }
+     },
+     {
+      "message": "CMD-W70",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     },
+     {
+      "message": "CMD-W06",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_REPLAY"
+      }
+     },
+     {
+      "message": "CMD-W07",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
+      }
+     },
+     {
+      "message": "CMD-W07",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_REPLAY"
+      }
+     },
+     {
+      "message": "CMD-W00",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_REPLAY"
+      }
+     }
+    ]
+   }
+  ]
+ }
+}
