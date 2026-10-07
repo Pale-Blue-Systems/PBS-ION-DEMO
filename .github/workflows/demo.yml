@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            autoconf automake libtool gcc make pkg-config \
+            build-essential autoconf automake libtool \
             python3 python3-venv python3-pip libssl-dev procps
 
       - name: Restore the ION build

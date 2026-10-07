@@ -105,8 +105,10 @@ def git_head():
     try:
         r = subprocess.run(["git", "-C", ROOT, "rev-parse", "HEAD"], capture_output=True,
                            text=True, check=True)
-        dirty = subprocess.run(["git", "-C", ROOT, "status", "--porcelain"], capture_output=True,
-                               text=True).stdout.strip() != ""
+        # Tracked files only, outside the outputs this demo writes.
+        dirty = subprocess.run(["git", "-C", ROOT, "status", "--porcelain",
+                                "--untracked-files=no", "--", ".", ":!results", ":!REPORT.md"],
+                               capture_output=True, text=True).stdout.strip() != ""
         return {"commit": r.stdout.strip(), "worktree_modified": dirty}
     except (subprocess.CalledProcessError, FileNotFoundError):
         return {"commit": None, "worktree_modified": None}
