@@ -92,7 +92,7 @@ S1 to S7 of the two recorded runs of commit `7095caa`
 | Run | Datagrams forwarded | Median | 99th percentile | Maximum |
 |---|---|---|---|---|
 | run E (`results/`) | 3461 | 0.773 ms | 2.235 ms | 18.831 ms |
-| run D (`results/repeat/run-D/`) | 3388 | 0.759 ms | 2.215 ms | 15.394 ms |
+| run D (`runs/run-D/`) | 3388 | 0.759 ms | 2.215 ms | 15.394 ms |
 
 The one-way delays the emulator adds are therefore 0.25 s and 1.3 s plus
 0.8 ms at the median. The largest value of each run was in S2 (18.8 ms and

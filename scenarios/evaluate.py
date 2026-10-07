@@ -58,8 +58,19 @@ Checks:
   latency_compare   statistic stat_a of select <= statistic stat_b of other
   post_exit         post-run command "name" exited 0
   vectors_identical vector-comparison.json reports all items identical
+  last_receipt      (informative) the last receipt of the selected envelopes,
+                    its margin to the end of the traffic phase (duration_s),
+                    receipts during the drain, and how the drain ended
+  accepted_after_rejects
+                    the envelope with "label" is received with "expect" at
+                    the receiver after at least min_rejects REJECT records
+                    there; the measured value is the count
+
+Statistics: min, max, median (statistics.median) and pNN, the nearest-rank
+percentile: the value at position ceil(NN/100 * n) of the sorted values.
 """
 import json
+import math
 import os
 import statistics
 import sys
@@ -117,10 +128,18 @@ def stat(values, name):
     if name == "median":
         return statistics.median(values)
     if name.startswith("p"):
-        q = float(name[1:]) / 100.0
-        k = max(0, min(len(values) - 1, int(round(q * (len(values) - 1)))))
-        return values[k]
+        return nearest_rank(values, float(name[1:]) / 100.0)
     raise ValueError(name)
+
+
+def nearest_rank(values, p):
+    """Nearest-rank percentile: the value at position ceil(p * n) (1-based) of
+    the sorted values; p = 0 gives the minimum."""
+    if not values:
+        return None
+    v = sorted(values)
+    k = max(1, min(len(v), math.ceil(p * len(v))))
+    return v[k - 1]
 
 
 def describe(r):
@@ -453,12 +472,64 @@ class Evaluator:
         return ok, "%s %s = %s; %s %s = %s" % (c.get("name_a", "selected"), c["stat_a"], fmt_s(va),
                                                 c.get("name_b", "other"), c["stat_b"], fmt_s(vb)), []
 
+    def c_last_receipt(self, c):
+        rows = [r for r in select(self.rows, c.get("select")) if r["delivered"]]
+        end = self.scn["duration_s"]
+        drain = self.d.run.get("drain") or {}
+        last = max((r["recv_t_s"] for r in rows), default=None)
+        late = [r for r in rows if r["recv_t_s"] > end]
+        if not drain:
+            how = "no drain recorded in run.json"
+        else:
+            how = "drain ended at %s s, %s" % (
+                drain["end_scenario_s"],
+                "every envelope handed to ION received or its lifetime ended" if drain["complete"]
+                else "%d envelopes still pending (bound %s s)" % (len(drain["pending"]),
+                                                                  drain["max_s"]))
+        measured = "last receipt at %s; traffic phase ends at %s s (margin %s); %d receipts " \
+            "after it; %s" % (fmt_s(last), end, fmt_s(None if last is None else end - last),
+                              len(late), how)
+        return True, measured, [describe(r) + " received at %.3f s" % r["recv_t_s"] for r in late]
+
+    def c_accepted_after_rejects(self, c):
+        rows = select(self.rows, {"label": c["label"]})
+        if len(rows) != 1 or not rows[0]["delivered"]:
+            return False, "%s: %d envelopes, delivered %s" % (
+                c["label"], len(rows), [r["delivered"] for r in rows]), []
+        r = rows[0]
+        receiver = r["dir"].split("->")[1]
+        t_recv = self.d.origin + r["recv_t_s"]
+        before = [x for x in self.d.records(receiver, "recv")
+                  if x.get("result") == "REJECT" and x["t_us"] / 1e6 < t_recv]
+        reasons = {}
+        for x in before:
+            reasons[x.get("reason")] = reasons.get(x.get("reason"), 0) + 1
+        have = "%s %s" % (r["recv_result"], r["recv_reason"])
+        ok = have == c.get("expect", "ACCEPT OK") and len(before) >= c.get("min_rejects", 1)
+        return ok, "%s received %s after %d rejected envelopes at receiver %s (%s)" % (
+            c["label"], have, len(before), receiver,
+            ", ".join("%s %d" % kv for kv in sorted(reasons.items()))), []
+
     def c_post_exit(self, c):
         for p in self.d.run.get("post", []):
             if p["name"] == c["name"]:
                 out = os.path.join(self.d.dir, p["file"])
-                tail = open(out).read().strip().splitlines()[-3:] if os.path.exists(out) else []
-                return p["exit"] == 0, "%s exit status %s" % (c["name"], p["exit"]), tail
+                text = open(out).read().strip() if os.path.exists(out) else ""
+                tail = text.splitlines()[-3:]
+                measured = "%s exit status %s" % (c["name"], p["exit"])
+                try:
+                    rep = json.loads(text)
+                except ValueError:
+                    rep = None
+                if isinstance(rep, dict) and "decoded" in rep:
+                    # Cross-check report: say what was compared, not only the status.
+                    measured += "; decoded %s of %s peer send records (%s without bytes), %d field " \
+                        "mismatches" % (rep["decoded"], rep.get("peer_send_records", "?"),
+                                        rep.get("no_hex"), len(rep.get("decode_mismatch") or []))
+                    if "own_sent" in rep:
+                        measured += "; own envelopes delivered %s of %s, byte-identical %s" % (
+                            rep["delivered"], rep["own_sent"], rep["byte_identical"])
+                return p["exit"] == 0, measured, tail
         return False, "post-run command %s did not run" % c["name"], []
 
     def c_vectors_identical(self, c):

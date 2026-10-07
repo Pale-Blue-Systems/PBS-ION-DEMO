@@ -115,7 +115,7 @@ class Rover:
                 bundle_ttl_field_ms=dlv.ttl_ms, bundle_admin_record=bool(dlv.admin_record),
                 expected_eid=expected,
                 eid_match=(dlv.source_eid == expected) if expected is not None else None,
-                latency_us=(dlv.t_us - hdr.timestamp_us) if hdr is not None else None,
+                latency_us=jsonlog.latency_us(dlv.t_us, hdr.timestamp_us) if hdr is not None else None,
                 commands=commands,
                 suite_id=secb.suite_str(sec.suite) if sec else None,
                 key_id=sec.key_id.decode("ascii", "replace") if sec else None,
@@ -225,6 +225,9 @@ def parse_args(argv):
                     help="answer each accepted PING with a Status envelope (priority 1, TTL 60)")
     ap.add_argument("--ready-file", default=None,
                     help="file created once the endpoint is open and receiving")
+    ap.add_argument("--log-hex-max", type=int, default=jsonlog.ENVELOPE_HEX_MAX,
+                    help="log envelope_hex for envelopes of at most this many bytes "
+                         "(default %(default)s; 65580 logs every envelope)")
     return ap.parse_args(argv)
 
 
@@ -244,6 +247,7 @@ def main(argv=None):
     except ion.IonError as ex:
         print("rover: %s" % ex, file=sys.stderr, flush=True)
         return 2
+    jsonlog.set_hex_max(args.log_hex_max)
     log = jsonlog.JsonlLog(args.log, "A", args.eid, args.scenario)
     rover = Rover(endpoint, log, receiver, source_id=args.source_id, dest_eid=args.dest,
                   sequence_start=args.sequence_start, reply_ping=args.reply_ping)
@@ -256,7 +260,8 @@ def main(argv=None):
 
     log.write("run_start", E.now_us(), impl=IMPL, pbs_link_version=PBS_LINK.__version__,
               ion_version=endpoint.ion_version, source_id=args.source_id, dest_eid=args.dest,
-              pid=os.getpid(), argv=[sys.executable] + sys.argv, keys=receiver.keys.key_ids())
+              pid=os.getpid(), argv=[sys.executable] + sys.argv, keys=receiver.keys.key_ids(),
+              x_log_hex_max=jsonlog.hex_max())
     try:
         rover.start_receiving()
         if args.ready_file:

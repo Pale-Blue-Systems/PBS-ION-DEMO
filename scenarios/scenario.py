@@ -13,7 +13,11 @@ start. This module turns a scenario into
 
 Scenario keys:
   id, title, summary       text
-  duration_s               traffic phase length; endpoints are stopped then
+  duration_s               traffic phase length
+  drain_max_s              after the traffic phase the runner waits until every
+                           envelope handed to ION has been received or its
+                           bundle lifetime has ended, at most this long
+                           (default 30 s); the endpoints are stopped then
   seed                     emulator loss seed
   links                    per-direction emulator settings; key "*" applies to
                            all four directions, a direction name overrides it:
@@ -62,6 +66,7 @@ def load(path):
     scn.setdefault("criteria", [])
     scn.setdefault("conformance", [])
     scn.setdefault("lead_s", 10)
+    scn.setdefault("drain_max_s", 30)
     scn.setdefault("live", True)
     topo = load_topology()
     for name, spec in scn["links"].items():

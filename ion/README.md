@@ -56,7 +56,10 @@ Nothing is installed outside `build/`. The binaries carry a RUNPATH to
 `build/ion-build.log`. `build/ion/.ion-commit` records the installed commit;
 the script skips the build when it matches. `ION_FORCE=1` forces a rebuild.
 
-Build prerequisites: `git`, `autoconf`, `automake`, `libtool`, `gcc`, `make`.
+Build prerequisites: `git`, `autoconf`, `automake`, `libtool`, `pkgconf`,
+`gcc`, `make`. ION's `configure.ac` uses `PKG_CHECK_MODULES` (line 1087), so
+`autoreconf -fi` needs `pkg.m4` from the `pkgconf` package; without it
+autoreconf stops with `possibly undefined macro: PKG_CHECK_MODULES`.
 `udp_forward.py` and `selftest.sh` also need `python3`.
 
 Measured build (one run, 2026-10-07): 91 s wall clock (`real 1m30.8s`,
@@ -354,7 +357,7 @@ waits about 2 s for `rfxclock` to end (both visible in `stop.log` and
     segments) discarded no segment, and Earth sent 24 reports between
     92.58 and 92.78 s in the corresponding checkpoint round. None of the five S2 runs with the
     raised limit discarded a segment for backlog; two S2 runs with the
-    `m maxbacklog` lines removed (`results/control/`) discarded 1 and 5
+    `m maxbacklog` lines removed (`runs/control/`) discarded 1 and 5
     (`scenarios/README.md`, observation 6). Run A's files are not in the
     repository; the figures above were read from them.
 

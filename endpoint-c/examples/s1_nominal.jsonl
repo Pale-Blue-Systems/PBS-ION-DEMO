@@ -6,6 +6,6 @@
 {"at_s": 2.0, "kind": "command", "command": "DRIVE 10"}
 {"at_s": 3.0, "kind": "command", "command": "CAPTURE_IMAGE NAVCAM", "role": "SCIENCE-OPS"}
 {"at_s": 4.0, "kind": "command", "command": "SET_MODE SCIENCE", "suite": "hmac"}
-{"at_s": 5.0, "kind": "telemetry", "text": "TLM MCC CLOCK SYNC", "priority": 2, "ttl": 60}
+{"at_s": 5.0, "kind": "telemetry", "text": "TLM MCC CLOCK SYNC", "priority": 2, "ttl": 60, "sign": true}
 {"at_s": 6.0, "kind": "heartbeat", "priority": 0, "ttl": 0}
 {"at_s": 7.0, "kind": "command", "command": "PING TLM-REQ-2", "count": 3, "interval_s": 1.0}

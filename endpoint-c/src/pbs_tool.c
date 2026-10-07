@@ -35,7 +35,11 @@ static void usage(void)
           "  pbs_tool lifetime TTL TIMESTAMP_US CLOCK_US\n"
           "  pbs_tool crosscheck PEER_LOG [--own-log OWN_LOG] [--out FILE]\n"
           "                                        decode the other endpoint's logged\n"
-          "                                        envelopes; compare delivered bytes\n",
+          "                                        envelopes; compare delivered bytes.\n"
+          "                                        Exit 0 only when every peer send\n"
+          "                                        record was decoded with no mismatch\n"
+          "                                        and, with --own-log, every own\n"
+          "                                        envelope was delivered byte-identical\n",
           stderr);
 }
 
@@ -436,13 +440,14 @@ static int cmd_crosscheck(int argc, char **argv)
     jw_init(&w);
     jw_init(&rep_w);
     jw_init(&mism);
-    long decoded = 0, no_hex = 0, mismatches = 0, rx_counts[PBS_R_COUNT_] = {0};
+    long peer_sends = 0, decoded = 0, no_hex = 0, mismatches = 0, rx_counts[PBS_R_COUNT_] = {0};
     long rx_accept = 0, rx_reject = 0;
     jw_arr_begin(&mism);
     for (size_t i = 0; i < peer.n; i++) {
         const json_value_t *r = peer.v[i];
         if (!is_event(r, "send"))
             continue;
+        peer_sends++;
         const char *hex = json_get_str(r, "envelope_hex");
         long n = hex ? pbs_hex_decode(hex, buf, PBS_MAX_ENVELOPE + 1) : -1;
         if (n < 0) {
@@ -521,10 +526,15 @@ static int cmd_crosscheck(int argc, char **argv)
     }
     jw_arr_end(&bm);
 
-    int ok = mismatches == 0 && (!own_path || identical == delivered);
+    /* Every peer send record decoded (none without envelope_hex), and with
+     * --own-log every envelope this endpoint sent found in the peer's recv
+     * records, byte-identical. */
+    int ok = mismatches == 0 && no_hex == 0 && decoded == peer_sends &&
+             (!own_path || (identical == delivered && delivered == own_sent));
     jw_obj_begin(&rep_w);
     jw_kstr(&rep_w, "impl", EARTH_IMPL);
     jw_kstr(&rep_w, "peer_log", peer_path);
+    jw_kint(&rep_w, "peer_send_records", peer_sends);
     jw_kint(&rep_w, "decoded", decoded);
     jw_kint(&rep_w, "no_hex", no_hex);
     jw_kint(&rep_w, "decode_mismatch_records", mismatches);

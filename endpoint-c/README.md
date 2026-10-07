@@ -18,6 +18,28 @@ and decode functions of `tool.py`. They were read so that both endpoints
 write the same log, `pbs_tool crosscheck` compares the same fields, and the
 interoperability test can drive Endpoint A.
 
+What this independence covers: Endpoint B's code is not derived from
+PBS_LINK or from Endpoint A, and Endpoint A calls no C code. Both endpoints
+implement the same interpretation document, `docs/SPEC-DIGEST.md`. That
+digest, which fixes the receive steps R1 to R14, every reason code and the
+demo choices A1 to A38, was written, and `docs/test-vectors.json` generated,
+by a separate step that ran PBS_LINK 0.1.4; the expected results in the
+vectors come from the reference receiver in `docs/gen_test_vectors.py`,
+written with Endpoint A. Endpoint B therefore agrees with Endpoint A on those
+choices by construction. S7 shows code-level independence (separate code,
+language, cryptographic library and CRC implementation), not independent
+interpretations of PBS v1.5.0.
+
+Round-2 changes (after review, 2026-10-07): the receive rule R8a (digest
+A38; rejects a container without a Security frame that has an Authority
+Context frame, padding, or a Source ID bound to a provisioned key), the
+128-bit `latency_us` computation, the `frame_count` tamper modes,
+`--log-hex-max` and the stricter `crosscheck` were written in one session by
+one author, who also made the matching changes to Endpoint A and to the
+vector generator. In that session Endpoint B's changes were written from the
+digest rule and Endpoint B's sources before Endpoint A's protocol modules or
+the generator were opened.
+
 Cryptography is OpenSSL libcrypto: HMAC-SHA-256 with `HMAC()`, Ed25519 with
 `EVP_DigestSign`/`EVP_DigestVerify`, SHA-256 with `EVP_Digest`. The keys are the
 demo TEST KEYS of `docs/SPEC-DIGEST.md` Section 6.3, derived at start-up from
@@ -89,6 +111,8 @@ pbs_earth [options] [run|recv|send]
   --map SRC=EID      Source ID to EID entry for expected_eid
                      (default Rover-Alpha=ipn:99.1 and Earth-MCC=ipn:23.1)
   --node-dir DIR     ION node working directory (sets ION_NODE_WDNAME)
+  --log-hex-max N    log envelope_hex for envelopes of at most N bytes
+                     (default 4096; S7 uses 65580, which logs every envelope)
 ```
 
 Without `--duration`, `--linger`, `--idle` or `--expect`, `run` and `recv`
@@ -172,7 +196,7 @@ Test-only fault injection. Each of these is recorded in the `send` record
 
 | Field | Effect |
 |---|---|
-| `tamper` | applied after the lifetime decision, as a change in transit: `command` (last byte of the Command value), `authority` (last byte of the Authority Context value), `priority` and `ttl` and `timestamp` (CRC32 recomputed), `security_sequence` (+1), `auth_data` (last byte), `crc` (CRC32 field) |
+| `tamper` | applied after the lifetime decision, as a change in transit: `command` (last byte of the Command value), `authority` (last byte of the Authority Context value), `priority` and `ttl` and `timestamp` (CRC32 recomputed), `security_sequence` (+1), `auth_data` (last byte), `crc` (CRC32 field), `frame_count` and `frame_count_0` (MUX `frame_count`, payload byte 1, lowered to 1 or 0; header and CRC32 unchanged) |
 | `kind: "replay"`, `replay_of` | sends the exact bytes of the earlier item with that `label` |
 | `signing_key` other than `key_id` | wrong key (`TEST-ED25519-ROGUE`, `TEST-HMAC-ROGUE`) |
 | `key_id` not provisioned at the rover | unknown key |
@@ -188,7 +212,10 @@ verdict that digest Section 6.6 requires.
 The receiver thread blocks in `bp_receive()`; `t_us` is read when it returns.
 It copies up to 65,581 bytes (44 + 65,536 + 1) of the ZCO and computes the
 SHA-256 over the whole payload. It then runs digest Section 6.6 steps R1 to
-R14 with the demo policy of digest Section 5. The policy holds the
+R14 with the demo policy of digest Section 5. Step R8a rejects, with
+`SEC_MISSING`, a container without a Security frame that has an Authority
+Context frame, padding after the last frame, or a Source ID bound to a
+provisioned key (`Earth-MCC`); a header-only envelope is accepted at R6a. The policy holds the
 `TEST-ED25519-01` public key and `TEST-HMAC-01`, both bound to `Earth-MCC`
 and `PBS-DEMO-MCC`, and a 64-entry replay window per (Source ID, key_id).
 
@@ -232,7 +259,7 @@ not valid UTF-8 become U+FFFD.
 | `pbs_tool receive [--now-us N] [--fresh] < lines` | receive path on hex lines or `{"id", "hex", "now_us"}` lines, one replay state unless `--fresh`; prints `recv` records with `bundle_*` fields `null` |
 | `pbs_tool plan [--now-us N] [--source-id ID] [--dest EID] < plan.jsonl` | dry run: `x_plan` records (send fields, `result` `TO_SEND` or `NOT_SENT`, `x_envelope_hex` with all bytes) |
 | `pbs_tool lifetime TTL TIMESTAMP_US CLOCK_US` | digest 7.4 computation |
-| `pbs_tool crosscheck PEER_LOG [--own-log OWN_LOG] [--out FILE]` | decodes the `envelope_hex` of every `send` record of the other endpoint's log and compares 13 fields (header fields, length, SHA-256, `frame_types`); runs Endpoint B's receive path on each at the peer's `t_us`; with `--own-log`, finds the peer's `recv` record for every envelope this endpoint sent (matched on Source ID, Sequence, Timestamp) and compares SHA-256 and header bytes. Exit status 0 when nothing differs |
+| `pbs_tool crosscheck PEER_LOG [--own-log OWN_LOG] [--out FILE]` | decodes the `envelope_hex` of every `send` record of the other endpoint's log and compares 13 fields (header fields, length, SHA-256, `frame_types`); runs Endpoint B's receive path on each at the peer's `t_us`; with `--own-log`, finds the peer's `recv` record for every envelope this endpoint sent (matched on Source ID, Sequence, Timestamp) and compares SHA-256 and header bytes. Exit status 0 only when every peer `send` record was decoded (a record without `envelope_hex` counts as a failure), no field differs, and with `--own-log` every own envelope was delivered byte-identical |
 
 ## Choices made in Endpoint B
 
@@ -241,10 +268,7 @@ These choices are within the room `docs/SPEC-DIGEST.md` leaves:
 - Replay state holds 256 (Source ID, key_id) pairs. When all are in use, a
   new pair is rejected with `SEC_REPLAY`.
 - A key without a Source ID and authority binding cannot authorize a
-  command (`AUTHZ_DENIED`). A Command frame whose operation is empty (an
-  empty value, or one starting with a space) is not permitted for any role.
-- The lookup in R9c is by (suite_id, key_id). `TEST-ED25519-01` presented
-  with suite `0xFF01` gives `SEC_KEY_UNKNOWN`.
+  command (`AUTHZ_DENIED`).
 - Fault injection is applied after the lifetime and class-of-service
   decision, as a modification in transit would be.
 - A Source ID whose UTF-8 encoding exceeds 16 bytes is refused when the
@@ -252,57 +276,78 @@ These choices are within the room `docs/SPEC-DIGEST.md` leaves:
 - For `raw` items whose priority byte is above 4, the class of service is 1
   unless `class_of_service` is given.
 
+Prescribed by the digest, not Endpoint B choices (Endpoint A behaves the
+same way): the key lookup in R9c is by (suite_id, key_id), so
+`TEST-ED25519-01` presented with suite `0xFF01` gives `SEC_KEY_UNKNOWN`
+(R9c, A18); a Command frame whose operation is empty (an empty value, or one
+starting with a space) is permitted for no role and gives `AUTHZ_DENIED`
+(R13).
+
 ## Results
 
 All runs on 2026-10-07 on one host: 4 vCPU Intel Xeon 2.80 GHz, Ubuntu
 24.04.5, gcc 13.3.0, clang 18.1.3, OpenSSL 3.0.13, ION
 `ion-open-source-4.2.0` (commit `568df887cb9f18aa8ec013b1a566d83215e499ae`,
 built by `ion/build_ion.sh`), `docs/test-vectors.json` SHA-256
-`789ac1b4a02f38e8adf3d9bc1eeabe4d0bb7abc74a95b3dd8439633bcb3885ff`. All ION
-nodes and endpoints read the same host clock (A37).
+`51e09856fa3c59130aa01f9c5d0e661a26cd19bda2aec74c45f8084bffd69b25`. All ION
+nodes and endpoints read the same host clock (A37). The runs below were
+repeated after the round-2 changes.
 
 ### Unit tests (`make test`)
 
-`build/test_pbs docs/test-vectors.json`: 757 checks passed, 0 failed. The
-same 757 checks passed in the clang build and in the `make asan` build;
-AddressSanitizer, LeakSanitizer and UndefinedBehaviorSanitizer reported
-nothing.
+Run on 2026-10-07 after the round-2 changes, `docs/test-vectors.json`
+SHA-256 `51e09856fa3c59130aa01f9c5d0e661a26cd19bda2aec74c45f8084bffd69b25`:
+
+`build/test_pbs docs/test-vectors.json`: 812 checks passed, 0 failed. The
+same 812 checks passed in the `make asan` build (AddressSanitizer,
+LeakSanitizer and UndefinedBehaviorSanitizer reported nothing), and the
+clang build compiled without warnings.
 
 | Group | Checks | Content |
 |---|---|---|
 | constants and CRC-32 | 9 | `constants`, `crc32_check` (`0xCBF43926`) |
-| envelopes | 166 | ENV-01 to ENV-15: built from `inputs` byte-identical to `envelope_hex`, header and CRC32, Source ID encoding, parse back to the inputs, MUX frames |
-| receiver cases | 23 | RX-01 to RX-22: result and reason; ACK_REQ of RX-13 |
+| envelopes | 166 | ENV-01 to ENV-15: built from `inputs` byte-identical to `envelope_hex`, header and CRC32, Source ID encoding, parse back to the inputs, MUX frames, disposition under the rover policy (ENV-15, unsigned Earth-MCC data: `SEC_MISSING`) |
+| receiver cases | 24 | RX-01 to RX-23: result and reason; ACK_REQ of RX-13 |
 | lifetime cases | 39 | LT-01 to LT-10: outcome, bound, `c_us`, lifespan |
 | class of service | 16 | `cos_map`, and priority 5 has no class |
 | test keys | 17 | the four keys derived from their labels equal the vector values; provisioning and binding |
 | rover policy | 7 | `sec_b.rover_policy` equals the built-in policy |
-| SEC-B messages | 216 | CMD-01 to CMD-18 and CMD-W00 to CMD-W70: the 19 messages with `inputs` built byte-identical; `auth_input` and `auth_data` positions; signatures and tags verify with the signing key; MUX frames |
-| SEC-B cases | 30 | SB-01 to SB-21, all 30 deliveries in order: result and reason |
-| negative and edge cases | 90 | Source ID length; Size 65,537; MUX structure; Security frame not last, duplicated, short, wrong version, flags, nonce, auth_len, empty key_id, unknown suite; Authority Context missing, duplicated, wrong version or length; authorization (namespace, authority, role, operation, two commands, Source ID binding); replay window edges (H-64, H-63, shift by 64, 2^64-1, full table); replay state not consumed by a failed signature and consumed by an unauthorized command; TTL and lifetime edges |
-| bit flips, truncation, fuzz | 9 | every single-bit flip and every truncation of CMD-01 (1,504 flips) and CMD-02 (1,264 flips); 24,400 seeded random mutations of all vector envelopes |
-| plan items | 95 | every plan kind and fault-injection mode, built and then received under the rover policy |
-| log records and JSON | 40 | `send`, `recv`, `exec` and `x_plan` records against the `docs/LOG-SCHEMA.md` field lists; hostile bytes; state file; JSON reader |
+| SEC-B messages | 239 | CMD-01 to CMD-22 and CMD-W00 to CMD-W70: the 21 messages with `inputs` built byte-identical; `auth_input` and `auth_data` positions; signatures and tags verify with the signing key; MUX frames |
+| SEC-B cases | 34 | SB-01 to SB-25, all 34 deliveries in order: result and reason |
+| negative and edge cases | 97 | Source ID length; Size 65,537; MUX structure; rule R8a (padding, Authority Context, Earth-MCC data without a Security frame; header-only and rover data accepted); Security frame not last, duplicated, short, wrong version, flags, nonce, auth_len, empty key_id, unknown suite; Authority Context missing, duplicated, wrong version or length; authorization (namespace, authority, role, operation, two commands, Source ID binding); replay window edges (H-64, H-63, shift by 64, 2^64-1, full table); replay state not consumed by a failed signature and consumed by an unauthorized command; TTL and lifetime edges |
+| bit flips, truncation, fuzz | 15 | every single-bit flip and every truncation of CMD-01 (1,504 flips) and CMD-02 (1,264 flips); `frame_count` of each lowered to 2, 1 and 0; 26,400 seeded random mutations of all vector envelopes |
+| plan items | 106 | every plan kind and fault-injection mode (including `frame_count`, `frame_count_0` and an unknown `authority_id`), built and then received under the rover policy |
+| log records and JSON | 43 | `send`, `recv`, `exec` and `x_plan` records against the `docs/LOG-SCHEMA.md` field lists; `latency_us` for Timestamps 2^63 - 1, 2^63 and 2^64 - 1; hostile bytes; state file; JSON reader |
 
-Of the 1,504 single-bit flips of CMD-01, 1,503 are rejected: 344 `CRC`, 8
-`MAGIC`, 8 `MUX_VERSION`, 47 `MUX_MALFORMED`, 10 `SEC_MISSING`, 56
-`SEC_MALFORMED`, 16 `SEC_SUITE_UNKNOWN`, 120 `SEC_KEY_UNKNOWN` and 894
-`SEC_AUTH_FAIL`. The remaining flip is accepted. It changes `frame_count` from 3 to 1
-(payload byte 1, bit 1). The receiver then parses only the Authority Context
-frame and treats the Command and Security frames as padding (PBS-MUX-01
-4.3). With no Command and no Security frame, R8 accepts the envelope as
-unprotected data, and no command runs. CMD-02 gives the same single
-accepted flip. The test asserts that no flip yields an accepted envelope
-that carries a command. Every truncation of both messages is rejected.
+All 1,504 single-bit flips of CMD-01 are rejected: 344 `CRC`, 8 `MAGIC`, 8
+`MUX_VERSION`, 47 `MUX_MALFORMED`, 11 `SEC_MISSING`, 56 `SEC_MALFORMED`, 16
+`SEC_SUITE_UNKNOWN`, 120 `SEC_KEY_UNKNOWN` and 894 `SEC_AUTH_FAIL`. All
+1,264 flips of CMD-02 are rejected. Before rule R8a one flip of each was
+accepted: it changes `frame_count` from 3 to 1 (payload byte 1, bit 1), so
+the receiver parsed only the Authority Context frame and treated the
+Command and Security frames as padding (PBS-MUX-01 4.3), and R8 accepted the
+envelope as unprotected data without running a command (digest A38). R8a
+now rejects it with `SEC_MISSING`; the flip accounts for the eleventh
+`SEC_MISSING`. Every truncation of both messages is rejected.
+
+Before the 128-bit `latency_us` computation, `pbs_tool receive` under
+UndefinedBehaviorSanitizer stopped on a header with Timestamp
+`0x8000000000000000` (`src/earth.c`: signed integer overflow in
+`1767225600000000 - -9223372036854775808`). With the change the same input
+gives `latency_us` -9221604811254775808, and Timestamp
+`0xFFFFFFFFFFFFFFFF` gives `null`; `tests/test_pbs_tool.sh` feeds both to
+`pbs_tool receive`, so `make asan` runs them under the sanitizers.
 
 `tests/test_pbs_tool.sh`:
 
-- 34/34 vectors built byte-identical by `pbs_tool build`.
-- 52/52 receiver and SEC-B deliveries as expected through `pbs_tool receive`.
+- 36/36 vectors built byte-identical by `pbs_tool build`.
+- 57/57 receiver and SEC-B deliveries as expected through `pbs_tool receive`.
+- Timestamps 2^63, 2^64 - 1 and 2^63 - 1: `latency_us` as above.
 - 10/10 lifetime cases.
 - `crosscheck` reports 0 mismatches for a clean peer log, reports an altered
-  `sequence` and `frame_types`, and reports 1 digest mismatch among 10
-  delivered envelopes.
+  `sequence` and `frame_types`, reports 1 digest mismatch among 10
+  delivered envelopes, and fails when a peer send record has no
+  `envelope_hex` or one own envelope was not delivered.
 - The three example plans build.
 
 ### Live test with ION tools on the rover (`tests/ion_smoke.sh`)
@@ -315,7 +360,7 @@ Conditions:
 - Rover side: ION's `bprecvfile` and `bpsendfile` stand in for the rover
   endpoint.
 
-Run at 02:00 UTC, 55.0 s wall clock, PASS:
+Run at 07:15 UTC after the round-2 changes, PASS:
 
 - A, Earth to rover: `pbs_earth send` with `examples/s6_auth.jsonl` handed
   16 envelopes to ION, and `bprecvfile ipn:99.1` received 16, all
@@ -324,8 +369,8 @@ Run at 02:00 UTC, 55.0 s wall clock, PASS:
   `SEC_AUTH_FAIL` (four tamper modes and two wrong keys), 1 `SEC_REPLAY`, 1
   `SEC_KEY_UNKNOWN`, 1 `TTL_EXPIRED`, 2 `AUTHZ_DENIED`, 1 `SEC_MISSING`, 1
   `AUTH_CTX_MISSING`, then `ACCEPT OK`.
-  From envelope Timestamp to file write at the rover took 1.566 to 1.578 s
-  (15 envelopes; the replay, sent 6 s after its original, 7.574 s).
+  From envelope Timestamp to file write at the rover took 1.571 to 1.591 s
+  (15 envelopes; the replay, sent 6 s after its original, 7.587 s).
 - B, rover to Earth: `bpsendfile ipn:99.1` sent 10 envelopes built by
   `pbs_tool plan --source-id Rover-Alpha`. `pbs_earth run` received all 10,
   with `bundle_source_eid` `ipn:99.1` and `eid_match` true. It accepted 7
@@ -333,7 +378,7 @@ Run at 02:00 UTC, 55.0 s wall clock, PASS:
   and a signed telemetry envelope). It rejected 3: `CRC` (CRC32 field
   altered), `TTL_EXPIRED` (TTL 1, lifetime override 60 s) and `SEC_MISSING`
   (unsigned Command frame). From bundle creation to `bp_receive()` return
-  took 1.570 to 1.580 s, and 1.626 s for the 60,005-byte envelope.
+  took 1.586 to 1.605 s, and 1.711 s for the 60,005-byte envelope.
 - C: three envelopes sent by `pbs_earth run` to `ipn:99.1` waited in the
   rover endpoint queue (rule `q`). `bprecvfile` collected all three
   byte-identical, including a TTL 0 envelope sent with the no-expiry
@@ -351,8 +396,8 @@ For the TTL 0 bundle (lifetime 2147483647 s), `BpDelivery.timeToLive` was
 
 Same nodes, links and contact plan. Endpoint A ran `endpoint-python/bin/rover`
 with `endpoint-python/plans/example.json` and `--reply-ping`; Endpoint B ran
-`pbs_earth run` with `examples/s6_auth.jsonl`; both for 40 s. Run at 02:03
-UTC, 71.7 s wall clock, PASS:
+`pbs_earth run` with `examples/s6_auth.jsonl`; both for 40 s. Run at 07:16
+UTC after the round-2 changes, PASS:
 
 - Endpoint A's verdict on each of the 16 Endpoint B envelopes equals the plan
   note. A accepted 3 commands (`DRIVE 10`, `SET_HEATER ON`, `PING
@@ -361,7 +406,7 @@ UTC, 71.7 s wall clock, PASS:
   `AUTHZ_DENIED`, 1 `SEC_MISSING` and 1 `AUTH_CTX_MISSING`.
 - Endpoint A sent 19 envelopes (its example plan and one ping reply).
   Endpoint B received and accepted all 19, with `eid_match` true. Latency
-  from Timestamp to `bp_receive()` return was 1.569 / 1.577 / 1.589 s (min /
+  from Timestamp to `bp_receive()` return was 1.573 / 1.583 / 1.590 s (min /
   median / max).
 - Endpoint A's `tool crosscheck` decoded Endpoint B's 16 envelopes with 0
   mismatches, and found all 19 of its own envelopes byte-identical in
@@ -372,19 +417,21 @@ UTC, 71.7 s wall clock, PASS:
 - Endpoint A's log (40 records) and Endpoint B's log (37 records) passed the
   `docs/LOG-SCHEMA.md` field check.
 
-Endpoint B's first command of that run took 2.248 s from Timestamp to
-Endpoint A, against 1.571 to 1.588 s for the other 14 non-replayed
-commands. The forwarder log shows the cause is on the EARTH node: the first
-LTP datagram of that bundle left 0.671 s after `bp_send()` returned, while
-the following commands' datagrams left 7 to 8 ms after it. The reason for
-the first-bundle delay was not investigated. In the smoke run above, the
-first command took 1.574 s.
+Endpoint B's first command of that run took 2.350 s from Timestamp to
+Endpoint A, against 1.572 to 1.580 s for the other 14 non-replayed
+commands. The forwarder log shows the delay is on the EARTH node: the first
+LTP data datagram towards the Gateway came 0.779 s after `bp_send()`
+returned for the first command and 4 ms after it for the next three. The
+same first-command delay was seen in the run before the round-2 changes
+(2.248 s; 0.671 s at the Earth node). Its cause was not investigated. In the
+smoke run above, the first command took 1.591 s.
 
 Offline checks in the same session:
 - Endpoint A's `tool vectors` and `pbs_tool build --vectors` produced
-  byte-identical envelopes for all 34 vector inputs.
-- Endpoint A's `tool parse --shared-state` on the 16 envelopes of smoke run
-  A, in arrival order, gave the 16 verdicts of the plan notes.
+  byte-identical envelopes for all 36 vector inputs (`scenarios/s7_compare.py`).
+- Endpoint A's `tool parse --shared-state`, with the clock set to the last
+  arrival, on the 16 envelopes of smoke run A in arrival order gave the 16
+  verdicts of the plan notes.
 
 ## Conformance test identifiers exercised
 
@@ -396,16 +443,16 @@ conformance claim and has no certification.
 | PBS-CONFORMANCE-01 4.1, 4.3, 5.1 | ENV-01 to ENV-15 built and parsed; RX-07 to RX-09 |
 | PBS-CONFORMANCE-01 4.2, 9 | RX-01 to RX-22 receive order and reason codes; random mutation |
 | PBS-CONFORMANCE-01 7 | Sequence 65535 then 0 (plan test P06) |
-| PBS-CONFORMANCE-01 8, statements 1 and 2 | RX-01, RX-02, RX-04 (TTL 30) and RX-05 (TTL 0) as unit tests with a set clock |
-| PBS-CONFORMANCE-02 T002 | byte identity after BPv7 carriage: smoke test A, B, C; interop crosschecks |
-| PBS-CONFORMANCE-02 T004 | RX-03, RX-04, RX-06, SB-11; expired envelopes rejected after ION delivery (smoke A, B; interop) |
-| PBS-CONFORMANCE-02 T006 | SB-03 to SB-06; tampered commands rejected by both endpoints (smoke A, interop) |
-| PBS-CONFORMANCE-02 T007 | SB-10, SB-21; replay rejected (smoke A, interop) |
-| PBS-CONFORMANCE-02 T008 | SB-12, SB-13, SB-14; role and epoch (interop) |
-| PBS-CONFORMANCE-02 T010 | `cos_map` and the class passed to `bp_send()` |
-| PBS-CONFORMANCE-02 T014 | RX-21, SB-18 (unknown frame skipped, inside a protected command) |
-| PBS-CONFORMANCE-02 T015 | `recv` and `exec` records with reason codes |
-| PBS-CONFORMANCE-02 T016 | TTL 0 envelope sent with the 2147483647 s lifetime and delivered (smoke C) |
+| PBS-CONFORMANCE-01 8, receiver side of statements 1 and 2 (no relay steps) | RX-01, RX-02, RX-04 (TTL 30) and RX-05 (TTL 0) as unit tests with a set clock |
+| PBS-C02-T002 | byte identity after BPv7 carriage: smoke test A, B, C; interop crosschecks |
+| PBS-C02-T004 | RX-03, RX-04, RX-06, SB-11; expired envelopes rejected after ION delivery (smoke A, B; interop) |
+| PBS-C02-T006 | SB-03 to SB-06, SB-22, SB-23; every single-bit flip of CMD-01 and CMD-02 rejected; tampered commands rejected by both endpoints (smoke A, interop) |
+| PBS-C02-T007 | SB-10, SB-21; replay rejected (smoke A, interop) |
+| PBS-C02-T008 | SB-12, SB-13, SB-14; role and epoch (interop) |
+| PBS-C02-T010 (partial) | `cos_map` and the class passed to `bp_send()` |
+| PBS-C02-T014 | RX-21, SB-18 (unknown frame skipped, inside a protected command) |
+| PBS-C02-T015 | `recv` and `exec` records with reason codes |
+| PBS-C02-T016 | TTL 0 envelope sent with the 2147483647 s lifetime and delivered (smoke C) |
 
 ## Limits
 

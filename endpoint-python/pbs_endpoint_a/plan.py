@@ -29,6 +29,10 @@ Keys:
   lifespan_override_s  FAULT INJECTION: pass this bundle lifetime to bp_send()
                        instead of the PBS-DTN-MAP-01 6.1 value (logged with
                        lifespan_rule OVERRIDE); not conformant
+  extra_frames         frames placed before the main frame, e.g. an
+                       application-defined type: [{"type": "0x80", "hex": "00ff"}]
+                       or {"type": 128, "text": "..."}; not combined with
+                       payload_bytes
 """
 
 import json
@@ -40,7 +44,7 @@ DEFAULT_TTL = {0: 0, 1: 60, 2: 60, 3: 3600, 4: 86400}       # PBS-ENV-01 Section
 FILLER = b"0123456789abcdef"
 ALLOWED_FRAMES = {"telemetry": FT_TELEMETRY, "event": FT_EVENT, "status": FT_STATUS}
 ITEM_KEYS = {"at_s", "count", "interval_s", "priority", "ttl_s", "frame", "text",
-             "payload_bytes", "ack_req", "label", "lifespan_override_s"}
+             "payload_bytes", "ack_req", "label", "lifespan_override_s", "extra_frames"}
 
 NOMINAL_TEXT = {
     0: ("event", "EVT MOTOR_STALL WHEEL=3"),
@@ -64,8 +68,24 @@ class Send:
     lifespan_override_s: object
 
 
-def make_payload(frame, text, index, payload_bytes):
-    """MUX container with one frame; ``payload_bytes`` fixes the Size."""
+def extra_frame_list(spec):
+    """[(type, value)] from the plan's extra_frames list."""
+    out = []
+    for f in spec or ():
+        t = f["type"]
+        t = int(t, 16) if isinstance(t, str) else int(t)
+        if not 0 <= t <= 255:
+            raise ValueError("extra frame type %r" % f["type"])
+        value = bytes.fromhex(f["hex"]) if "hex" in f else f.get("text", "").encode("ascii")
+        out.append((t, value))
+    return out
+
+
+def make_payload(frame, text, index, payload_bytes, extra=()):
+    """MUX container with ``extra`` frames and one main frame;
+    ``payload_bytes`` fixes the Size."""
+    if extra and payload_bytes is not None:
+        raise ValueError("extra_frames cannot be combined with payload_bytes")
     if payload_bytes == 0:
         return b"", ()
     if payload_bytes is not None and payload_bytes > 65536:
@@ -78,7 +98,8 @@ def make_payload(frame, text, index, payload_bytes):
             raise ValueError("payload_bytes %d too small for text %r" % (payload_bytes, value))
         fill = need - len(value)
         value += (FILLER * (fill // len(FILLER) + 1))[:fill]
-    return build_container([(ftype, value)]), (ftype,)
+    frames = list(extra) + [(ftype, value)]
+    return build_container(frames), tuple(t for t, _ in frames)
 
 
 def expand(plan):
@@ -101,8 +122,9 @@ def expand(plan):
         ttl = int(item.get("ttl_s", DEFAULT_TTL[prio]))
         text = item.get("text", NOMINAL_TEXT[prio][1])
         label = item.get("label") or "P%d" % prio
+        extra = extra_frame_list(item.get("extra_frames"))
         for i in range(1, count + 1):
-            payload, types = make_payload(frame, text, i, item.get("payload_bytes"))
+            payload, types = make_payload(frame, text, i, item.get("payload_bytes"), extra)
             out.append(Send(at + (i - 1) * interval, prio, ttl, payload, types,
                             bool(item.get("ack_req", False)), label,
                             item.get("lifespan_override_s")))

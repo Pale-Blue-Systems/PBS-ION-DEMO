@@ -189,7 +189,12 @@ static void t_envelopes(const json_value_t *root, const earth_ctx_t *ctx, const 
         pbs_replay_init(&rep);
         pbs_rx_t rx;
         pbs_reason_t r = pbs_receive(pol, &rep, vb, (size_t)vl, gint(in, "timestamp_us"), &rx);
-        CHECK(r == PBS_R_OK, id, "receive at Timestamp: ACCEPT");
+        /* Under the rover policy an unsigned envelope with a payload from
+         * Earth-MCC (bound to the test keys) is rejected (R8a, A38). */
+        int bound = strcmp(json_get_str(in, "source_id"), "Earth-MCC") == 0;
+        pbs_reason_t want = bound && gint(e, "size") > 0 ? PBS_R_SEC_MISSING : PBS_R_OK;
+        check(r == want, id, "receive at Timestamp under the rover policy", "got %s, expected %s",
+              pbs_reason_str(r), pbs_reason_str(want));
         CHECK(rx.hdr.magic == 0x10 && rx.hdr.priority == gint(in, "priority") &&
                   rx.hdr.flags == gint(in, "flags") && rx.hdr.sequence == gint(in, "sequence") &&
                   (int64_t)rx.hdr.timestamp_us == gint(in, "timestamp_us") &&
@@ -587,10 +592,29 @@ static void t_negative(const pbs_policy_t *pol, earth_ctx_t *ctx)
         expect(rx1(pol, b, n), PBS_R_MUX_MALFORMED, "N04", "truncated frame header");
         uint8_t p4[] = {0x01, 0x00, 0xAA, 0xBB};
         n = mk_env(b, 2, "Rover-Alpha", (uint64_t)T0, 60, p4, sizeof p4);
-        expect(rx1(pol, b, n), PBS_R_OK, "N04", "frame_count 0 with padding");
+        expect(rx1(pol, b, n), PBS_R_SEC_MISSING, "N04", "frame_count 0 with padding (R8a)");
+        uint8_t p4b[] = {0x01, 0x00};
+        n = mk_env(b, 2, "Rover-Alpha", (uint64_t)T0, 60, p4b, sizeof p4b);
+        expect(rx1(pol, b, n), PBS_R_OK, "N04", "frame_count 0, no padding (R8b)");
+        uint8_t p4c[] = {0x01, 0x01, 0x01, 0x00, 0x01, 'T', 0x00};
+        n = mk_env(b, 2, "Rover-Alpha", (uint64_t)T0, 60, p4c, sizeof p4c);
+        expect(rx1(pol, b, n), PBS_R_SEC_MISSING, "N04", "one frame and one padding byte (R8a)");
         uint8_t p5[] = {0x01, 0x01, 0x02, 0x00, 0x04, 'P', 'I', 'N', 'G'};
         n = mk_env(b, 2, "Rover-Alpha", (uint64_t)T0, 60, p5, sizeof p5);
         expect(rx1(pol, b, n), PBS_R_SEC_MISSING, "N15", "unprotected command without AUTH");
+        /* R8a (digest A38). */
+        uint8_t p6[] = {0x01, 0x01, 0x08, 0x00, 0x0A, 0x01, 0x03, 0x01, 0x01, 0, 0, 0, 1, 'M', 'R'};
+        n = mk_env(b, 2, "Rover-Alpha", (uint64_t)T0, 60, p6, sizeof p6);
+        expect(rx1(pol, b, n), PBS_R_SEC_MISSING, "N16", "Authority Context without Security frame");
+        uint8_t p7[] = {0x01, 0x01, 0x01, 0x00, 0x03, 'T', 'L', 'M'};
+        n = mk_env(b, 2, "Earth-MCC", (uint64_t)T0, 60, p7, sizeof p7);
+        expect(rx1(pol, b, n), PBS_R_SEC_MISSING, "N17", "unsigned telemetry from Earth-MCC (bound)");
+        n = mk_env(b, 2, "Rover-Alpha", (uint64_t)T0, 60, p7, sizeof p7);
+        expect(rx1(pol, b, n), PBS_R_OK, "N17", "unsigned telemetry from Rover-Alpha (not bound)");
+        n = mk_env(b, 0, "Earth-MCC", (uint64_t)T0, 0, NULL, 0);
+        expect(rx1(pol, b, n), PBS_R_OK, "N17", "header-only envelope from Earth-MCC (R6a)");
+        n = mk_env(b, 2, "Earth-MCC", (uint64_t)T0, 60, p4b, sizeof p4b);
+        expect(rx1(pol, b, n), PBS_R_SEC_MISSING, "N17", "empty container from Earth-MCC");
     }
 
     /* Security frame structure (R9, R9a, R9b). */
@@ -833,20 +857,16 @@ static void t_mutation(const json_value_t *root, const pbs_policy_t *pol)
         uint8_t *b;
         long n = hexbuf(json_get_str(two[m], "envelope_hex"), &b);
         const char *id = json_get_str(two[m], "id");
-        /* A flip may turn the container into one without Command and
-         * Security frames (frame_count 3 -> 1 leaves the Authority Context
-         * frame and padding); R8 accepts that as unprotected data and no
-         * command runs. The property checked: no flip yields an accepted
-         * envelope that carries a command. */
+        /* Every single-bit flip is rejected. A flip of frame_count 3 -> 1
+         * leaves the Authority Context frame and padding; R8a rejects it
+         * with SEC_MISSING (digest A38). */
         int accepted = 0, with_cmd = 0, total = 0, counts[PBS_R_COUNT_] = {0};
-        long acc_at = -1;
         for (long i = 0; i < n * 8; i++) {
             b[i / 8] ^= (uint8_t)(1u << (i % 8));
             pbs_replay_init(rep);
             pbs_reason_t r = pbs_receive(pol, rep, b, (size_t)n, T0 + 2000000, &rx);
             if (rx.accepted) {
                 accepted++;
-                acc_at = i;
                 if (rx.n_commands)
                     with_cmd++;
             }
@@ -857,14 +877,24 @@ static void t_mutation(const json_value_t *root, const pbs_policy_t *pol)
         char what[96];
         snprintf(what, sizeof what, "none of %d single-bit flips accepted with a command", total);
         check(with_cmd == 0, id, what, "%d accepted with a command", with_cmd);
-        CHECK(accepted == 1 && acc_at == 45 * 8 + 1, id,
-              "only accepted flip: frame_count 3 -> 1 (no command left)");
+        snprintf(what, sizeof what, "none of %d single-bit flips accepted", total);
+        check(accepted == 0, id, what, "%d accepted", accepted);
         printf("    %s: %d single-bit flips:", id, total);
         for (int k = 0; k < PBS_R_COUNT_; k++)
             if (counts[k])
-                printf(" %s %d", k == PBS_R_OK ? "accepted-without-command" : pbs_reason_str((pbs_reason_t)k),
+                printf(" %s %d", k == PBS_R_OK ? "accepted" : pbs_reason_str((pbs_reason_t)k),
                        counts[k]);
         printf("\n");
+        /* frame_count lowered to each value below 3 (vectors CMD-19, CMD-20). */
+        for (uint8_t fc = 0; fc < 3; fc++) {
+            uint8_t keep = b[45];
+            b[45] = fc;
+            pbs_replay_init(rep);
+            pbs_reason_t r = pbs_receive(pol, rep, b, (size_t)n, T0 + 1, &rx);
+            snprintf(what, sizeof what, "frame_count %u: SEC_MISSING", fc);
+            check(r == PBS_R_SEC_MISSING, id, what, "got %s", pbs_reason_str(r));
+            b[45] = keep;
+        }
         accepted = 0;
         for (long l = 0; l < n; l++) {
             pbs_replay_init(rep);
@@ -962,11 +992,16 @@ static void t_plan(earth_ctx_t *ctx, const pbs_policy_t *pol)
     CHECK(it.hdr.priority == 2 && it.hdr.ttl == 60 && it.hdr.sequence == 1 && it.send &&
               it.lt.outcome == PBS_LT_OK && it.lifespan_s == 59 && it.class_of_service == 1,
           "P01", "defaults: priority 2, TTL 60, Sequence 1, lifetime 59 s, class 1");
-    expect(pbs_receive(pol, rep, it.env, it.len, now + 1550000, &rx), PBS_R_OK, "P01", "received");
+    expect(pbs_receive(pol, rep, it.env, it.len, now + 1550000, &rx), PBS_R_SEC_MISSING, "P01",
+           "unsigned telemetry from Earth-MCC rejected (R8a)");
+    CHECK(BUILD("{\"kind\":\"telemetry\",\"text\":\"TLM BATT=27.9V\",\"sign\":true}") == 0, "P01",
+          "signed telemetry");
+    expect(pbs_receive(pol, rep, it.env, it.len, now + 1550000, &rx), PBS_R_OK, "P01",
+           "signed telemetry accepted as protected data (R11a)");
     CHECK(BUILD("{\"kind\":\"telemetry\",\"text\":\"X\",\"priority\":4,\"pad_to\":1000,\"ttl\":86400}") == 0,
           "P02", "bulk telemetry");
-    CHECK(it.hdr.size == 1005 && it.hdr.sequence == 2 && it.class_of_service == 0, "P02",
-          "pad_to 1000: Size 1005, Sequence 2, class 0");
+    CHECK(it.hdr.size == 1005 && it.hdr.sequence == 3 && it.class_of_service == 0, "P02",
+          "pad_to 1000: Size 1005, Sequence 3, class 0");
     CHECK(BUILD("{\"kind\":\"heartbeat\",\"ttl\":0,\"priority\":0}") == 0, "P03", "heartbeat");
     CHECK(it.hdr.size == 0 && it.lt.outcome == PBS_LT_NO_EXPIRY && it.lifespan_s == 2147483647 &&
               it.class_of_service == 2,
@@ -1009,6 +1044,12 @@ static void t_plan(earth_ctx_t *ctx, const pbs_policy_t *pol)
         {"{\"kind\":\"command\",\"command\":\"DRIVE 10\",\"tamper\":\"authority\"}",
          PBS_R_SEC_AUTH_FAIL, "tamper Authority Context"},
         {"{\"kind\":\"command\",\"command\":\"DRIVE 10\",\"tamper\":\"crc\"}", PBS_R_CRC, "tamper CRC32"},
+        {"{\"kind\":\"command\",\"command\":\"DRIVE 10\",\"tamper\":\"frame_count\"}",
+         PBS_R_SEC_MISSING, "tamper frame_count to 1"},
+        {"{\"kind\":\"command\",\"command\":\"DRIVE 10\",\"tamper\":\"frame_count_0\"}",
+         PBS_R_SEC_MISSING, "tamper frame_count to 0"},
+        {"{\"kind\":\"command\",\"command\":\"DRIVE 10\",\"authority_id\":\"PBS-DEMO-OTHER\"}",
+         PBS_R_AUTHZ_DENIED, "authority not authorized"},
         {"{\"kind\":\"command\",\"command\":\"DRIVE 10\",\"signing_key\":\"TEST-ED25519-ROGUE\"}",
          PBS_R_SEC_AUTH_FAIL, "wrong key, Ed25519"},
         {"{\"kind\":\"command\",\"command\":\"DRIVE 10\",\"suite\":\"hmac\",\"signing_key\":\"TEST-HMAC-ROGUE\"}",
@@ -1328,6 +1369,29 @@ static void t_logs(earth_ctx_t *ctx, const pbs_policy_t *pol)
               schema_ok(r, F_ENV, F_RECV, NULL, why, sizeof why),
           "L04", "10-byte payload record");
     json_free(r);
+    /* Timestamps of 2^63 and above: latency_us is t_us - Timestamp when that
+     * fits in 64 bits and null otherwise, never an overflowed value (the
+     * subtraction is done in 128 bits). */
+    {
+        static const uint64_t ts[] = {0x8000000000000000ULL, 0xFFFFFFFFFFFFFFFFULL,
+                                      0x7FFFFFFFFFFFFFFFULL};
+        for (size_t i = 0; i < sizeof ts / sizeof ts[0]; i++) {
+            size_t hn = mk_env(b, 2, "Rover-Alpha", ts[i], 30, NULL, 0);
+            pbs_receive(pol, rep, b, hn, T0, &rx);
+            earth_log_recv(&w, &lc, &rx, b, hn, NULL, T0, NULL);
+            r = json_parse(jw_cstr(&w), w.len, err, sizeof err);
+            const json_value_t *lat = r ? json_get(r, "latency_us") : NULL;
+            /* T0 - 2^63 and T0 - (2^63 - 1) fit in 64 bits; T0 - (2^64 - 1)
+             * does not and is logged as null. */
+            int64_t want = i == 0 ? T0 - INT64_MAX - 1 : T0 - INT64_MAX;
+            int ok = lat && (i == 1 ? lat->type == JSON_NULL
+                                    : lat->type != JSON_NULL && lat->integer == want);
+            snprintf(why, sizeof why, "Timestamp 0x%016llx: latency_us %s", (unsigned long long)ts[i],
+                     i == 1 ? "null (outside 64 bits)" : "t_us - Timestamp");
+            CHECK(ok, "L04", why);
+            json_free(r);
+        }
+    }
     /* Oversize payload: header read, digest supplied by the caller. */
     {
         uint8_t big[PBS_HEADER_SIZE], md[32];

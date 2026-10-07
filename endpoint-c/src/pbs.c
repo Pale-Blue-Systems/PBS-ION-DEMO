@@ -909,6 +909,16 @@ static int authorize(const pbs_policy_t *pol, const pbs_key_t *key,
     return 1;
 }
 
+/* 1 if a provisioned key of the policy is bound to this Source ID (R8a). */
+static int source_bound(const pbs_policy_t *pol, const uint8_t sid[PBS_SOURCE_ID_LEN])
+{
+    for (size_t i = 0; pol && i < pol->nkeys; i++)
+        if (pol->keys[i].has_binding &&
+            memcmp(pol->keys[i].bound_source_id, sid, PBS_SOURCE_ID_LEN) == 0)
+            return 1;
+    return 0;
+}
+
 static pbs_reason_t rx_done(pbs_rx_t *rx, pbs_reason_t r)
 {
     rx->reason = r;
@@ -976,11 +986,18 @@ pbs_reason_t pbs_receive_ex(const pbs_policy_t *pol, pbs_replay_t *rep,
         }
     }
 
-    /* R8, R8a. */
-    if (rx->n_security == 0 && rx->n_commands == 0)
+    /* R8, R8a, R8b: no Security frame. A Command frame (R8), an Authority
+     * Context frame, padding, or a Source ID bound to a provisioned key
+     * (R8a, digest A38) requires one. Lowering frame_count in transit turns
+     * the Security frame into padding (PBS-MUX-01 4.3), so padding without
+     * a Security frame is not accepted. */
+    if (rx->n_security == 0) {
+        if (rx->n_commands > 0)
+            return rx_done(rx, PBS_R_SEC_MISSING);
+        if (rx->n_authority > 0 || rx->mux.padding > 0 || source_bound(pol, h->source_id))
+            return rx_done(rx, PBS_R_SEC_MISSING);
         return rx_done(rx, PBS_R_OK);
-    if (rx->n_security == 0)
-        return rx_done(rx, PBS_R_SEC_MISSING);
+    }
 
     /* R9: exactly one Security frame, last, no padding; structure. */
     if (rx->n_security != 1 || sec_index + 1u != rx->mux.count || rx->mux.padding != 0)

@@ -1,7 +1,7 @@
 {
  "id": "S1",
- "title": "Nominal telemetry and commands both ways",
- "summary": "All links up, fixed one-way delays only. The rover sends telemetry at all five priorities, a 20000-byte BULK image chunk and a header-only envelope with ACK_REQ; Mission Control sends signed commands, MCC telemetry and a TTL 0 heartbeat; the rover answers each PING.",
+ "title": "Nominal traffic: rover telemetry at five priorities; signed commands, signed telemetry and a heartbeat from Earth; PING replies",
+ "summary": "All links up, fixed one-way delays only. Rover to Earth: telemetry at all five priorities, a 20000-byte BULK image chunk, a header-only envelope with ACK_REQ, and a Status envelope answering each PING; none of these is signed. Earth to rover: signed commands (Ed25519, and HMAC-SHA-256 for SET_HEATER), signed MCC telemetry (the rover requires a Security frame on every Earth-MCC envelope that has a payload, SPEC-DIGEST A38) and a header-only TTL 0 heartbeat. Signed envelopes travel only from Earth to the rover, so Endpoint B verifies no live signed envelope; it verifies SEC-B-01 only in the offline S7 vectors.",
  "duration_s": 40,
  "seed": 1,
  "links": {},
@@ -28,7 +28,7 @@
     {"at_s": 9.0, "kind": "command", "command": "DRIVE 10", "label": "S1-DRIVE"},
     {"at_s": 12.0, "kind": "command", "command": "CAPTURE_IMAGE NAVCAM", "role": "SCIENCE-OPS", "label": "S1-CAPTURE_IMAGE"},
     {"at_s": 15.0, "kind": "command", "command": "SET_MODE SCIENCE", "label": "S1-SET_MODE"},
-    {"at_s": 18.0, "kind": "telemetry", "text": "TLM MCC CLOCK SYNC", "priority": 2, "ttl": 60, "label": "S1-MCC-TLM"},
+    {"at_s": 18.0, "kind": "telemetry", "text": "TLM MCC CLOCK SYNC", "priority": 2, "ttl": 60, "label": "S1-MCC-TLM", "sign": true},
     {"at_s": 21.0, "kind": "heartbeat", "priority": 0, "ttl": 0, "label": "S1-MCC-HEARTBEAT"},
     {"at_s": 24.0, "kind": "command", "command": "PING S1-2", "count": 3, "interval_s": 1.0, "label": "S1-PING-2"}
    ]
@@ -50,10 +50,10 @@
    {"id": "S1-13", "check": "ttl_respected", "text": "No receiver accepts an envelope older than its TTL"}
   ],
  "conformance": [
-   {"ref": "PBS-CONFORMANCE-02 T002", "how": "S1-3: header bytes and SHA-256 equal after BPv7 carriage over LTP through the relay"},
-   {"ref": "PBS-CONFORMANCE-02 T010", "how": "S1-10: one ION class of service per priority (SPEC-DIGEST 7.5)"},
-   {"ref": "PBS-CONFORMANCE-02 T015", "how": "one recv record per delivered bundle and one exec record per executed command (S1-4, S1-5)"},
-   {"ref": "PBS-CONFORMANCE-02 T016", "how": "S1-8, S1-9: TTL 0 envelopes carried with the no-expiry lifetime and delivered"},
+   {"ref": "PBS-C02-T002", "how": "S1-3: header bytes and SHA-256 equal after BPv7 carriage over LTP through the relay"},
+   {"ref": "PBS-C02-T010", "how": "partial: S1-10 shows one ION class of service per priority (SPEC-DIGEST 7.5, docs/MAPPING-PROFILE.md); the demo has one static mapping, with no network state input and no policy version, so a mapping per defined network state is not exercised"},
+   {"ref": "PBS-C02-T015", "how": "one recv record per delivered bundle and one exec record per executed command (S1-4, S1-5)"},
+   {"ref": "PBS-C02-T016", "how": "S1-8, S1-9: TTL 0 envelopes carried with the no-expiry lifetime of the mapping profile (docs/MAPPING-PROFILE.md) and delivered"},
    {"ref": "PBS-CONFORMANCE-01 4.1, 4.2, 4.3, 5.1", "how": "both receivers parse and CRC-check every envelope of the other implementation (S1-4)"},
    {"ref": "PBS-CONFORMANCE-01 6", "how": "all five priorities sent and received (S1-1, S1-10)"},
    {"ref": "PBS-CONFORMANCE-01 7", "how": "Sequence starts at 1 and increments per envelope at each sender (send records)"},

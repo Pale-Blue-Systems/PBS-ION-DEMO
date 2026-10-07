@@ -7,7 +7,24 @@ import threading
 from . import envelope as E
 
 SCHEMA = "pbs-ion-demo-log/1"
-ENVELOPE_HEX_MAX = 4096
+ENVELOPE_HEX_MAX = 4096             # default hex limit (docs/LOG-SCHEMA.md Section 4)
+_hex_max = ENVELOPE_HEX_MAX
+
+
+def set_hex_max(n):
+    """Log envelope_hex for envelopes of at most n bytes (bin/rover --log-hex-max)."""
+    global _hex_max
+    _hex_max = int(n)
+
+
+def hex_max():
+    return _hex_max
+
+
+def latency_us(t_us, timestamp_us):
+    """t_us - Timestamp, or None outside the signed 64-bit range (LOG-SCHEMA.md 6)."""
+    d = t_us - timestamp_us
+    return d if -(1 << 63) <= d < (1 << 63) else None
 
 COMMON_FIELDS = ("schema", "event", "t_us", "endpoint", "node_eid", "scenario")
 ENVELOPE_FIELDS = ("source_id", "source_id_hex", "sequence", "priority", "flags", "timestamp_us",
@@ -36,7 +53,7 @@ def envelope_fields(data, header=None, frame_types=None):
     out = dict.fromkeys(ENVELOPE_FIELDS)
     out["envelope_len"] = len(data)
     out["envelope_sha256"] = E.sha256_hex(data)
-    out["envelope_hex"] = data.hex() if len(data) <= ENVELOPE_HEX_MAX else None
+    out["envelope_hex"] = data.hex() if len(data) <= _hex_max else None
     out["frame_types"] = None if frame_types is None else list(frame_types)
     if header is None and len(data) >= E.HEADER_SIZE:
         header = E.decode_header(data)

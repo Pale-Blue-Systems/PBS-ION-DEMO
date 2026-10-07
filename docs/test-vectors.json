@@ -6,7 +6,7 @@
   "pbs": "PBS-PROTOCOL-OPEN main, PBS v1.5.0, commit f18957b8fd96eb7955ffa8b55081f8f5fd352ce1",
   "pbs_link": {
    "version": "0.1.4",
-   "path_commit": "54ae20ee650be9b31601f824a7cdecf4bce2dfb2"
+   "path_commit": "d3b81d32f91c10d30b5a834b7fb64a353285fd27"
   },
   "python": "3.13.16",
   "cryptography": "50.0.1"
@@ -742,7 +742,7 @@
   },
   {
    "id": "RX-20",
-   "description": "Two padding bytes after the last frame of an unprotected container: accepted, padding ignored",
+   "description": "Two padding bytes after the last frame of a container without a Security frame: rejected, padding requires a Security frame (R8a, A38)",
    "spec_refs": [
     "PBS-MUX-01 4.3"
    ],
@@ -750,8 +750,8 @@
    "input_hex": "1002000000140000526f7665722d416c70686100000000000006474846204000000000090000003c95f7e47f01010100024f4bffff",
    "now_us": 1767225601000000,
    "expected": {
-    "result": "ACCEPT",
-    "reason": "OK"
+    "result": "REJECT",
+    "reason": "SEC_MISSING"
    },
    "pbs_link_0_1_4_parse": "parsed (size=9, payload bytes returned=9)"
   },
@@ -761,7 +761,7 @@
    "spec_refs": [
     "PBS-MUX-01 4.2",
     "PBS-MUX-01 10",
-    "PBS-CONFORMANCE-02 T014"
+    "PBS-C02-T014"
    ],
    "derived_from": null,
    "input_hex": "1002000000140000526f7665722d416c706861000000000000064748462040000000000d0000003cc81bb57301025500030001020100024f4b",
@@ -786,9 +786,25 @@
     "reason": "OK"
    },
    "pbs_link_0_1_4_parse": "parsed (size=2, payload bytes returned=2)"
+  },
+  {
+   "id": "RX-23",
+   "description": "Authority Context frame and a Telemetry frame, no Security frame, Source ID Rover-Alpha: rejected (R8a, A38)",
+   "spec_refs": [
+    "PBS-AUTH-01 2",
+    "PBS-SEC-B-01 5"
+   ],
+   "derived_from": null,
+   "input_hex": "1002000000140000526f7665722d416c70686100000000000006474846204000000000280000003c007d729f010208001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f50530100024f4b",
+   "now_us": 1767225601000000,
+   "expected": {
+    "result": "REJECT",
+    "reason": "SEC_MISSING"
+   },
+   "pbs_link_0_1_4_parse": "parsed (size=40, payload bytes returned=40)"
   }
  ],
- "ttl_note": "Expired iff TTL > 0 and now_us - Timestamp > TTL * 1000000 (SPEC-DIGEST.md 2.4). RX-01..RX-06 cover PBS-ENV-01 12.5 and PBS-CONFORMANCE-01 Section 8.",
+ "ttl_note": "Expired iff TTL > 0 and now_us - Timestamp > TTL * 1000000 (SPEC-DIGEST.md 2.4). RX-01..RX-06 cover PBS-ENV-01 12.5. RX-01, RX-02, RX-04 and RX-05 are the receiver-side TTL checks at the clock values of PBS-CONFORMANCE-01 Section 8 statements 1 and 2; the relay store-and-forward steps of those statements are not covered.",
  "lifetime_cases": [
   {
    "id": "LT-01",
@@ -1019,7 +1035,11 @@
     ]
    },
    "replay_window": 64,
-   "replay_state_key": "(Source ID 16 raw bytes, key_id)"
+   "replay_state_key": "(Source ID 16 raw bytes, key_id)",
+   "security_frame_required": "a Command frame; an Authority Context frame; padding after the last frame; a Source ID bound to a provisioned key (SPEC-DIGEST.md 6.6 R8 and R8a, A38). A header-only envelope (Size 0) is accepted at R6a.",
+   "bound_source_ids": [
+    "Earth-MCC"
+   ]
   },
   "messages": [
    {
@@ -1028,9 +1048,11 @@
     "spec_refs": [
      "PBS-SEC-B-01 4",
      "PBS-SEC-B-01 5",
-     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002",
      "PBS-AUTH-01 2",
-     "PBS-SEC-B-01 6 (REQ-005, REQ-006)"
+     "PBS-SECB-REQ-005",
+     "PBS-SECB-REQ-006"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1089,7 +1111,8 @@
     "spec_refs": [
      "PBS-SEC-B-01 4",
      "PBS-SEC-B-01 5",
-     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002",
      "PBS-AUTH-01 2"
     ],
     "inputs": {
@@ -1149,8 +1172,9 @@
     "spec_refs": [
      "PBS-SEC-B-01 4",
      "PBS-SEC-B-01 5",
-     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
-     "PBS-CONFORMANCE-02 T006"
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002",
+     "PBS-C02-T006"
     ],
     "derived_from": "CMD-01",
     "envelope_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452039300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03",
@@ -1163,8 +1187,9 @@
     "spec_refs": [
      "PBS-SEC-B-01 4",
      "PBS-SEC-B-01 5",
-     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
-     "PBS-SEC-B-01 6 (REQ-004)",
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002",
+     "PBS-SECB-REQ-004",
      "PBS-PRIO-01 10"
     ],
     "derived_from": "CMD-01",
@@ -1178,7 +1203,8 @@
     "spec_refs": [
      "PBS-SEC-B-01 4",
      "PBS-SEC-B-01 5",
-     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002",
      "PBS-SEC-B-01 5"
     ],
     "derived_from": "CMD-01",
@@ -1192,8 +1218,9 @@
     "spec_refs": [
      "PBS-SEC-B-01 4",
      "PBS-SEC-B-01 5",
-     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
-     "PBS-SEC-B-01 6 (REQ-003)"
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002",
+     "PBS-SECB-REQ-003"
     ],
     "derived_from": "CMD-01",
     "envelope_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000002544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03",
@@ -1206,7 +1233,8 @@
     "spec_refs": [
      "PBS-SEC-B-01 4",
      "PBS-SEC-B-01 5",
-     "PBS-SEC-B-01 6 (REQ-001, REQ-002)"
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1265,7 +1293,8 @@
     "spec_refs": [
      "PBS-SEC-B-01 4",
      "PBS-SEC-B-01 5",
-     "PBS-SEC-B-01 6 (REQ-001, REQ-002)"
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1379,8 +1408,9 @@
     "id": "CMD-10",
     "description": "Role SCIENCE-OPS issuing DRIVE 10 (operation not permitted for the role)",
     "spec_refs": [
-     "PBS-AUTH-01 3 (REQ-003, REQ-006)",
-     "PBS-CONFORMANCE-02 T008"
+     "PBS-AUTH-REQ-003",
+     "PBS-AUTH-REQ-006",
+     "PBS-C02-T008"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1438,7 +1468,7 @@
     "description": "Role SCIENCE-OPS issuing CAPTURE_IMAGE NAVCAM (permitted)",
     "spec_refs": [
      "PBS-AUTH-01 3",
-     "PBS-CONFORMANCE-02 T008"
+     "PBS-C02-T008"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1495,8 +1525,8 @@
     "id": "CMD-12",
     "description": "policy_epoch 2 (rover policy epoch is 1)",
     "spec_refs": [
-     "PBS-AUTH-01 3 (REQ-005)",
-     "PBS-CONFORMANCE-02 T008"
+     "PBS-AUTH-REQ-005",
+     "PBS-C02-T008"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1553,7 +1583,7 @@
     "id": "CMD-13",
     "description": "Command with Authority Context and no Security frame",
     "spec_refs": [
-     "PBS-SEC-B-01 6 (REQ-005)"
+     "PBS-SECB-REQ-005"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1593,8 +1623,8 @@
     "id": "CMD-14",
     "description": "Signed command with no Authority Context frame",
     "spec_refs": [
-     "PBS-SEC-B-01 6 (REQ-005)",
-     "PBS-AUTH-01 3 (REQ-002)"
+     "PBS-SECB-REQ-005",
+     "PBS-AUTH-REQ-002"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1702,9 +1732,10 @@
     "spec_refs": [
      "PBS-SEC-B-01 4",
      "PBS-SEC-B-01 5",
-     "PBS-SEC-B-01 6 (REQ-001, REQ-002)",
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002",
      "PBS-MUX-01 5.9",
-     "PBS-CONFORMANCE-02 T014"
+     "PBS-C02-T014"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1769,7 +1800,7 @@
     "id": "CMD-17",
     "description": "Validly signed with the Earth key, Source ID Rover-Alpha (key bound to Earth-MCC)",
     "spec_refs": [
-     "PBS-AUTH-01 3 (REQ-003)"
+     "PBS-AUTH-REQ-003"
     ],
     "inputs": {
      "source_id": "Rover-Alpha",
@@ -1835,11 +1866,39 @@
     "crc32": "0x2FF8A4CF"
    },
    {
+    "id": "CMD-19",
+    "description": "CMD-01 with frame_count lowered 3 -> 1 (payload byte 1); header and CRC32 unchanged. The Command and Security frames become padding (PBS-MUX-01 4.3)",
+    "spec_refs": [
+     "PBS-MUX-01 4.3",
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002",
+     "PBS-C02-T006"
+    ],
+    "derived_from": "CMD-01",
+    "envelope_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49010108001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03",
+    "header_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49",
+    "crc32": "0x010E8C49"
+   },
+   {
+    "id": "CMD-20",
+    "description": "CMD-01 with frame_count lowered 3 -> 0 (payload byte 1); header and CRC32 unchanged. All frames become padding (PBS-MUX-01 4.3)",
+    "spec_refs": [
+     "PBS-MUX-01 4.3",
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002",
+     "PBS-C02-T006"
+    ],
+    "derived_from": "CMD-01",
+    "envelope_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49010008001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000844524956452031300a005f01ff02010f0000400000000000000001544553542d454432353531392d3031dad0ed18cd04f7426f5781f7bf02620b5f45f95809a9692ff2d24aa473cf9f1642cf519b49c3ed9a92d859092e1264fc4311e7880665f92e6e9d4e03f617fc03",
+    "header_hex": "100100000001000045617274682d4d4343000000000000000006474846204000000000900000001e010e8c49",
+    "crc32": "0x010E8C49"
+   },
+   {
     "id": "CMD-W05",
     "description": "Valid command, security_sequence 5 (replay-window case)",
     "spec_refs": [
      "PBS-SEC-B-01 4",
-     "PBS-SEC-B-01 6 (REQ-003)"
+     "PBS-SECB-REQ-003"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1897,7 +1956,7 @@
     "description": "Valid command, security_sequence 3 (replay-window case)",
     "spec_refs": [
      "PBS-SEC-B-01 4",
-     "PBS-SEC-B-01 6 (REQ-003)"
+     "PBS-SECB-REQ-003"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -1955,7 +2014,7 @@
     "description": "Valid command, security_sequence 70 (replay-window case)",
     "spec_refs": [
      "PBS-SEC-B-01 4",
-     "PBS-SEC-B-01 6 (REQ-003)"
+     "PBS-SECB-REQ-003"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -2013,7 +2072,7 @@
     "description": "Valid command, security_sequence 7 (replay-window case)",
     "spec_refs": [
      "PBS-SEC-B-01 4",
-     "PBS-SEC-B-01 6 (REQ-003)"
+     "PBS-SECB-REQ-003"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -2071,7 +2130,7 @@
     "description": "Valid command, security_sequence 6 (replay-window case)",
     "spec_refs": [
      "PBS-SEC-B-01 4",
-     "PBS-SEC-B-01 6 (REQ-003)"
+     "PBS-SECB-REQ-003"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -2128,7 +2187,7 @@
     "id": "CMD-W00",
     "description": "Valid signature, security_sequence 0",
     "spec_refs": [
-     "PBS-SEC-B-01 6 (REQ-003)"
+     "PBS-SECB-REQ-003"
     ],
     "inputs": {
      "source_id": "Earth-MCC",
@@ -2179,6 +2238,91 @@
      "auth_input_len": 120,
      "auth_input_hex": "100100000013000045617274682d4d43430000000000000000064748462040000000008c0000001ee55e8568010308001e01030c0a000000015042532d44454d4f2d4d4343464c494748542d4f505302000450494e470a005f01ff02010f0000400000000000000000544553542d454432353531392d3031",
      "auth_data_hex": "eb59ac5010db5e67ea845404cc053db4800daf2cde85ada1f36e063d39b4308eee3a8e863bc1e846e90ece68167eba38f5a91cf88ab9fdf01301e9cd0db5a40a"
+    }
+   },
+   {
+    "id": "CMD-21",
+    "description": "Unsigned telemetry from Earth-MCC (Source ID bound to the test keys): one Telemetry frame, no Security frame",
+    "spec_refs": [
+     "PBS-SEC-B-01 2",
+     "PBS-SECB-REQ-001"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 2,
+     "flags": 0,
+     "sequence": 20,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 60,
+     "frames_before_security_frame": [
+      {
+       "type": "0x01",
+       "value_hex": "544c4d204d434320434c4f434b2053594e43"
+      }
+     ]
+    },
+    "envelope_hex": "100200000014000045617274682d4d4343000000000000000006474846204000000000170000003ced650afc0101010012544c4d204d434320434c4f434b2053594e43",
+    "header_hex": "100200000014000045617274682d4d4343000000000000000006474846204000000000170000003ced650afc",
+    "crc32": "0xED650AFC",
+    "size": 23,
+    "mux_frames": [
+     {
+      "type": "0x01",
+      "value_hex": "544c4d204d434320434c4f434b2053594e43"
+     }
+    ]
+   },
+   {
+    "id": "CMD-22",
+    "description": "Signed telemetry from Earth-MCC (protected data, no Command frame), suite 0xFF02",
+    "spec_refs": [
+     "PBS-SEC-B-01 4",
+     "PBS-SEC-B-01 5",
+     "PBS-SECB-REQ-001",
+     "PBS-SECB-REQ-002"
+    ],
+    "inputs": {
+     "source_id": "Earth-MCC",
+     "source_id_hex": "45617274682d4d434300000000000000",
+     "priority": 2,
+     "flags": 0,
+     "sequence": 21,
+     "timestamp_us": 1767225600000000,
+     "ttl_s": 60,
+     "frames_before_security_frame": [
+      {
+       "type": "0x01",
+       "value_hex": "544c4d204d434320434c4f434b2053594e43"
+      }
+     ]
+    },
+    "envelope_hex": "100200000015000045617274682d4d4343000000000000000006474846204000000000790000003c374d5b630102010012544c4d204d434320434c4f434b2053594e430a005f01ff02010f0000400000000000000001544553542d454432353531392d3031e9e9c0d40f7f0758952bc85bb230017bf8e76e7f0203d33dd71c2db6c59488eca7352ba71a82cca7cb60d716adae8cfcadfd9de4ba1bfc89cd85f7c02fce3909",
+    "header_hex": "100200000015000045617274682d4d4343000000000000000006474846204000000000790000003c374d5b63",
+    "crc32": "0x374D5B63",
+    "size": 121,
+    "mux_frames": [
+     {
+      "type": "0x01",
+      "value_hex": "544c4d204d434320434c4f434b2053594e43"
+     },
+     {
+      "type": "0x0A",
+      "value_hex": "01ff02010f0000400000000000000001544553542d454432353531392d3031e9e9c0d40f7f0758952bc85bb230017bf8e76e7f0203d33dd71c2db6c59488eca7352ba71a82cca7cb60d716adae8cfcadfd9de4ba1bfc89cd85f7c02fce3909"
+     }
+    ],
+    "security": {
+     "version": 1,
+     "suite_id": "0xFF02",
+     "flags": "0x01",
+     "key_id": "TEST-ED25519-01",
+     "nonce_hex": "",
+     "auth_len": 64,
+     "security_sequence": 1,
+     "signing_key": "TEST-ED25519-01",
+     "auth_input_len": 101,
+     "auth_input_hex": "100200000015000045617274682d4d4343000000000000000006474846204000000000790000003c374d5b630102010012544c4d204d434320434c4f434b2053594e430a005f01ff02010f0000400000000000000001544553542d454432353531392d3031",
+     "auth_data_hex": "e9e9c0d40f7f0758952bc85bb230017bf8e76e7f0203d33dd71c2db6c59488eca7352ba71a82cca7cb60d716adae8cfcadfd9de4ba1bfc89cd85f7c02fce3909"
     }
    }
   ],
@@ -2475,6 +2619,62 @@
       "expected": {
        "result": "REJECT",
        "reason": "SEC_MALFORMED"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-22",
+    "description": "frame_count lowered to 1: Command and Security frames read as padding (A38)",
+    "deliveries": [
+     {
+      "message": "CMD-19",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_MISSING"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-23",
+    "description": "frame_count lowered to 0: all frames read as padding (A38)",
+    "deliveries": [
+     {
+      "message": "CMD-20",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_MISSING"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-24",
+    "description": "Unsigned telemetry from a Source ID bound to a provisioned key (A38)",
+    "deliveries": [
+     {
+      "message": "CMD-21",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "REJECT",
+       "reason": "SEC_MISSING"
+      }
+     }
+    ]
+   },
+   {
+    "id": "SB-25",
+    "description": "Signed telemetry from Earth-MCC (protected data)",
+    "deliveries": [
+     {
+      "message": "CMD-22",
+      "now_us": 1767225602000000,
+      "expected": {
+       "result": "ACCEPT",
+       "reason": "OK"
       }
      }
     ]

@@ -111,6 +111,8 @@ static void usage(FILE *f)
         "  --map SRC=EID      Source ID to EID entry for the bundle source check\n"
         "                     (default Rover-Alpha=ipn:99.1 and Earth-MCC=ipn:23.1)\n"
         "  --node-dir DIR     ION node working directory (sets ION_NODE_WDNAME)\n"
+        "  --log-hex-max N    log envelope_hex for envelopes of at most N bytes\n"
+        "                     (default 4096; 65580 logs every envelope)\n"
         "\n"
         "ION_NODE_LIST_DIR must be set as for every other process of the node.\n"
         "Keys are the demo TEST KEYS derived from public labels; NOT FOR OPERATIONAL USE.\n",
@@ -439,6 +441,7 @@ static void log_run_start(const earth_ctx_t *ctx, size_t nentries)
     jw_knum(&w, "x_duration_s", G.duration_s);
     jw_knum(&w, "x_linger_s", G.linger_s);
     jw_knum(&w, "x_idle_s", G.idle_s);
+    jw_kuint(&w, "x_log_hex_max", earth_log_hex_max());
     jw_kint(&w, "x_expect", G.expect);
     jw_kstr(&w, "x_ion_node_wdname", getenv("ION_NODE_WDNAME"));
     jw_kstr(&w, "x_ion_node_list_dir", getenv("ION_NODE_LIST_DIR"));
@@ -542,6 +545,15 @@ int main(int argc, char **argv)
             }
         } else if (!strcmp(a, "--node-dir") && has)
             setenv("ION_NODE_WDNAME", argv[++i], 1);
+        else if (!strcmp(a, "--log-hex-max") && has) {
+            char *end;
+            unsigned long long n = strtoull(argv[++i], &end, 10);
+            if (*end || n > PBS_MAX_ENVELOPE + 1u) {
+                fprintf(stderr, "pbs_earth: bad --log-hex-max value\n");
+                return 2;
+            }
+            earth_log_set_hex_max((size_t)n);
+        }
         else {
             usage(stderr);
             return 2;

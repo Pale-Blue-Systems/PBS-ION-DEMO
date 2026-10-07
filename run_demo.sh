@@ -35,8 +35,10 @@ for s in "${SCENARIOS[@]}"; do
 done
 
 if [[ $# -eq 0 ]]; then
-  # Full run: start from an empty results directory.
-  find "$RESULTS" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+  # Full run: remove what an earlier run wrote (only that; other files in the
+  # results directory are kept).
+  rm -rf "$RESULTS"/S[0-9]* "$RESULTS/selfcheck" "$RESULTS/charts" "$RESULTS/summary.json" \
+         "$RESULTS/all-envelopes.csv" "$RESULTS/run_demo.log" "$RESULTS/REPORT.md"
 fi
 LOG="$RESULTS/run_demo.log"
 exec > >(tee -a "$LOG") 2>&1
@@ -52,9 +54,13 @@ done
 if ! echo '#include <openssl/evp.h>' | gcc -E -x c - >/dev/null 2>&1; then
   missing+=("OpenSSL headers (libssl-dev)")
 fi
+# ION's configure.ac uses PKG_CHECK_MODULES; autoreconf needs pkg.m4 (pkgconf).
+if ! command -v aclocal >/dev/null 2>&1 || [[ ! -f "$(aclocal --print-ac-dir 2>/dev/null)/pkg.m4" ]]; then
+  missing+=("pkg.m4 (pkgconf)")
+fi
 if [[ ${#missing[@]} -gt 0 ]]; then
   say "missing prerequisites: ${missing[*]}"
-  say "on Ubuntu: apt-get install git autoconf automake libtool gcc make python3 python3-venv libssl-dev procps"
+  say "on Ubuntu: apt-get install git autoconf automake libtool pkgconf gcc make python3 python3-venv libssl-dev procps"
   exit 2
 fi
 

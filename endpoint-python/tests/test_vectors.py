@@ -28,11 +28,11 @@ def test_vector_coverage(vectors):
     for c in vectors["sec_b"]["cases"]:
         assert c["id"] in ids
     deliveries = sum(len(c["deliveries"]) for c in vectors["sec_b"]["cases"])
-    assert sum(1 for r in RESULTS if r["id"].startswith("SB-")) == deliveries == 30
+    assert sum(1 for r in RESULTS if r["id"].startswith("SB-")) == deliveries == 34
     # every message with inputs was rebuilt byte for byte
     with_inputs = [m["id"] for m in vectors["sec_b"]["messages"] if "inputs" in m]
     assert sorted(with_inputs) == sorted(k for k in PRODUCED if k.startswith("CMD-"))
-    assert len(with_inputs) == 19
+    assert len(with_inputs) == 21
 
 
 def test_rx_order_differs_from_pbs_link(vectors):

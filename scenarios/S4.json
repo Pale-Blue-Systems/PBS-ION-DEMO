@@ -1,14 +1,16 @@
 {
  "id": "S4",
  "title": "Priority under a rate-limited link",
- "summary": "The rover-Gateway leg is limited to 4000 bytes/s in the contact plan (so ION meters bundles onto the link at that rate) and to 4400 bytes/s with a 65536-byte drop-tail queue in the emulator (10 % above the contact rate for LTP and UDP header overhead). At 2 s the rover queues 40 BULK envelopes of 3000 bytes (about 30 s of link time); from 6 s it sends five small envelopes each of CRITICAL, HIGH, NORMAL and LOW, 3 s apart. ION's strict-priority egress queues are expected to send CRITICAL and HIGH (ION expedited class) and NORMAL (standard class) ahead of the BULK backlog, while LOW shares ION's bulk class with BULK and waits behind it.",
+ "summary": "The rover-Gateway leg is limited to 4000 bytes/s in the contact plan (so ION meters bundles onto the link at that rate) and to 4400 bytes/s with a 65536-byte drop-tail queue in the emulator (10 % above the contact rate for LTP and UDP header overhead). At 2 s the rover queues 40 BULK envelopes of 3000 bytes (about 30 s of link time); from 6 s it sends five small envelopes each of CRITICAL, HIGH, NORMAL and LOW, 3 s apart. ION's bpclm serves the urgent queue (expedited class: CRITICAL, HIGH) before any other, and shares the remaining capacity between the standard queue (NORMAL) and the bulk queue (LOW, BULK) in proportion 2:1 by bytes sent (bpv7/daemon/bpclm.c; docs/MAPPING-PROFILE.md). CRITICAL, HIGH and NORMAL are expected to arrive ahead of the BULK backlog; LOW shares ION's bulk queue with BULK and is expected to wait behind it.",
  "duration_s": 60,
  "seed": 4,
  "links": {
   "rover-gateway": {"rate_Bps": 4400, "queue_bytes": 65536},
   "gateway-rover": {"rate_Bps": 4400, "queue_bytes": 65536}
  },
- "contacts": {"rate_Bps": {"rover-gateway": 4000}},
+ "contacts": {
+  "rate_Bps": {"rover-gateway": 4000}
+ },
  "outages": [],
  "rover": {
   "args": ["--reply-ping"],
@@ -46,10 +48,10 @@
    {"id": "S4-15", "check": "link_counter", "links": ["rover-gateway"], "counter": "max_queue_delay_s", "min": 0, "informative": true, "text": "Largest wait in the emulator queue, rover-gateway (informative)"}
   ],
  "conformance": [
-   {"ref": "PBS-CONFORMANCE-02 T012", "how": "higher-priority envelopes forwarded ahead of a lower-priority backlog under constrained throughput (S4-5 to S4-8)"},
-   {"ref": "PBS-CONFORMANCE-02 T010", "how": "one ION class of service per priority per SPEC-DIGEST 7.5 (S4-11); LOW and BULK share the bulk class (S4-9)"},
+   {"ref": "PBS-C02-T012", "how": "partial: higher-priority envelopes forwarded ahead of a lower-priority backlog under constrained throughput (S4-5 to S4-8); no authorized degradation policy (PBS-QOS-MAP-01) is defined or applied"},
+   {"ref": "PBS-C02-T010", "how": "partial: one ION class of service per priority per SPEC-DIGEST 7.5 and docs/MAPPING-PROFILE.md (S4-11); LOW and BULK share the bulk class (S4-9). One static mapping, with no network state input and no policy version"},
    {"ref": "PBS-CONFORMANCE-01 6", "how": "priority handling observed end to end"},
-   {"ref": "PBS-PRIO-01 4, 6; PBS-DTN-MAP-01 6.3; PBS-DTN-MAP-02 5, 10 (priority semantic preservation)", "how": "priority byte unchanged (S4-3) and mapped to ION class of service"},
+   {"ref": "PBS-PRIO-01 4, 6; PBS-DTN-MAP-01 6.3; PBS-DTN-MAP-02 5, 10 (priority semantic preservation)", "how": "priority byte unchanged (S4-3) and mapped to ION class of service; the mapping profile with the four PBS-DTN-MAP-02 Section 5 items is docs/MAPPING-PROFILE.md"},
    {"ref": "PBS-CONFORMANCE-02 Section 4 (constrained throughput)", "how": "4000 bytes/s contact rate, 4400 bytes/s emulated link"}
   ],
  "charts": ["arrivals"]

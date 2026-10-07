@@ -56,11 +56,17 @@ def test_sign_verify_roundtrip(rover_rx):
 
 
 def test_every_single_bit_flip_of_a_valid_command_is_rejected(messages):
-    """Flip one bit at every position of CMD-01: no altered byte is accepted."""
-    base = messages["CMD-01"]
+    """Flip every bit of CMD-01 and CMD-02: no altered envelope is accepted.
+    The flip of frame_count 3 -> 1 (payload byte 1, bit 1) leaves an
+    Authority Context frame and padding; R8a rejects it (SPEC-DIGEST A38)."""
+    for mid in ("CMD-01", "CMD-02"):
+        _all_flips_rejected(messages[mid])
+
+
+def _all_flips_rejected(base):
     reasons = {}
     for i in range(len(base)):
-        for bit in (0x01, 0x80):
+        for bit in (0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80):
             b = bytearray(base)
             b[i] ^= bit
             d = secb.Receiver(secb.KeyStore.from_json(os.path.join(CONFIG, "rover-keys.json")),
@@ -144,3 +150,28 @@ def test_mux_errors():
         assert e.value.reason == "MUX_MALFORMED"
     frames, pad = parse_container(b"\x01\x01\x01\x00\x01a\xff\xff")
     assert [(f.type, f.value) for f in frames] == [(1, b"a")] and pad == 2
+
+
+@pytest.mark.parametrize("fc", [0, 1, 2])
+def test_lowered_frame_count_is_rejected(messages, rover_rx, fc):
+    """CMD-01 with frame_count lowered in transit (vectors CMD-19, CMD-20)."""
+    b = bytearray(messages["CMD-01"])
+    b[45] = fc
+    d = rover_rx.receive(bytes(b), T + 1)
+    assert (d.result, d.reason) == ("REJECT", "SEC_MISSING")
+
+
+def test_security_frame_required_r8a(rover_rx):
+    """R8a (SPEC-DIGEST 6.6, A38): Authority Context, padding or a bound Source ID
+    without a Security frame is rejected; header-only and plain rover data are not."""
+    tlm = build_container([(0x01, b"TLM")])
+    assert rover_rx.receive(E.build_envelope("Earth-MCC", 2, tlm, 60, 1, T), NOW).reason == "SEC_MISSING"
+    assert rover_rx.receive(E.build_envelope("Rover-Alpha", 2, tlm, 60, 1, T), NOW).reason == "OK"
+    assert rover_rx.receive(E.build_envelope("Earth-MCC", 0, b"", 0, 2, T), NOW).reason == "OK"
+    assert rover_rx.receive(E.build_envelope("Earth-MCC", 2, build_container([]), 60, 3, T),
+                            NOW).reason == "SEC_MISSING"
+    assert rover_rx.receive(E.build_envelope("Rover-Alpha", 2, tlm + b"\0", 60, 4, T),
+                            NOW).reason == "SEC_MISSING"
+    auth = build_container([(FT_AUTH, secb.auth_value(b"PBS-DEMO-MCC", b"FLIGHT-OPS", 1)),
+                            (0x01, b"TLM")])
+    assert rover_rx.receive(E.build_envelope("Rover-Alpha", 2, auth, 60, 5, T), NOW).reason == "SEC_MISSING"

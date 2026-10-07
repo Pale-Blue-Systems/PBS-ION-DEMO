@@ -13,9 +13,13 @@ Sequence (scenario time 0 = traffic origin O; T0 = O - lead_s):
      its plan starts at about O, then Endpoint B (pbs_earth run) on the EARTH
      node with its plan origin --t0-us exactly O;
   5. runs the probes (bplist / bpstats on a node) at their scenario times;
-  6. at O + duration_s stops both endpoints (SIGTERM), runs bpstats and
-     ltpstats -a on every node, copies each node's ion.log, stops the nodes (ion/stop_nodes.sh)
-     and then the emulator;
+  6. at O + duration_s (end of the traffic phase) starts the drain: it reads
+     both endpoint logs every 0.5 s and waits until every envelope handed to
+     ION has been received by the other endpoint or its bundle lifetime has
+     ended, for at most drain_max_s (scenario key, default 30 s: six LTP
+     checkpoint timeouts of 5 s); then stops both endpoints (SIGTERM), runs
+     bpstats and ltpstats -a on every node, copies each node's ion.log, stops
+     the nodes (ion/stop_nodes.sh) and then the emulator;
   7. runs the scenario's post-run commands (offline cross-checks);
   8. writes run.json (times, versions, exit statuses).
 
@@ -56,6 +60,9 @@ LINKEMU = os.path.join(ROOT, "emulator", "linkemu.py")
 
 ROVER_STARTUP_EST_S = 0.1      # launch-to-ready time of bin/rover (0.098 s measured)
 STOP_GRACE_S = 15
+DRAIN_MAX_S = 30               # default bound of the drain after the traffic phase
+DRAIN_POLL_S = 0.5
+LIFETIME_MARGIN_S = 2.0        # a bundle counts as expired this long after send + lifetime
 
 
 def now():
@@ -95,6 +102,48 @@ def ion_state_report():
     cmd = 'source "%s/ion/env.sh"; source "%s/ion/lib.sh"; ion_state_report' % (ROOT, ROOT)
     return subprocess.run(["bash", "-c", cmd], env=ion_env(), capture_output=True,
                           text=True).stdout
+
+
+def read_jsonl(path):
+    """Complete lines of a JSON-lines log that is still being written."""
+    out = []
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                if not line.endswith("\n"):
+                    break
+                try:
+                    out.append(json.loads(line))
+                except ValueError:
+                    pass
+    except OSError:
+        pass
+    return out
+
+
+def undelivered(log_a, log_b, now_s):
+    """Envelopes handed to ION (send result SENT) that the other endpoint has
+    not logged as received and whose bundle lifetime has not ended
+    (send time + lifespan_s + LIFETIME_MARGIN_S >= now_s)."""
+    logs = {"A": read_jsonl(log_a), "B": read_jsonl(log_b)}
+    received = {}
+    for ep, recs in logs.items():
+        received[ep] = {(r.get("source_id_hex"), r.get("sequence"), r.get("timestamp_us"))
+                        for r in recs if r.get("event") == "recv"}
+    out = []
+    for ep, peer in (("A", "B"), ("B", "A")):
+        for r in logs[ep]:
+            if r.get("event") != "send" or r.get("result") != "SENT":
+                continue
+            ident = (r.get("source_id_hex"), r.get("sequence"), r.get("timestamp_us"))
+            if ident in received[peer]:
+                continue
+            life = r.get("lifespan_s")
+            if life is not None and r["t_us"] / 1e6 + life + LIFETIME_MARGIN_S < now_s:
+                continue
+            out.append({"from": ep, "label": r.get("label"), "sequence": r.get("sequence"),
+                        "send_unix_s": r["t_us"] / 1e6})
+    return out
 
 
 def utc_ion(t):
@@ -294,9 +343,10 @@ class Run:
 
         # Endpoint A, timed so that its plan origin falls near O.
         rover_ready = self.path("rover.ready")
+        run_s = scn["duration_s"] + scn["drain_max_s"] + 20     # endpoints outlive the drain
         argv = [ROVER_BIN, "--log", self.path("endpoint-a.jsonl"), "--scenario", scn["id"],
                 "--plan", self.path("rover-plan.json"),
-                "--duration", str(scn["duration_s"] + 20),
+                "--duration", str(run_s),
                 "--ion-node-dir", os.path.join(ION_RUN_DIR, "rover"),
                 "--ion-node-list-dir", ION_RUN_DIR, "--ready-file", rover_ready]
         argv += scn["rover"].get("args", [])
@@ -314,7 +364,7 @@ class Run:
 
         argv = [EARTH_BIN, "run", "--plan", self.path("earth-plan.jsonl"),
                 "--log", self.path("endpoint-b.jsonl"), "--scenario", scn["id"],
-                "--t0-us", str(int(origin * 1e6)), "--duration", str(scn["duration_s"] + 20),
+                "--t0-us", str(int(origin * 1e6)), "--duration", str(run_s),
                 "--node-dir", os.path.join(ION_RUN_DIR, "earth")]
         argv += scn["earth"].get("args", [])
         self.spawn("endpoint-b", argv, env=ion_env("earth"))
@@ -346,6 +396,7 @@ class Run:
             if self.procs[name].poll() is not None:
                 self.step("early_exit", endpoint=name, status=self.procs[name].returncode)
         self.step("traffic_phase_end")
+        self.drain(origin, stop_at)
         self.stop_proc("endpoint-a")
         self.stop_proc("endpoint-b")
         self.step("endpoints_stopped", a=self.info["exit"].get("endpoint-a"),
@@ -357,6 +408,25 @@ class Run:
                 self.info["probes"].append(rec)
         time.sleep(1.0)
         self.collect_ion_logs()
+
+    def drain(self, origin, stop_at):
+        """Wait until nothing handed to ION is still on its way (or drain_max_s)."""
+        bound = stop_at + self.scn["drain_max_s"]
+        while True:
+            t = now()
+            pending = undelivered(self.path("endpoint-a.jsonl"), self.path("endpoint-b.jsonl"), t)
+            alive = all(self.procs[n].poll() is None for n in ("endpoint-a", "endpoint-b"))
+            if not pending or t >= bound or not alive:
+                break
+            time.sleep(DRAIN_POLL_S)
+        self.info["drain"] = {
+            "max_s": self.scn["drain_max_s"], "end_unix_s": t,
+            "end_scenario_s": round(t - origin, 3), "duration_s": round(t - stop_at, 3),
+            "complete": not pending,
+            "pending": [{"from": p["from"], "label": p["label"], "sequence": p["sequence"],
+                         "send_scenario_s": round(p["send_unix_s"] - origin, 3)}
+                        for p in pending]}
+        self.step("drain_end", duration_s=round(t - stop_at, 1), pending=len(pending))
 
     def collect_ion_logs(self):
         for node in ("rover", "gateway", "earth"):

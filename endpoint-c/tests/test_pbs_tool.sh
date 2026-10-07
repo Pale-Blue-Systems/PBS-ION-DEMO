@@ -16,7 +16,7 @@ import json, sys
 rows = [json.loads(l) for l in open(sys.argv[1])]
 bad = [r["id"] for r in rows if not r.get("matches_vector")]
 print(f"  pbs_tool build --vectors: {len(rows) - len(bad)}/{len(rows)} byte-identical")
-sys.exit(1 if bad or len(rows) != 34 else 0)
+sys.exit(1 if bad or len(rows) != 36 else 0)
 EOF
 
 # 2. The same inputs fed as JSON lines on stdin give the same bytes.
@@ -64,6 +64,27 @@ bad = [k for k in exp if got.get(k) != (exp[k]["result"], exp[k]["reason"])]
 for k in bad: print("  MISMATCH", k, got.get(k), exp[k])
 print(f"  pbs_tool receive: {len(exp) - len(bad)}/{len(exp)} receiver and SEC-B deliveries as expected")
 sys.exit(1 if bad else 0)
+EOF
+
+# 3b. Timestamps of 2^63 and above through pbs_tool receive (make asan runs
+#     this under UndefinedBehaviorSanitizer): latency_us is t_us - Timestamp,
+#     or null when that is outside the signed 64-bit range.
+python3 - > "$tmp/ts63.jsonl" <<'EOF'
+import json, struct, zlib
+for ts in (0x8000000000000000, 0xFFFFFFFFFFFFFFFF, 0x7FFFFFFFFFFFFFFF):
+    h = struct.pack('>BBBxHxx16sQIII', 0x10, 2, 0, 1, b'Rover-Alpha', ts, 0, 30, 0)
+    h = h[:40] + struct.pack('>I', zlib.crc32(h) & 0xffffffff)
+    print(json.dumps({"id": "TS-%016x" % ts, "hex": h.hex(), "now_us": 1767225600000000}))
+EOF
+"$tool" receive --fresh < "$tmp/ts63.jsonl" > "$tmp/ts63.out" || fail=1
+python3 - "$tmp/ts63.out" <<'EOF' || fail=1
+import json, sys
+rows = [json.loads(l) for l in open(sys.argv[1])]
+want = [1767225600000000 - 0x8000000000000000, None, 1767225600000000 - 0x7FFFFFFFFFFFFFFF]
+got = [r["latency_us"] for r in rows]
+ok = got == want and all(r["result"] == "ACCEPT" for r in rows)
+print(f"  pbs_tool receive, Timestamp >= 2^63: latency_us {got} ({'as expected' if ok else 'WRONG'})")
+sys.exit(0 if ok else 1)
 EOF
 
 # 4. Lifetime cases.
@@ -121,6 +142,37 @@ cat "$tmp/peer_ok.jsonl" "$tmp/peer_recv.jsonl" > "$tmp/peer_mix.jsonl"
 python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); sys.exit(0 if r["own_sent"]==16 and r["delivered"]==10 and r["byte_identical"]==9 and len(r["byte_mismatch"])==1 and not r["ok"] else 1)' "$tmp/cc_own.json" \
   && echo "  pbs_tool crosscheck --own-log: 10 delivered, 9 identical, 1 digest mismatch reported" \
   || { echo "  pbs_tool crosscheck --own-log: wrong report"; fail=1; }
+# A peer send record without envelope_hex, or an own envelope that was not
+# delivered, makes crosscheck fail.
+python3 - "$tmp" <<'EOF2'
+import json, os, sys
+d = sys.argv[1]
+recs = [json.loads(l) for l in open(os.path.join(d, "peer_ok.jsonl"))]
+recs[2]["envelope_hex"] = None
+with open(os.path.join(d, "peer_nohex.jsonl"), "w") as f:
+    for r in recs: f.write(json.dumps(r) + "\n")
+with open(os.path.join(d, "peer_recv15.jsonl"), "w") as f:
+    for r in [json.loads(l) for l in open(os.path.join(d, "peer_ok.jsonl"))][:15]:
+        f.write(json.dumps({"event": "recv", "source_id_hex": r["source_id_hex"],
+                            "sequence": r["sequence"], "timestamp_us": r["timestamp_us"],
+                            "envelope_sha256": r["envelope_sha256"],
+                            "header_hex": r["header_hex"]}) + "\n")
+EOF2
+if "$tool" crosscheck "$tmp/peer_nohex.jsonl" > "$tmp/cc_nohex.json"; then
+  echo "  pbs_tool crosscheck: send record without envelope_hex NOT reported"; fail=1
+else
+  python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); sys.exit(0 if r["no_hex"]==1 and r["decoded"]==15 and r["peer_send_records"]==16 and not r["ok"] else 1)' "$tmp/cc_nohex.json" \
+    && echo "  pbs_tool crosscheck: 15 of 16 send records decoded, 1 without envelope_hex: fails" \
+    || { echo "  pbs_tool crosscheck (no hex): wrong report"; fail=1; }
+fi
+cat "$tmp/peer_ok.jsonl" "$tmp/peer_recv15.jsonl" > "$tmp/peer_mix2.jsonl"
+if "$tool" crosscheck "$tmp/peer_mix2.jsonl" --own-log "$tmp/peer_ok.jsonl" > "$tmp/cc_own2.json"; then
+  echo "  pbs_tool crosscheck --own-log: undelivered envelope NOT reported"; fail=1
+else
+  python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); sys.exit(0 if r["own_sent"]==16 and r["delivered"]==15 and r["byte_identical"]==15 and not r["ok"] else 1)' "$tmp/cc_own2.json" \
+    && echo "  pbs_tool crosscheck --own-log: 15 of 16 delivered, all identical: fails" \
+    || { echo "  pbs_tool crosscheck --own-log (undelivered): wrong report"; fail=1; }
+fi
 
 # 6. Plan dry run: every example plan builds.
 here="$(cd "$(dirname "$0")/.." && pwd)"

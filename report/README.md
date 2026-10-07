@@ -16,14 +16,18 @@ Both read only files written during a run: the endpoint logs
 python3 report/collect.py results/S2              # results/S2/*.csv
 python3 report/make_report.py                     # REPORT.md from results/
 python3 report/make_report.py --results results --out results/REPORT.md
-python3 report/compare_runs.py --run "run D=results/repeat/run-D" --run "run E=results"
-python3 report/make_report.py --name "run E" --compare "run D=results/repeat/run-D"
+python3 report/compare_runs.py --run "run X=runs/run-X" --run "run Y=results"
+python3 report/make_report.py --name "run Y" --compare "run X=runs/run-X"
 ```
 
-The last command wrote the REPORT.md in this repository (and, with
-`--out results/REPORT.md`, its copy in `results/`). `results/` holds run E;
-`results/repeat/` and `results/control/` are not scenario directories, so
-`make_report.py` reads only run E from `results/`.
+The committed REPORT.md is written by the last form, with the run in
+`results/` and a second run of the same commit kept in `runs/`
+(`scenarios/README.md`, Recorded runs). `./run_demo.sh` calls neither
+`--compare` nor `compare_runs.py`, so the REPORT.md it writes has no
+Repeatability section. Archived runs are kept in `runs/`, outside the
+directory `run_demo.sh` writes; a full run removes only the files and
+directories it writes itself (`S*/`, `selfcheck/`, `charts/`,
+`summary.json`, `all-envelopes.csv`, `run_demo.log`, `REPORT.md`).
 
 `compare_runs.py` reads complete results directories of `./run_demo.sh`
 (`<S>/run.json`, `<S>/verdict.json`, the logs and `run_demo.log`) and lists,
@@ -73,13 +77,21 @@ node (`src`, `fwd`, `xmt`, `rcv`, `dlv`, `rfw`, `exp` per ION priority class
 
 For each scenario: the result and every criterion with its measured value;
 the conditions (delays, loss, rate limits, outage windows, contact rates,
-seed, traffic mix, plan origins); delivery and latency per direction and
-priority (min, median, p95, max); for envelopes sent during an outage, the
+seed, traffic mix, plan origins, how the drain after the traffic phase
+ended); delivery and latency per direction and priority (min, median, p95,
+max; the median is `statistics.median`, p95 the nearest-rank percentile,
+the value at position ceil(0.95 n) of the sorted latencies, which is the
+maximum for n < 20); repeated deliveries (an envelope handed to ION once
+and received more than once); for envelopes sent during an outage, the
 time held beyond the 1.55 s propagation and the delivery time after the
 outage ended; the `bplist` probes; S5 expiry outcomes per label; S6 command
-dispositions; S7 offline comparison and cross-check output; emulator and
+dispositions; S7 scope of the cross-implementation result, offline comparison and
+cross-check output; emulator and
 ION counters; charts; the conformance items exercised; and the file list.
-The header records the test environment as PBS-CONFORMANCE-02 Section 4 asks:
+Measured values and criterion results are computed from the logs of the
+run; scenario titles, descriptions, notes and conformance mappings are
+copied from `scenarios/*.json`, and REPORT.md says so in its first
+paragraph. The header records the test environment as PBS-CONFORMANCE-02 Section 4 asks:
 implementations and versions, ION version and commit, emulator, host, clock
 source, cryptographic suites and the SHA-256 of `docs/test-vectors.json`.
 

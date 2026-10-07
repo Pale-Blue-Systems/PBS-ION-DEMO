@@ -29,21 +29,23 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.join(ROOT, "scenarios"))
 import collect  # noqa: E402
+import evaluate  # noqa: E402
 
 PRIO = collect.PRIO_NAME
 
 
 def q(values, p):
-    """Quantile by nearest rank; the median (p = 0.5) is statistics.median,
-    as in scenarios/evaluate.py, so both give the same median."""
+    """Statistic of scenarios/evaluate.py: the median (p = 0.5) is
+    statistics.median; any other p is the nearest-rank percentile, the value
+    at position ceil(p * n) (1-based) of the sorted values (p = 0 gives the
+    minimum, p = 1 the maximum; for n < 20, p = 0.95 gives the maximum)."""
     if not values:
         return None
     if p == 0.5:
         return statistics.median(values)
-    v = sorted(values)
-    k = max(0, min(len(v) - 1, int(round(p * (len(v) - 1)))))
-    return v[k]
+    return evaluate.nearest_rank(values, p)
 
 
 def fs(v, nd=3):

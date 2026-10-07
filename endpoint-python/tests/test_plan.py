@@ -54,3 +54,14 @@ def test_example_plan_file():
                         "plans", "example.json")
     sends = plan.expand(plan.load(path))
     assert len(sends) == 18 and sorted({s.priority for s in sends}) == [0, 1, 2, 3, 4]
+
+
+def test_extra_frames_before_the_main_frame():
+    s = plan.expand({"items": [{"priority": 2, "text": "TLM X",
+                                "extra_frames": [{"type": "0x80", "hex": "00ff00ff"}]}]})[0]
+    frames, pad = parse_container(s.payload)
+    assert [(f.type, f.value) for f in frames] == [(0x80, b"\x00\xff\x00\xff"), (1, b"TLM X N=1")]
+    assert pad == 0 and s.frame_types == (0x80, 1)
+    with pytest.raises(ValueError):
+        plan.expand({"items": [{"priority": 2, "payload_bytes": 100,
+                                "extra_frames": [{"type": "0x80", "hex": "00"}]}]})

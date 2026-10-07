@@ -1,7 +1,7 @@
 {
  "id": "S5",
  "title": "Expiry: bundle lifetime during an outage, and receivers rejecting expired envelopes",
- "summary": "The rover-Gateway leg has a scheduled outage from 20 s to 50 s. During it both endpoints send short-TTL envelopes (TTL 10 s and 20 s) whose bundle lifetime, computed from the TTL per PBS-DTN-MAP-01 6.1, ends before the contact resumes, together with control envelopes (TTL 60, TTL 0 and a TTL 30 command) that outlive it. Before the outage, each endpoint offers TTL 1 and TTL 2 envelopes (too short to send; Endpoint B's TTL 2 envelope carries a Timestamp 1 ms in the past) and sends one TTL 1 envelope with a bundle lifetime override of 60 s (fault injection, not conformant to PBS-DTN-MAP-01 6.1) so that an expired envelope reaches the other receiver. TTL 3 envelopes and a TTL 2 envelope handed over at its Timestamp are sent as observations.",
+ "summary": "The rover-Gateway leg has a scheduled outage from 20 s to 50 s. During it both endpoints send short-TTL envelopes (TTL 10 s and 20 s) whose bundle lifetime, computed from the TTL per PBS-DTN-MAP-01 6.1, ends before the contact resumes, together with control envelopes (TTL 60, TTL 0 and a TTL 30 command) that outlive it. Before the outage, each endpoint offers TTL 1 and TTL 2 envelopes (too short to send; Endpoint B's TTL 2 envelope carries a Timestamp 1 ms in the past) and sends one TTL 1 envelope with a bundle lifetime override of 60 s (fault injection, not conformant to PBS-DTN-MAP-01 6.1) so that an expired envelope reaches the other receiver. TTL 3 envelopes and a TTL 2 envelope handed over at its Timestamp are sent as observations. Earth's telemetry envelopes are signed (SPEC-DIGEST A38); an expired one is rejected at the TTL step, before authentication.",
  "duration_s": 70,
  "seed": 5,
  "links": {},
@@ -28,15 +28,15 @@
  },
  "earth": {
   "plan": [
-    {"at_s": 3.0, "kind": "telemetry", "text": "TLM MCC TTL1", "ttl": 1, "label": "S5-GW-TTL1"},
-    {"at_s": 3.5, "kind": "telemetry", "text": "TLM MCC TTL2 AGE 1MS", "ttl": 2, "label": "S5-GW-TTL2", "timestamp_offset_us": -1000},
-    {"at_s": 3.7, "kind": "telemetry", "text": "TLM MCC TTL2", "ttl": 2, "label": "S5-TTL2-ZERO-AGE"},
-    {"at_s": 4.0, "kind": "telemetry", "text": "TLM MCC TTL3", "ttl": 3, "label": "S5-TTL3"},
-    {"at_s": 5.0, "kind": "telemetry", "text": "TLM MCC INJECTED", "ttl": 1, "lifetime_s": 60, "label": "S5-INJECT-EXPIRED"},
+    {"at_s": 3.0, "kind": "telemetry", "text": "TLM MCC TTL1", "ttl": 1, "label": "S5-GW-TTL1", "sign": true},
+    {"at_s": 3.5, "kind": "telemetry", "text": "TLM MCC TTL2 AGE 1MS", "ttl": 2, "label": "S5-GW-TTL2", "timestamp_offset_us": -1000, "sign": true},
+    {"at_s": 3.7, "kind": "telemetry", "text": "TLM MCC TTL2", "ttl": 2, "label": "S5-TTL2-ZERO-AGE", "sign": true},
+    {"at_s": 4.0, "kind": "telemetry", "text": "TLM MCC TTL3", "ttl": 3, "label": "S5-TTL3", "sign": true},
+    {"at_s": 5.0, "kind": "telemetry", "text": "TLM MCC INJECTED", "ttl": 1, "lifetime_s": 60, "label": "S5-INJECT-EXPIRED", "sign": true},
     {"at_s": 6.0, "kind": "command", "command": "DRIVE 5", "ttl": 1, "lifetime_s": 60, "label": "S5-INJECT-EXPIRED-CMD"},
     {"at_s": 7.0, "kind": "command", "command": "PING S5-PRE", "label": "S5-PRE"},
-    {"at_s": 22.0, "count": 3, "interval_s": 1.0, "kind": "telemetry", "text": "TLM MCC SHORT", "ttl": 10, "label": "S5-TTL10-IN-OUTAGE"},
-    {"at_s": 23.5, "count": 2, "interval_s": 1.0, "kind": "telemetry", "text": "TLM MCC LONG", "ttl": 60, "label": "S5-TTL60-IN-OUTAGE"},
+    {"at_s": 22.0, "count": 3, "interval_s": 1.0, "kind": "telemetry", "text": "TLM MCC SHORT", "ttl": 10, "label": "S5-TTL10-IN-OUTAGE", "sign": true},
+    {"at_s": 23.5, "count": 2, "interval_s": 1.0, "kind": "telemetry", "text": "TLM MCC LONG", "ttl": 60, "label": "S5-TTL60-IN-OUTAGE", "sign": true},
     {"at_s": 25.0, "kind": "command", "command": "PING S5-IN-OUTAGE", "label": "S5-CMD-IN-OUTAGE"},
     {"at_s": 55.0, "kind": "command", "command": "PING S5-POST", "label": "S5-POST"}
    ]
@@ -73,11 +73,12 @@
    {"id": "S5-21", "check": "observe", "informative": true, "labels": ["S5-TTL3", "S5-TTL2-ZERO-AGE"], "text": "Observed: TTL 3 envelopes (bundle lifetime 1 s at A, 2 s at B) and B's TTL 2 envelope handed over at its Timestamp (lifetime 1 s); the contact-plan ranges on the path sum to 3 s (informative)"}
   ],
  "conformance": [
-   {"ref": "PBS-CONFORMANCE-02 T004", "how": "expired envelopes rejected by both receivers with TTL_EXPIRED (S5-3)"},
-   {"ref": "PBS-CONFORMANCE-02 T011", "how": "short-TTL envelopes not delivered after an outage longer than their lifetime; longer ones delivered (S5-4, S5-5)"},
-   {"ref": "PBS-CONFORMANCE-02 T016", "how": "TTL 0 envelopes held through the outage and delivered (S5-5, S5-12)"},
+   {"ref": "PBS-C02-T004", "how": "expired envelopes rejected by both receivers with TTL_EXPIRED (S5-3)"},
+   {"ref": "PBS-C02-T011", "how": "short-TTL envelopes not delivered after an outage longer than their lifetime; longer ones delivered (S5-4, S5-5)"},
+   {"ref": "PBS-C02-T016", "how": "TTL 0 envelopes held through the outage with the no-expiry lifetime of docs/MAPPING-PROFILE.md and delivered (S5-5, S5-12)"},
    {"ref": "PBS-CONFORMANCE-01 4.2, 9", "how": "TTL check in receive order; discard and continue (S5-3, S5-17)"},
-   {"ref": "PBS-CONFORMANCE-01 8 statements 1 and 2", "how": "as unit tests with an injected clock (vectors RX-01 to RX-06) in both endpoints' test suites and in S7"},
+   {"ref": "PBS-CONFORMANCE-01 8 (receiver side of statements 1 and 2)", "how": "receiver-side TTL checks at the clock values of statements 1 and 2 (vectors RX-01, RX-02, RX-04 and RX-05, both endpoints' unit tests and S7-1); the relay store-and-forward steps of the statements are not exercised: the demo has no PBS relay, and the gateway rule of PBS-DTN-MAP-01 6.1 does not encapsulate a TTL 30 envelope at T+30 s (vectors LT-05, LT-06)"},
+   {"ref": "PBS-CONFORMANCE-01 8 (discard envelopes with expired TTL)", "how": "applied by both endpoints as gateways before handing an envelope to ION: S5-1 (GW_EXPIRED) and S5-2 (GW_LIFETIME_UNDER_1S)"},
    {"ref": "PBS-ENV-01 12.1 to 12.5; PBS-DTN-MAP-01 6.1, 6.1.1, 7.3; PBS-DTN-MAP-02 4, 10 (deadline-to-lifetime bounding, expiry during disruption, no-expiry lifetime)", "how": "S5-1, S5-2, S5-4, S5-8 to S5-16"}
   ]
 }

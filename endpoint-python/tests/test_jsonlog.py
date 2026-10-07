@@ -60,3 +60,17 @@ def test_envelope_fields_hex_limit():
     assert big["envelope_hex"] is None and len(big["envelope_sha256"]) == 64
     short = jsonlog.envelope_fields(b"\x10\x00")
     assert short["header_hex"] is None and short["sequence"] is None
+
+
+def test_hex_limit_option_and_latency_range():
+    data = b"\x10" + b"\0" * 5000
+    try:
+        jsonlog.set_hex_max(65580)
+        assert jsonlog.envelope_fields(data)["envelope_hex"] == data.hex()
+    finally:
+        jsonlog.set_hex_max(jsonlog.ENVELOPE_HEX_MAX)
+    assert jsonlog.envelope_fields(data)["envelope_hex"] is None
+    t = 1767225600000000
+    assert jsonlog.latency_us(t, t - 5) == 5
+    assert jsonlog.latency_us(t, 1 << 63) == t - (1 << 63)
+    assert jsonlog.latency_us(t, (1 << 64) - 1) is None

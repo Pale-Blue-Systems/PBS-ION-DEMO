@@ -5,7 +5,7 @@
  * Written from the PBS specifications (PBS-ENV-01 1.5, PBS-MUX-01 1.4,
  * PBS-AUTH-01 1.4, PBS-SEC-B-01 1.5, PBS-DTN-MAP-01 1.5) and from
  * docs/SPEC-DIGEST.md, which fixes the choices the specifications leave
- * open (A1 to A37). Section numbers in comments refer to those documents.
+ * open (A1 to A38). Section numbers in comments refer to those documents.
  *
  * No function here depends on ION. Cryptography uses OpenSSL libcrypto.
  *

@@ -17,7 +17,9 @@ With --compare, REPORT.md also gets a Repeatability section
 (report/compare_runs.py) that sets the run in --results (called --name)
 beside each other complete run given as NAME=DIR.
 
-Every number in REPORT.md is computed from the files of the run it describes.
+Measured values and criterion results in REPORT.md are computed from the files
+of the run it describes; scenario titles, descriptions, notes and conformance
+mappings are copied from scenarios/*.json.
 """
 import argparse
 import csv
@@ -35,6 +37,7 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(ROOT, "scenarios"))
 import charts  # noqa: E402
 import collect  # noqa: E402
+import evaluate  # noqa: E402
 
 PRIO = collect.PRIO_NAME
 PROPAGATION_S = {"A->B": 1.55, "B->A": 1.55}       # 0.25 + 1.3 s one way (ion/topology.json)
@@ -49,15 +52,15 @@ def sha256_file(path):
 
 
 def q(values, p):
-    """Quantile by nearest rank; the median (p = 0.5) is statistics.median,
-    as in scenarios/evaluate.py, so both give the same median."""
+    """Statistic of scenarios/evaluate.py: the median (p = 0.5) is
+    statistics.median; any other p is the nearest-rank percentile, the value
+    at position ceil(p * n) (1-based) of the sorted values (p = 0 gives the
+    minimum, p = 1 the maximum; for n < 20, p = 0.95 gives the maximum)."""
     if not values:
         return None
     if p == 0.5:
         return statistics.median(values)
-    v = sorted(values)
-    k = max(0, min(len(v) - 1, int(round(p * (len(v) - 1)))))
-    return v[k]
+    return evaluate.nearest_rank(values, p)
 
 
 def fs(v, nd=3):
@@ -158,6 +161,17 @@ def conditions(run):
                      scn.get("duration_s"), scn.get("lead_s", 10), info.get("t0_utc"),
                      datetime.datetime.fromtimestamp(info["origin_unix_s"], datetime.timezone.utc)
                      .strftime("%Y-%m-%d %H:%M:%S") if info.get("origin_unix_s") else "n/a"))
+    dr = info.get("drain")
+    if dr:
+        lines.append("- Drain after the traffic phase: ended at %.3f s (%.3f s after the traffic "
+                     "phase), %s; endpoints stopped then." % (
+                         dr["end_scenario_s"], dr["duration_s"],
+                         "every envelope handed to ION had been received or its bundle lifetime "
+                         "had ended" if dr["complete"] else
+                         "bound of %s s reached with %d envelopes still on their way (%s)" % (
+                             dr["max_s"], len(dr["pending"]),
+                             ", ".join("%s seq %s" % (x["label"], x["sequence"])
+                                       for x in dr["pending"][:10]))))
     ea = info.get("endpoint_a", {})
     if ea:
         lines.append("- Endpoint A plan origin: %+.3f s from the traffic origin (bin/rover "
@@ -203,6 +217,48 @@ def conditions(run):
 
 _TOPO = None
 
+S7_SCOPE = (
+    "Scope of this result. Endpoint A (Python; PBS_LINK 0.1.4 for the envelope; the cryptography "
+    "package) and Endpoint B (C; its own CRC-32 and envelope code; OpenSSL libcrypto) are separate "
+    "code bases: Endpoint A calls no C code, and Endpoint B's author did not open PBS_LINK or "
+    "Endpoint A's protocol modules (endpoint-c/README.md). Both implement one interpretation "
+    "document, docs/SPEC-DIGEST.md, which fixes the receive steps R1 to R14, every reason code and "
+    "the demo choices A1 to A38. The digest was written, and docs/test-vectors.json generated, by a "
+    "separate step that ran PBS_LINK 0.1.4; the expected results in the vectors come from the "
+    "reference receiver in docs/gen_test_vectors.py, which was written with Endpoint A and has the "
+    "same structure as Endpoint A's receiver. Agreement on reason codes, check order, "
+    "canonicalization, the replay window and the lifetime rule follows from the shared digest. "
+    "S7 shows code-level independence (separate code, language, cryptographic library and CRC "
+    "implementation) and agreement with that shared interpretation; it does not show that two "
+    "independent readings of PBS v1.5.0 agree on the A1 to A38 choices or the R1 to R14 reason codes.")
+
+NOT_EXERCISED = [
+    "PBS-C02-T001 (IP carriage), PBS-C02-T003 (provider or path transition), PBS-C02-T005 "
+    "(latest-state degradation), PBS-C02-T009 (PNT context) and PBS-C02-T013 (security layering "
+    "with BPSec); ION is built without BPSec (docs/SPEC-DIGEST.md A35).",
+    "Asymmetric link availability (PBS-CONFORMANCE-02 Section 4): every outage in S2, S3 and S5 "
+    "takes down both directions of a leg.",
+    "Partial items: PBS-C02-T010 has one static priority-to-class mapping, with no network state "
+    "input and no policy version; PBS-C02-T012 applies no authorized degradation policy "
+    "(PBS-QOS-MAP-01); PBS-C02-T008 is covered for role, policy epoch and an unknown authority "
+    "(S6), not for authority translation across domains (PBS-AUTH-REQ-004).",
+    "PBS-CONFORMANCE-01 Section 8 relay statements: the demo has no PBS relay (the LUNAR GATEWAY "
+    "node does no PBS processing). The store, forward-at-T+30 s with the 44 header bytes "
+    "unchanged, and discard-at-T+31 s steps of statements 1 and 2 are not exercised; only the "
+    "receiver-side TTL checks at those clock values are (RX-01, RX-02, RX-04, RX-05). The "
+    "endpoints' gateway rule (PBS-DTN-MAP-01 6.1) does not encapsulate a TTL 30 envelope at "
+    "T+30 s (vectors LT-05, LT-06).",
+    "PBS-DTN-MAP-02 Section 10 duplicate handling: no criterion is designed for it. No envelope "
+    "declares a delivery mode (no Service Intent frames, docs/SPEC-DIGEST.md A23). Repeated "
+    "deliveries that occur are listed per scenario. Endpoint B logs each delivery with "
+    "x_duplicates_before and applies the normal receive path to it, so a repeated unprotected "
+    "rover envelope is accepted again. Endpoint A has no duplicate counter; its replay window "
+    "rejects a repeated signed envelope (SEC_REPLAY) and a repeated header-only envelope is "
+    "accepted again (both checked offline with `endpoint-python/bin/tool parse --shared-state` on "
+    "CMD-22 and ENV-02). Which of these occurred in a run is listed in the scenario sections.",
+    "PBS-DTN-MAP-02 Section 10 PBS-SEC-B preservation with BPSec enabled (A35).",
+]
+
 
 def collect_topology():
     global _TOPO
@@ -237,6 +293,35 @@ def s5_rows(run):
                         ", ".join(sorted({"not sent" if r["lifespan_s"] is None else str(r["lifespan_s"])
                                           for r in sel})),
                         r0["lifespan_rule"] or "", len(sel), "; ".join("%s x%d" % kv for kv in res.items())])
+    return out
+
+
+def repeat_lines(run):
+    """Envelopes delivered more than once after one hand-over to ION: a recv
+    record that matches no send record of its own (collect.py join) but has
+    the identity of an envelope that was sent. Deliberate re-sends, such as
+    the S6 replays, have a send record each and are not listed."""
+    out = []
+    for ep in ("A", "B"):
+        extra = [r for r in run.unmatched[ep] if collect.identity(r) is not None]
+        done = set()
+        for u in sorted(extra, key=lambda r: r["t_us"]):
+            k = collect.identity(u)
+            if k in done:
+                continue
+            done.add(k)
+            recs = sorted((r for r in run.records(ep, "recv") if collect.identity(r) == k),
+                          key=lambda r: r["t_us"])
+            parts = []
+            for r in recs:
+                dup = r.get("x_duplicates_before")
+                parts.append("%s s %s %s, bundle %s/%s%s" % (
+                    fs(run.t_s(r["t_us"])), r.get("result"), r.get("reason"),
+                    r.get("bundle_creation_ms"), r.get("bundle_creation_count"),
+                    "" if dup is None else ", x_duplicates_before %s" % dup))
+            out.append("- Receiver %s: %s Sequence %s delivered %d times: %s." % (
+                ep, recs[0].get("source_id"), recs[0].get("sequence"), len(recs),
+                "; ".join(parts)))
     return out
 
 
@@ -338,7 +423,9 @@ def scenario_section(run, verdict, chart_paths, results_rel, report_dir):
     lines.append("### Measurements")
     lines.append("")
     lines.append("Delivery and latency per direction and priority (latency = receive time minus "
-                 "envelope Timestamp, both from the host clock):")
+                 "envelope Timestamp, both from the host clock; median = statistics.median; p95 = "
+                 "nearest rank, the value at position ceil(0.95 n) of the sorted latencies, which "
+                 "is the maximum when n < 20):")
     lines.append("")
     lines.append(table(["Direction", "Priority", "Sent", "Received", "Delivery ratio",
                         "Min (s)", "Median (s)", "p95 (s)", "Max (s)"], latency_rows(run.envelopes)))
@@ -373,6 +460,19 @@ def scenario_section(run, verdict, chart_paths, results_rel, report_dir):
         lines.append("")
         lines.append(table(["Probe", "Node", "At (s)", "Bundles", "Envelopes by label"], prow))
         lines.append("")
+    rl = repeat_lines(run)
+    if rl:
+        lines.append("Repeated deliveries (an envelope handed to ION once and delivered more than "
+                     "once; bundle = creation time ms / count; Endpoint B counts earlier deliveries "
+                     "of an envelope identity in x_duplicates_before, Endpoint A has no such "
+                     "counter):")
+        lines.append("")
+        lines.extend(rl)
+        lines.append("")
+    else:
+        lines.append("Repeated deliveries: none; no envelope handed to ION once was delivered "
+                     "more than once.")
+        lines.append("")
     if sid == "S5":
         lines.append("Expiry outcomes by label (lifetime = bundle lifetime passed to ION, "
                      "DTN-MAP-01-6.1 = computed from the TTL, OVERRIDE = fault injection):")
@@ -390,6 +490,8 @@ def scenario_section(run, verdict, chart_paths, results_rel, report_dir):
                             "Rover result", "Executed", "Latency (s)"], s6_rows(run)))
         lines.append("")
     if sid == "S7":
+        lines.append(S7_SCOPE)
+        lines.append("")
         p = os.path.join(run.dir, "vector-comparison.json")
         if os.path.exists(p):
             v = json.load(open(p))
@@ -489,7 +591,6 @@ def main(argv=None):
     if not dirs:
         print("make_report: no scenario results in %s" % res, file=sys.stderr)
         return 1
-    import evaluate
     runs = []
     for d in dirs:
         path = os.path.join(res, d)
@@ -523,10 +624,13 @@ def main(argv=None):
     L = []
     L.append("# PBS ION demo: results")
     L.append("")
-    L.append("Generated by `report/make_report.py` from `%s/` on %s. Every number below is "
-             "computed from the logs of these runs. The demo exercises the PBS-CONFORMANCE-01 and "
-             "PBS-CONFORMANCE-02 items listed per scenario; it makes no conformance claim and no "
-             "certification claim." % (results_rel, summary["generated_utc"][:19].replace("T", " ") + " UTC"))
+    L.append("Generated by `report/make_report.py` from `%s/` on %s. Measured values and "
+             "criterion results are computed from the logs in `%s/`; scenario titles, "
+             "descriptions, notes and conformance mappings are copied from `scenarios/*.json`. "
+             "The demo exercises the PBS-CONFORMANCE-01 and PBS-CONFORMANCE-02 items listed per "
+             "scenario; it makes no conformance claim and no certification claim." % (
+                 results_rel, summary["generated_utc"][:19].replace("T", " ") + " UTC",
+                 results_rel))
     L.append("")
     L.append("## Summary")
     L.append("")
@@ -606,7 +710,8 @@ def main(argv=None):
              "ID Rover-Alpha), LUNAR GATEWAY relay node ipn:50 (store and forward only, no PBS "
              "processing), EARTH node ipn:23 (Endpoint B on ipn:23.1, Source ID Earth-MCC). "
              "BPv7 over LTP over UDP; every LTP datagram between nodes passes through the "
-             "emulator. One-way delays: %s." % "; ".join(
+             "emulator. One-way delays: %s. Priority to ION class of service, queue treatment "
+             "and the no-expiry lifetime: docs/MAPPING-PROFILE.md." % "; ".join(
                  "%s %s s" % (k, v["one_way_delay_s"]) for k, v in topo["legs"].items()))
     L.append("")
     for run, v in runs:
@@ -618,19 +723,19 @@ def main(argv=None):
         L.append(compare_runs.render([compare_runs.Run(args.name, res)] + others))
     L.append("## Not exercised")
     L.append("")
-    L.append("PBS-CONFORMANCE-02 T001 (IP carriage), T003 (provider or path transition), T005 "
-             "(latest-state degradation), T009 (PNT context) and T013 (security layering with "
-             "BPSec), and the PBS-DTN-MAP-02 Section 10 items on duplicate handling and on "
-             "PBS-SEC-B preservation with BPSec enabled (docs/SPEC-DIGEST.md Section 9 and A35). "
-             "ION is built without BPSec.")
+    for item in NOT_EXERCISED:
+        L.append("- " + item)
     L.append("")
     L.append("## Reproduce")
     L.append("")
     L.append("`./run_demo.sh` from a clean checkout builds ION at the pinned commit into "
              "`build/`, builds both endpoints, runs S1 to S7, and rewrites `results/` and this "
-             "file. `./run_demo.sh S4` runs one scenario. See README.md. Every run made of this "
-             "demo, with its result, is listed in scenarios/README.md; every change to a pass/fail "
-             "criterion made after a run is listed, with its reason, in docs/CRITERIA-CHANGES.md.")
+             "file. `./run_demo.sh S4` runs one scenario. See README.md. `./run_demo.sh` writes "
+             "this file without a Repeatability section; that section is added by "
+             "`report/make_report.py --name NAME --compare NAME=DIR`, which compares the run in "
+             "`results/` with recorded runs in `runs/`. Every run made of this demo, with its "
+             "result, is listed in scenarios/README.md; every change to a pass/fail criterion made "
+             "after a run is listed, with its reason, in docs/CRITERIA-CHANGES.md.")
     L.append("")
     with open(args.out, "w") as fh:
         fh.write("\n".join(L))

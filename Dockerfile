@@ -3,6 +3,9 @@
 #   docker build -t pbs-ion-demo .
 #   docker run --rm --shm-size=256m -v "$PWD/docker-results:/demo/results" pbs-ion-demo
 #
+# pkgconf provides pkg.m4, which autoreconf needs for ION's configure.ac
+# (PKG_CHECK_MODULES); no other listed package pulls it in.
+#
 # ION is built inside the container at the commit pinned in ion/build_ion.sh
 # (network access to github.com is needed at build time for ION and
 # PBS_LINK, and to PyPI for cryptography, pytest and matplotlib). The run
@@ -18,7 +21,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      ca-certificates git build-essential autoconf automake libtool \
+      ca-certificates git build-essential autoconf automake libtool pkgconf \
       python3 python3-venv python3-pip libssl-dev procps util-linux \
  && rm -rf /var/lib/apt/lists/*
 

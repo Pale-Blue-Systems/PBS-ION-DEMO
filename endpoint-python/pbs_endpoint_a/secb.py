@@ -125,6 +125,11 @@ class KeyStore:
     def key_ids(self):
         return sorted(k.key_id.decode("ascii", "replace") for k in self._keys.values())
 
+    def bound_source_ids(self):
+        """Source IDs (16 raw bytes) bound to a provisioned key (R8a, A38)."""
+        return {E.source_id_bytes(k.bound_source_id) for k in self._keys.values()
+                if k.bound_source_id}
+
     def __iter__(self):
         return iter(self._keys.values())
 
@@ -358,11 +363,18 @@ class Receiver:
         types = [f.type for f in frames]
         has_cmd = FT_COMMAND in types
         secs = [f for f in frames if f.type == FT_SEC]
-        # R8: unprotected data / R8a: unprotected command
-        if not secs and not has_cmd:
+        # R8, R8a, R8b: no Security frame. A Command frame (R8), an Authority
+        # Context frame, padding, or a Source ID bound to a provisioned key
+        # (R8a, SPEC-DIGEST A38) requires one; otherwise unprotected data.
+        # Lowering frame_count in transit turns the Security frame into
+        # padding (PBS-MUX-01 4.3), so padding alone is not accepted.
+        if not secs:
+            if has_cmd:
+                return self._done(d, "REJECT", "SEC_MISSING")
+            if (FT_AUTH in types or padding
+                    or hdr.source_id_raw in self.keys.bound_source_ids()):
+                return self._done(d, "REJECT", "SEC_MISSING")
             return self._done(d, "ACCEPT", "OK")
-        if has_cmd and not secs:
-            return self._done(d, "REJECT", "SEC_MISSING")
         # R9: one Security frame, last, no padding, consistent lengths
         if len(secs) != 1 or frames[-1].type != FT_SEC or padding != 0:
             return self._done(d, "REJECT", "SEC_MALFORMED")

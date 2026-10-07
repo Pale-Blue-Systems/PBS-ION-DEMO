@@ -61,7 +61,7 @@ bundle payload is shorter than 44 bytes; otherwise they are decoded from the
 | `header_hex` | string | the 44 header bytes (88 hex digits) |
 | `envelope_len` | int | number of bytes in the bundle payload (send: bytes handed to ION) |
 | `envelope_sha256` | string | SHA-256 of all `envelope_len` bytes |
-| `envelope_hex` | string or null | all `envelope_len` bytes when `envelope_len` <= 4096, else `null` |
+| `envelope_hex` | string or null | all `envelope_len` bytes when `envelope_len` is at most the endpoint's hex limit, else `null`. The limit is 4096 bytes unless the endpoint was started with `--log-hex-max N` (both endpoints; S7 uses 65580, so every envelope is logged with its bytes) |
 | `frame_types` | array of int or null | MUX frame types in container order; `[]` for Size 0; `null` if the container was not parsed |
 
 Envelope identity, used to join `send` and `recv` records, is
@@ -110,7 +110,7 @@ Envelope fields (Section 4), plus:
 | `bundle_admin_record` | bool | `BpDelivery.adminRecord` non-zero |
 | `expected_eid` | string or null | EID the Source ID maps to (SPEC-DIGEST.md 7.1); `null` for an unknown Source ID |
 | `eid_match` | bool or null | `bundle_source_eid == expected_eid`; `null` when `expected_eid` is `null` (A32: logged, not a discard reason) |
-| `latency_us` | int or null | `t_us - timestamp_us` |
+| `latency_us` | int or null | `t_us - timestamp_us`; `null` when the difference is outside the signed 64-bit range (possible only for a Timestamp of 2^63 or more) |
 | `commands` | array of string or null | Command frame values of an accepted command envelope |
 | `suite_id` | string or null | from the Security frame, once its structure has been checked (step R9) |
 | `key_id` | string or null | as above |

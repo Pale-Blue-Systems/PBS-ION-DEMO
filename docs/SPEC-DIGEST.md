@@ -1,11 +1,11 @@
 # PBS specification digest for the PBS ION demo
 
-This document lists what Endpoint A (rover, Python) and Endpoint B (Earth, C) implement, with the specification clause for each rule. Endpoint B is written from this document and the PBS specifications only.
+This document lists what Endpoint A (rover, Python) and Endpoint B (Earth, C) implement, with the specification clause for each rule. Endpoint B is written from the PBS specifications and this digest. Both endpoints implement the demo choices recorded here, so their agreement on those choices (reason codes, check order, canonicalization, replay window, lifetime rule) follows from this one document; it was written, and `docs/test-vectors.json` generated, by a separate step that ran PBS_LINK 0.1.4 (Section 10).
 
 Two kinds of statement appear below:
 
 - **Spec**: a rule taken from the cited section of PBS v1.5.0.
-- **Demo**: a choice made for this demo where the specification leaves the choice open or says nothing. Each one is listed with its reason in Section 11 (A1 to A37).
+- **Demo**: a choice made for this demo where the specification leaves the choice open or says nothing. Each one is listed with its reason in Section 11 (A1 to A38).
 
 ## 1. Sources
 
@@ -99,7 +99,7 @@ Demo (A6): integer arithmetic in microseconds:
 expired  <=>  TTL > 0  and  now_us - Timestamp > TTL * 1000000
 ```
 
-`now_us - Timestamp` is computed as a signed 64-bit value; a Timestamp in the future gives a negative age and is not expired. This equals the Section 12.2 formula evaluated with exact real numbers. Vectors: RX-01 (T+5 s, accept), RX-02 (T+30 s, accept), RX-03 (T+30.000001 s, expired), RX-04 (T+31 s, expired), RX-05 (TTL 0 at 365 days, accept), RX-06 (TTL 10 at T+26 s, expired). RX-01, RX-02, RX-04 and RX-05 are the PBS-ENV-01 Section 12.5 and PBS-CONFORMANCE-01 Section 8 test statements.
+A Timestamp later than `now_us` gives a negative age and is not expired; the comparison is made without overflow for any 64-bit Timestamp. This equals the Section 12.2 formula evaluated with exact real numbers. Vectors: RX-01 (T+5 s, accept), RX-02 (T+30 s, accept), RX-03 (T+30.000001 s, expired), RX-04 (T+31 s, expired), RX-05 (TTL 0 at 365 days, accept), RX-06 (TTL 10 at T+26 s, expired). RX-01, RX-02, RX-04 and RX-05 are the receiver checks of the PBS-ENV-01 Section 12.5 statements, at the clock values of the PBS-CONFORMANCE-01 Section 8 statements 1 and 2; the relay store-and-forward steps of those statements are not covered by them (A33).
 
 Typical TTL values (Section 12.4, informative): critical alerts 0, commands 30, telemetry 60, science data 3600, bulk 86400.
 
@@ -166,7 +166,7 @@ Demo:
 - Every envelope with `Size > 0` carries a MUX container; `Size = 0` is a header-only heartbeat (A12).
 - A container whose TLV structure is inconsistent (fewer than `frame_count` complete frames, or a frame running past the payload end) is discarded as a whole with reason `MUX_MALFORMED`; an unsupported `mux_version` gives `MUX_VERSION` (A14; vectors RX-17 to RX-19).
 - Telemetry, Status and Event frame values are ASCII text or opaque bytes; Command frame values are ASCII `<OPERATION>[ <arguments>]`, for example `DRIVE 10` (A15).
-- Senders write no padding. Receivers accept padding in unprotected containers (RX-20); a protected container has none (Section 6.2).
+- Senders write no padding. A receiver rejects a container that has padding and no Security frame with `SEC_MISSING` (Section 6.6 R8a, A38; RX-20); a protected container has none (Section 6.2).
 
 ## 5. Authority Context (PBS-AUTH-01)
 
@@ -281,15 +281,16 @@ Demo command defaults: Source ID `Earth-MCC`, Priority 1 (HIGH), Flags `0x00`, T
 
 ### 6.6 Receive procedure (rover)
 
-Spec order: PBS-ENV-01 Section 14 first; authenticate before application acceptance (REQ-001); reject on authentication failure (REQ-002); replay validation (REQ-003); authenticated authority context for commands (REQ-005); authorize before execution (REQ-006); audit security failures (REQ-007). Demo order and reason codes (A26), implemented by `Receiver.receive` in `docs/gen_test_vectors.py`:
+Spec order: PBS-ENV-01 Section 14 first; authenticate before application acceptance (PBS-SECB-REQ-001); reject on authentication failure (PBS-SECB-REQ-002); replay validation (PBS-SECB-REQ-003); authenticated authority context for commands (PBS-SECB-REQ-005); authorize before execution (PBS-SECB-REQ-006); audit security failures (PBS-SECB-REQ-007). Demo order and reason codes (A26), implemented by `Receiver.receive` in `docs/gen_test_vectors.py`:
 
 | Step | Check | Reason code on failure |
 |---|---|---|
 | R1 to R6 | Section 2.5 | `LENGTH`, `MAGIC`, `CRC`, `PRIORITY`, `TTL_EXPIRED`, `LENGTH` |
 | R6a | `Size = 0`: accept, no frames | none |
 | R7 | MUX version and TLV structure | `MUX_VERSION`, `MUX_MALFORMED` |
-| R8 | no Security frame and no Command frame: accept as unprotected data | none |
-| R8a | Command frame present, no Security frame | `SEC_MISSING` |
+| R8 | no Security frame, and a Command frame | `SEC_MISSING` |
+| R8a | no Security frame, and at least one of: an Authority Context frame; padding after the last frame; a Source ID to which a provisioned key is bound (`Earth-MCC` at the rover) (A38) | `SEC_MISSING` |
+| R8b | no Security frame: accept as unprotected data | none |
 | R9 | one Security frame, last, no padding; value length >= 16; version 1; value length = `16 + key_id_len + nonce_len + auth_len` | `SEC_MALFORMED` |
 | R9a | suite_id is `0xFF01` or `0xFF02` | `SEC_SUITE_UNKNOWN` |
 | R9b | flags `0x01`, nonce_len 0, auth_len of the suite, key_id_len >= 1 | `SEC_MALFORMED` |
@@ -302,11 +303,13 @@ Spec order: PBS-ENV-01 Section 14 first; authenticate before application accepta
 | R13 | Source ID and authority match the key binding; authority_id_type 3; policy_epoch 1; role known; every Command operation permitted for the role | `AUTHZ_DENIED` |
 | R14 | accept; execute Command frames in frame order | `OK` |
 
-Unknown frame types, including `0x80` to `0xFF`, are skipped in every step and stay covered by authentication (vector CMD-16, PBS-CONFORMANCE-02 T014).
+A header-only envelope (Size 0) is accepted at R6a; it carries no frames, and R8a does not apply to it.
+
+Unknown frame types, including `0x80` to `0xFF`, are skipped in every step and stay covered by authentication (vector CMD-16, PBS-C02-T014).
 
 ### 6.7 Audit records
 
-Spec: security failures are auditable (PBS-SECB-REQ-007); authorization failure produces an auditable status (PBS-AUTH-REQ-006); PBS-CONFORMANCE-02 T015 checks traceable event evidence. Demo (A25): each endpoint writes one JSON line per received envelope with at least: receive time (us), endpoint, result (`ACCEPT` or `REJECT`), reason code, Source ID, Sequence, Priority, Timestamp, TTL, Size, header hex, bundle source EID, bundle creation time, and for protected messages suite_id, key_id and security_sequence.
+Spec: security failures are auditable (PBS-SECB-REQ-007); authorization failure produces an auditable status (PBS-AUTH-REQ-006); PBS-C02-T015 checks traceable event evidence. Demo (A25): each endpoint writes one JSON line per received envelope with at least: receive time (us), endpoint, result (`ACCEPT` or `REJECT`), reason code, Source ID, Sequence, Priority, Timestamp, TTL, Size, header hex, bundle source EID, bundle creation time, and for protected messages suite_id, key_id and security_sequence.
 
 ## 7. DTN mapping (PBS-DTN-MAP-01 Sections 5 to 8, PBS-DTN-MAP-02)
 
@@ -374,7 +377,7 @@ else:
     if lifespan_s < 1: do not send; log GW_LIFETIME_UNDER_1S
 ```
 
-The no-expiry lifetime is 2147483647 s = 2147483647000 ms, the largest value `bp_send()` accepts, documented here for ION 4.2.0 as PBS-DTN-MAP-01 Section 6.1.1 requires. Vectors LT-01 to LT-10 give the results for ten inputs, for example TTL 30 handed over at Timestamp gives 29 s (LT-01), and TTL 4294967295 is clamped to 2147483647 s (LT-09).
+The no-expiry lifetime is 2147483647 s = 2147483647000 ms, the largest value `bp_send()` accepts, documented for ION 4.2.0 in the mapping profile, `docs/MAPPING-PROFILE.md` Section 6, as PBS-DTN-MAP-01 Section 6.1.1 and PBS-DTN-MAP-02 Section 4 require. Vectors LT-01 to LT-10 give the results for ten inputs, for example TTL 30 handed over at Timestamp gives 29 s (LT-01), and TTL 4294967295 is clamped to 2147483647 s (LT-09).
 
 ### 7.5 Priority and class of service
 
@@ -390,11 +393,7 @@ Spec (PBS-DTN-MAP-01 Section 6.3): no primary block field carries Priority; rese
 
 Constants: `bp.h` lines 52 to 54. With `bpsendfile` the class is passed as the string `0.<classOfService>` (format `<custody-requested>.<priority>[.<ordinal>...]`, `bp.h` `BP_PARSE_QUALITY_OF_SERVICE_USAGE`). Demo: ancillary data NULL, ordinal 0, no custody (A31).
 
-Mapping profile items (PBS-DTN-MAP-02 Section 5), to be completed in the ION configuration documentation:
-
-- BP QoS mechanism: ION `classOfService` argument of `bp_send()`, carried in ION's Quality of Service extension block, block type 193 (`bp.h` line 309; serialized as `[flags, classOfService, ordinal, dataLabel]` in `bpv7/library/ext/bpq/bpq.c` lines 29 to 47). RFC 9171 does not define this block.
-- Queue treatment: ION inserts each bundle into the bulk, standard or urgent queue of the egress plan by class (`libbpP.c` line 11991 onward).
-- Behaviour under congestion and when the treatment is unavailable: to be stated from the ION configuration and measured in S4.
+The mapping profile with the four PBS-DTN-MAP-02 Section 5 items (BP QoS mechanism: `classOfService` of `bp_send()`, carried in ION's block type 193; queue treatment: urgent queue first, then the standard and bulk queues shared 2:1 by bytes sent; behaviour under congestion, measured in S4; behaviour when the treatment is unavailable) and the no-expiry lifetime of PBS-DTN-MAP-02 Section 4 is `docs/MAPPING-PROFILE.md`.
 
 ### 7.6 Inbound
 
@@ -426,19 +425,19 @@ Spec: DTN-layer validation first; invalid bundles are discarded before PBS proce
 
 ## 9. Scenario to conformance mapping
 
-PBS-CONFORMANCE-01 defines no test identifiers; it is cited by section, and the Section 8 test statements are numbered 1 (TTL 30) and 2 (TTL 0) in order of appearance (A33). PBS-CONFORMANCE-02 test identifiers are from its Section 3. The method letters T, D, A, I are read as Test, Demonstration, Analysis, Inspection (A34). The demo exercises these tests and makes no conformance claim and no certification claim.
+PBS-CONFORMANCE-01 defines no test identifiers; it is cited by section, and the Section 8 test statements are numbered 1 (TTL 30) and 2 (TTL 0) in order of appearance (A33). PBS-CONFORMANCE-02 test identifiers (`PBS-C02-T001` to `PBS-C02-T016`) are from its Section 3, requirement identifiers from PBS-SEC-B-01 Section 6 (`PBS-SECB-REQ-nnn`) and PBS-AUTH-01 Section 3 (`PBS-AUTH-REQ-nnn`). The method letters T, D, A, I are read as Test, Demonstration, Analysis, Inspection (A34). The demo exercises these tests and makes no conformance claim and no certification claim.
 
 | Scenario | PBS-CONFORMANCE-02 | PBS-CONFORMANCE-01 | Other clauses checked |
 |---|---|---|---|
-| S1 nominal telemetry and commands | T002 (header byte-identical after BPv7 carriage), T015 (dispositions logged), T016 (TTL 0 envelopes carried with the 2147483647 s lifetime and delivered) | 4.1, 4.2, 4.3, 5.1, 6, 7, 10 | DTN-MAP-01 5.1, 6.1, 6.1.1, 6.2, 7.2, 8; DTN-MAP-02 10 (envelope preservation, EID mapping stability, no-expiry lifetime) |
-| S2 scheduled outage | T011, T002 (header unchanged after storage in ION) | 4.2 | DTN-MAP-01 9; DTN-MAP-02 10 (store-and-forward delivery); C02 Section 4 (complete outage, delayed contact, service restoration) |
-| S3 unscheduled blackout and loss | T011, T002 | 4.2 | C02 Section 4 (complete outage, service restoration, link impairment model) |
-| S4 priority under a rate limit | T012, T010 (one class per priority, Section 7.5 table) | 6 | PRIO-01 4, 6; DTN-MAP-01 6.3; DTN-MAP-02 5, 10 (priority semantic preservation); C02 Section 4 (constrained throughput) |
-| S5 expiry | T004, T011 (expiry), T016 | 4.2, 8 statements 1 and 2 (as unit tests, vectors RX-01 to RX-06), 9 | ENV-01 12.1 to 12.5; DTN-MAP-01 6.1, 6.1.1, 7.3; DTN-MAP-02 4, 10 (deadline-to-lifetime bounding, expiry during disruption, no-expiry lifetime) |
-| S6 authenticated commands | T006 (tamper), T007 (replay), T008 (authorized and unauthorized role), T004 (expired command), T015 (audit) | 9 | SEC-B-01 6 (REQ-001 to REQ-007); AUTH-01 3 (REQ-002, REQ-003, REQ-005, REQ-006); PRIO-01 10 |
-| S7 cross-implementation | T014 (unknown frame skipped, RX-21 and CMD-16), T002 | 4.1, 4.3, 5.1, 7, 10 | ENV-01 12.5, 13.2 vectors |
+| S1 nominal traffic | PBS-C02-T002 (header byte-identical after BPv7 carriage), PBS-C02-T010 (partial: one static class per priority), PBS-C02-T015 (dispositions logged), PBS-C02-T016 (TTL 0 envelopes carried with the 2147483647 s lifetime of `docs/MAPPING-PROFILE.md` and delivered) | 4.1, 4.2, 4.3, 5.1, 6, 7, 10 | DTN-MAP-01 5.1, 6.1, 6.1.1, 6.2, 7.2, 8; DTN-MAP-02 10 (envelope preservation, EID mapping stability, no-expiry lifetime) |
+| S2 scheduled outage | PBS-C02-T011, PBS-C02-T002 (header unchanged after storage in ION) | 4.2 | DTN-MAP-01 9; DTN-MAP-02 10 (store-and-forward delivery); C02 Section 4 (complete outage, delayed contact, service restoration) |
+| S3 unscheduled blackout and loss | PBS-C02-T011, PBS-C02-T002 | 4.2 | C02 Section 4 (complete outage, service restoration, link impairment model) |
+| S4 priority under a rate limit | PBS-C02-T012 (partial: no authorized degradation policy), PBS-C02-T010 (partial: one static class per priority, Section 7.5 table) | 6 | PRIO-01 4, 6; DTN-MAP-01 6.3; DTN-MAP-02 5 (`docs/MAPPING-PROFILE.md`), 10 (priority semantic preservation); C02 Section 4 (constrained throughput) |
+| S5 expiry | PBS-C02-T004, PBS-C02-T011 (expiry), PBS-C02-T016 | 4.2, 8 (receiver side of statements 1 and 2: vectors RX-01, RX-02, RX-04, RX-05; the relay store-and-forward steps are not exercised; discard of expired envelopes by the endpoints as gateways: S5-1, S5-2), 9 | ENV-01 12.1 to 12.5; DTN-MAP-01 6.1, 6.1.1, 7.3; DTN-MAP-02 4, 10 (deadline-to-lifetime bounding, expiry during disruption, no-expiry lifetime) |
+| S6 authenticated commands | PBS-C02-T006 (command byte, priority, TTL, Timestamp, security_sequence, Authority Context, CRC32 and frame_count modified; wrong keys), PBS-C02-T007 (replay), PBS-C02-T008 (authorized and unauthorized role, wrong policy epoch, unknown authority), PBS-C02-T004 (expired command), PBS-C02-T014, PBS-C02-T015 (audit) | 9 | PBS-SECB-REQ-001 to PBS-SECB-REQ-007; PBS-AUTH-REQ-002, PBS-AUTH-REQ-003, PBS-AUTH-REQ-005, PBS-AUTH-REQ-006; PRIO-01 10 |
+| S7 cross-implementation | PBS-C02-T014 (unknown frame skipped, live and RX-21, CMD-16), PBS-C02-T002 | 4.1, 4.3, 5.1, 7, 10 | ENV-01 12.5, 13.2 vectors |
 
-Not exercised: C02 T001 (IP carriage), T003 (provider or path transition), T005 (latest-state degradation), T009 (PNT context), T013 (security layering with BPSec); DTN-MAP-02 Section 10 items "duplicate handling" (receivers count duplicate envelope identities but no delivery mode requiring it is used) and "PBS-SEC-B preservation with BPSec enabled" (A35).
+Not exercised: PBS-C02-T001 (IP carriage), PBS-C02-T003 (provider or path transition), PBS-C02-T005 (latest-state degradation), PBS-C02-T009 (PNT context), PBS-C02-T013 (security layering with BPSec); asymmetric link availability (C02 Section 4: every outage takes down both directions of a leg); the relay steps of PBS-CONFORMANCE-01 Section 8 statements 1 and 2 (no PBS relay); DTN-MAP-02 Section 10 items "duplicate handling" (no delivery mode is declared and no criterion is designed for it; repeated deliveries are listed per run in REPORT.md) and "PBS-SEC-B preservation with BPSec enabled" (A35).
 
 Records: PBS-CONFORMANCE-02 Section 4 lists what the test environment records (endpoint and gateway implementations, emulator, clock source and uncertainty, impairment model, contact plan, cryptographic suite, test-vector hashes); Section 5 lists the fields of each verification record (test and requirement IDs, configuration, procedure revision, input vectors, expected and observed result, disposition, logs). REPORT.md carries these fields per scenario and the SHA-256 of the `test-vectors.json` used.
 
@@ -450,7 +449,7 @@ File: `docs/test-vectors.json`. Generator: `docs/gen_test_vectors.py`.
 PYTHONPATH=<PBS_LINK 0.1.4 checkout> python3 docs/gen_test_vectors.py
 ```
 
-Run on 2026-10-07 with Python 3.13.16, cryptography 50.0.1 and PBS_LINK 0.1.4 at commit `54ae20e`. Output: 15 envelopes, 22 receiver cases, 10 lifetime cases, 24 SEC-B messages and 21 SEC-B cases with 30 deliveries; all self-checks passed. Two runs produced identical files, SHA-256 `789ac1b4a02f38e8adf3d9bc1eeabe4d0bb7abc74a95b3dd8439633bcb3885ff`.
+First generated on 2026-10-07 with PBS_LINK 0.1.4 at commit `54ae20e` (15 envelopes, 22 receiver cases, 10 lifetime cases, 24 SEC-B messages, 21 SEC-B cases with 30 deliveries; SHA-256 `789ac1b4a02f38e8adf3d9bc1eeabe4d0bb7abc74a95b3dd8439633bcb3885ff`). Regenerated on 2026-10-07 after rule R8a (A38) with Python 3.13.16, cryptography 50.0.1 and PBS_LINK 0.1.4 at commit `d3b81d3` (`build/pbs-link`, fetched by `endpoint-python/fetch_pbs_link.sh`; its `PBS_LINK/` package tree is the one of `54ae20e`). Output: 15 envelopes, 23 receiver cases, 10 lifetime cases, 28 SEC-B messages and 25 SEC-B cases with 34 deliveries; all self-checks passed. Two runs produced identical files, SHA-256 `51e09856fa3c59130aa01f9c5d0e661a26cd19bda2aec74c45f8084bffd69b25`. Compared with the first file, RX-20's expected result changed (`ACCEPT OK` to `REJECT SEC_MISSING`) and RX-23, CMD-19 to CMD-22 and SB-22 to SB-25 were added; every other vector is unchanged.
 
 Self-checks in that run:
 
@@ -460,18 +459,18 @@ Self-checks in that run:
 - Every receiver case and SEC-B delivery gives the stated result and reason code in the reference receiver.
 - Every SEC-B header built by PBS_LINK equals the header used for `auth_input`.
 
-Cross-check with OpenSSL 3.0.13 command-line tools, run on 2026-10-07: `openssl pkeyutl -verify -rawin` verified the Ed25519 signatures of CMD-01, CMD-10 and CMD-W70 with the `TEST-ED25519-01` public key and reported failure for CMD-07 (signed with the rogue key); `openssl pkeyutl -sign` with the `TEST-ED25519-01` seed reproduced the CMD-01 signature; `openssl dgst -sha256 -mac HMAC` reproduced the CMD-02 tag.
+Cross-check with OpenSSL 3.0.13 command-line tools, run on 2026-10-07: `openssl pkeyutl -verify -rawin` verified the Ed25519 signatures of CMD-01, CMD-10 and CMD-W70 with the `TEST-ED25519-01` public key and reported failure for CMD-07 (signed with the rogue key); `openssl pkeyutl -sign` with the `TEST-ED25519-01` seed reproduced the CMD-01 signature; `openssl dgst -sha256 -mac HMAC` reproduced the CMD-02 tag. After the regeneration, `openssl pkeyutl -verify -rawin` verified the CMD-22 signature.
 
 Contents:
 
 | Section | Content |
 |---|---|
 | `envelopes` | ENV-01 to ENV-15: Section 13.2 and 12.5 vectors; one telemetry envelope per priority 0 to 4; 16-byte ASCII and 16-byte multi-byte UTF-8 Source IDs; Sequence 65535 and 0; TTL 0, TTL 4294967295; Timestamp with a microsecond fraction; ACK_REQ set; Size 0 and Size up to 261. Each has inputs, header, CRC32 and full envelope hex. |
-| `receiver_cases` | RX-01 to RX-22: TTL boundaries, bad magic, bad CRC, reserved priority, reserved bytes and flag bits, truncated and over-long buffers, MUX version and structure errors, padding, unknown frame, empty container. Each has input hex, `now_us`, expected result and reason, and the PBS_LINK 0.1.4 `parse()` outcome. |
+| `receiver_cases` | RX-01 to RX-23: TTL boundaries, bad magic, bad CRC, reserved priority, reserved bytes and flag bits, truncated and over-long buffers, MUX version and structure errors, padding without a Security frame, unknown frame, empty container, Authority Context without a Security frame. Each has input hex, `now_us`, expected result and reason, and the PBS_LINK 0.1.4 `parse()` outcome. |
 | `lifetime_cases` | LT-01 to LT-10: Section 7.4 inputs and results. |
 | `cos_map` | Section 7.5 table. |
-| `sec_b.messages` | CMD-01 to CMD-18 and CMD-W00 to CMD-W70: valid Ed25519 and HMAC commands; tampered command byte, priority, TTL and security_sequence; wrong key for each suite; unknown key_id; unauthorized and authorized roles; wrong policy epoch; unsigned command; missing Authority Context; unknown suite; unknown frame inside a protected command; Source ID not bound to the key; padding after the Security frame; replay-window messages. Each untampered message lists `auth_input_hex` and `auth_data_hex`. |
-| `sec_b.cases` | SB-01 to SB-21: ordered deliveries, each case starting from empty receiver state, with `now_us` and expected result and reason. |
+| `sec_b.messages` | CMD-01 to CMD-22 and CMD-W00 to CMD-W70: valid Ed25519 and HMAC commands; tampered command byte, priority, TTL and security_sequence; wrong key for each suite; unknown key_id; unauthorized and authorized roles; wrong policy epoch; unsigned command; missing Authority Context; unknown suite; unknown frame inside a protected command; Source ID not bound to the key; padding after the Security frame; `frame_count` lowered to 1 and 0; unsigned and signed Earth-MCC telemetry; replay-window messages. Each untampered message lists `auth_input_hex` and `auth_data_hex`. |
+| `sec_b.cases` | SB-01 to SB-25: ordered deliveries, each case starting from empty receiver state, with `now_us` and expected result and reason. |
 
 Use: each endpoint builds every `envelopes` and `sec_b.messages` entry from its `inputs` and compares the bytes (S7, identical bytes for identical inputs); parses every `envelope_hex` and compares the fields; runs `receiver_cases` and `sec_b.cases` through its receive path with the stated `now_us`; and computes `lifetime_cases`.
 
@@ -508,11 +507,12 @@ Use: each endpoint builds every `envelopes` and `sec_b.messages` entry from its 
 | A27 | PBS-DTN-MAP-01 Section 4 describes gateways as translators, not originators; here each endpoint originates and encapsulates on its own node. | The gateway rules of PBS-DTN-MAP-01 apply to each endpoint's BP send and receive path. |
 | A28 | Known issue in the PBS v1.5.0 changelog: PBS-DTN-MAP-01 Section 8 allows mapping a Source ID to an EID of another node, which conflicts with RFC 9171 Section 5.2. | Each Source ID maps to an EID of the node the endpoint runs on (Section 7.1). ION 4.2.0 `bp_send()` refuses a foreign node number. |
 | A29 | PBS-DTN-MAP-01 Section 6.1 counts lifetime in ms from the creation time; ION 4.2.0 `bp_send()` takes whole seconds and assigns the creation time inside the call. | 1 s latency margin, floor to whole seconds, no send below 1 s (`GW_LIFETIME_UNDER_1S`) or below 1 ms (`GW_EXPIRED`), clamp at 2147483647 s (Section 7.4). Dropping is permitted by PBS-DTN-MAP-01 Section 10. |
-| A30 | The no-expiry lifetime is gateway-specific (PBS-DTN-MAP-01 Section 6.1.1). | 2147483647 s, the largest `int` lifespan of ION 4.2.0 `bp_send()`. S1 and S5 check that ION delivers TTL 0 envelopes sent with it (PBS-CONFORMANCE-02 T016); this document reports no result for that check. |
+| A30 | The no-expiry lifetime is gateway-specific (PBS-DTN-MAP-01 Section 6.1.1). | 2147483647 s, the largest `int` lifespan of ION 4.2.0 `bp_send()`, documented in `docs/MAPPING-PROFILE.md`. S1 and S5 check that ION delivers TTL 0 envelopes sent with it (PBS-C02-T016); this document reports no result for that check. |
 | A31 | PBS-DTN-MAP-01 Section 6.3 maps to the RFC 4838 classes; ION also has an ordinal within its expedited class. | The Section 6.3 table onto ION classes 2, 1, 0; ordinal 0 for all. No other treatment is requested. |
 | A32 | No clause requires a receiver to compare the bundle source EID with the Source ID. | Logged with a match flag; not a discard reason. |
-| A33 | PBS-CONFORMANCE-01 has no test identifiers; its Section 8 statements describe a relay with a settable clock, and the demo has no PBS relay. | Cited by section and statement number; statements 1 and 2 run as unit tests with an injected clock (RX-01 to RX-06; lifetime cases for the gateway check). |
+| A33 | PBS-CONFORMANCE-01 has no test identifiers; its Section 8 statements describe a relay with a settable clock, and the demo has no PBS relay. | Cited by section and statement number. Only the receiver halves of statements 1 and 2 are exercised: RX-01, RX-02, RX-04 and RX-05 check the receiver's decision at the statements' clock values, as unit tests with an injected clock. The relay steps (store, forward at T+30 s with the 44 header bytes unchanged, discard at T+31 s, forward the TTL 0 envelope after 365 days) are not exercised; the endpoints' gateway rule of PBS-DTN-MAP-01 6.1 does not encapsulate a TTL 30 envelope at T+29 s or later (LT-05, LT-06: `GW_EXPIRED`). |
 | A34 | PBS-CONFORMANCE-02 Section 3 uses method letters T, D, A, I without defining them. | Test, Demonstration, Analysis, Inspection. |
-| A35 | PBS-CONFORMANCE-02 T013 and PBS-DTN-MAP-02 Section 10 test SEC-B with BPSec enabled. | BPSec is not configured; not exercised. |
+| A35 | PBS-C02-T013 and PBS-DTN-MAP-02 Section 10 test SEC-B with BPSec enabled. | BPSec is not configured; not exercised. |
 | A36 | PBS-ENV-01 Section 12.2 requires periodic expiry checks of stored messages; the endpoints hold no envelopes after handing them to ION, where they are stored as bundles. | Endpoints apply the check immediately before `bp_send()` (as part of the Section 7.4 computation) and on receipt; storage expiry is governed by the bundle lifetime. |
 | A37 | PBS-ENV-01 Section 15 requires synchronized clocks but the deployment chooses the clock source; future Timestamps are not addressed. | All nodes share one host clock; clock source and uncertainty are recorded in REPORT.md (PBS-CONFORMANCE-02 Section 4). A Timestamp later than `now_us` gives a negative age and is not expired. |
+| A38 | PBS-MUX-01 Section 4.3 makes the bytes after the last of `frame_count` frames padding, to be ignored; a receiver MAY accept padding of any value. `frame_count` is covered by `auth_data`, but the receiver reads it before it knows whether the container has a Security frame. Lowering `frame_count` of a protected command in transit turns its Command and Security frames into padding: before this rule both endpoints accepted CMD-01 with `frame_count` 1 and 0 as unprotected data (no command ran; no security-failure record was written). | Rover policy (mission profile, PBS-SEC-B-01 Section 3): a container without a Security frame is rejected with `SEC_MISSING` when it has an Authority Context frame, padding after the last frame, or a Source ID bound to a provisioned key (`Earth-MCC`), as well as a Command frame (Section 6.6 R8, R8a). A header-only envelope (Size 0) is accepted at R6a. Senders write no padding, and Endpoint B signs every Earth-MCC envelope that has a payload. Vectors CMD-19 and CMD-20 (CMD-01 with `frame_count` 1 and 0), CMD-21 (unsigned Earth-MCC telemetry), CMD-22 (signed Earth-MCC telemetry, accepted), RX-20 (padding, rejected), RX-23 (Authority Context without a Security frame, rejected); S6 cases S6-23 and S6-24. |

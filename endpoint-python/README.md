@@ -138,9 +138,12 @@ Each delivered bundle payload goes through steps R1 to R14 of Section 6.6
 1. Envelope checks (R1 to R6): `LENGTH`, `MAGIC`, `CRC`, `PRIORITY`,
    `TTL_EXPIRED`, `LENGTH`.
 2. MUX container (R7): `MUX_VERSION`, `MUX_MALFORMED`.
-3. Data with no Command frame and no Security frame (R8) is accepted.
-4. A Command frame without a Security frame (R8a) is rejected with
-   `SEC_MISSING`.
+3. Without a Security frame: a Command frame (R8), an Authority Context
+   frame, padding after the last frame, or a Source ID bound to a
+   provisioned key (`Earth-MCC`) (R8a, SPEC-DIGEST A38) gives `SEC_MISSING`;
+   other data is accepted as unprotected (R8b). A header-only envelope is
+   accepted at R6a.
+4. With a Security frame, the steps below follow.
 5. Security frame (R9 to R9c): `SEC_MALFORMED`, `SEC_SUITE_UNKNOWN`,
    `SEC_KEY_UNKNOWN`.
 6. Authentication over `envelope[0 : 44 + Size - auth_len]` (R10):
@@ -193,6 +196,7 @@ endpoint-python/bin/rover --log a.jsonl --plan endpoint-python/plans/example.jso
 | `--keys`, `--policy` | `config/rover-keys.json`, `config/rover-policy.json` | |
 | `--reply-ping` | off | answer accepted PING commands |
 | `--ready-file` | none | created once `ipn:99.1` is open and the receiver thread runs |
+| `--log-hex-max` | 4096 | log `envelope_hex` for envelopes of at most this many bytes (S7 uses 65580, which logs every envelope) |
 
 The rover prints `rover: READY ...` when it is receiving. On SIGINT or SIGTERM
 it stops sending, interrupts the receiver, writes `run_end`, closes the
@@ -204,8 +208,10 @@ Plan format: the docstring of `pbs_endpoint_a/plan.py` and
 `plans/example.json`. Each item gives `at_s`, `count`, `interval_s`,
 `priority`, `ttl_s` (default per PBS-ENV-01 12.4: 0, 60, 60, 3600, 86400),
 `frame` (`telemetry`, `event`, `status`), `text`, `payload_bytes` (the exact
-envelope Size; 0 gives a header-only envelope), `ack_req`, `label` and
-`lifespan_override_s`.
+envelope Size; 0 gives a header-only envelope), `ack_req`, `label`,
+`lifespan_override_s` and `extra_frames` (frames placed before the main
+frame, for example an application-defined type 0x80; not combined with
+`payload_bytes`).
 
 Tools:
 
@@ -222,7 +228,10 @@ endpoint-python/bin/tool crosscheck endpoint-b.jsonl --own-log endpoint-a.jsonl
 that endpoint's own values. With `--own-log`, it also finds the other
 endpoint's `recv` record for each envelope Endpoint A sent, matching on
 (Source ID, Sequence, Timestamp), and compares the SHA-256 and the header
-bytes.
+bytes. Its exit status is 0 only when every `send` record of the other
+endpoint was decoded (a record without `envelope_hex` counts as a failure)
+with no field mismatch and, with `--own-log`, every envelope Endpoint A sent
+was delivered byte-identical.
 
 Test harness (Earth-side stand-in; signs with the TEST KEYS):
 
@@ -252,11 +261,12 @@ and `pytest`, it creates `build/venv-endpoint-python` and installs
 
 | File | Content |
 |---|---|
-| `tests/test_vectors.py` | one test per check of `docs/test-vectors.json`, 237 checks in all. ENV-01 to ENV-15 are built from their inputs and compared byte for byte, then parsed. RX-01 to RX-22 (receiver cases), LT-01 to LT-10 (lifetime cases), the class-of-service table and the CRC-32 check value are run. The 19 CMD messages that have inputs are rebuilt, with `auth_input` and `auth_data` compared. The 30 deliveries of SB-01 to SB-21 are run with the rover's provisioned keys. |
+| `tests/test_vectors.py` | one test per check of `docs/test-vectors.json`, 253 checks in all. ENV-01 to ENV-15 are built from their inputs and compared byte for byte, then parsed. RX-01 to RX-23 (receiver cases), LT-01 to LT-10 (lifetime cases), the class-of-service table and the CRC-32 check value are run. The 21 CMD messages that have inputs are rebuilt, with `auth_input` and `auth_data` compared. The 34 deliveries of SB-01 to SB-25 are run with the rover's provisioned keys. |
 | `tests/test_envelope.py` | header layout against an independent `struct`/`zlib` build; Source ID length refusal; Sequence start and wrap; TTL-before-length order; trailing byte; Size limit; lifetime rule and its bound |
-| `tests/test_secb.py` | key file and policy against the vectors and the label derivations; one-bit flips at every bit position 0 and 7 of every byte of CMD-01, all rejected; replay window; replay state not consumed by rejected commands; authorization of every Command frame; malformed or duplicate Authority Context; two Security frames; MUX errors |
+| `tests/test_secb.py` | key file and policy against the vectors and the label derivations; every single-bit flip of CMD-01 and CMD-02 (all eight bit positions of every byte), all rejected; `frame_count` of CMD-01 lowered to 2, 1 and 0, rejected with `SEC_MISSING`; rule R8a (Earth-MCC data, padding, Authority Context without a Security frame; header-only and rover data accepted); replay window; replay state not consumed by rejected commands; authorization of every Command frame; malformed or duplicate Authority Context; two Security frames; MUX errors |
+| `tests/test_tool.py` | `tool crosscheck` fails when a peer send record has no `envelope_hex` or an own envelope was not delivered |
 | `tests/test_rover.py` | rover logic with an in-memory transport: send records, `NOT_SENT` outcomes, command dispositions and `exec` records, PING reply, scheduler and receiver thread, stop |
-| `tests/test_plan.py`, `tests/test_jsonlog.py` | plan expansion; log fields against the tables of `docs/LOG-SCHEMA.md` |
+| `tests/test_plan.py`, `tests/test_jsonlog.py` | plan expansion, `extra_frames`; log fields against the tables of `docs/LOG-SCHEMA.md`, the hex limit option, `latency_us` null outside the signed 64-bit range |
 | `tests/test_pins.py` | PBS_LINK pin; ctypes layouts against ION's headers (needs gcc and a built ION) |
 | `tests/test_live_ion.py` | opt-in (`PBS_ION_LIVE=1`): the rover on the three ION nodes; see below |
 
@@ -266,9 +276,15 @@ Host: 4 vCPU Intel Xeon 2.80 GHz, Ubuntu 24.04, Python 3.13.16, pytest
 9.1.1, cryptography 50.0.1, PBS_LINK 0.1.4 (`d3b81d3`), ION
 `ion-open-source-4.2.0` (`568df88`) built by `ion/build_ion.sh`.
 
-- `endpoint-python/run_tests.sh`: 294 passed, 1 skipped (the live test), in
-  1.13 s. `bin/tool vectors`: 237 checks, 237 passed. From a fresh `git
-  clone` with ION not built, the script fetched PBS_LINK, created
+- After the round-2 changes (`docs/test-vectors.json` SHA-256
+  `51e09856...`): `endpoint-python/run_tests.sh` 318 passed, 1 skipped (the
+  live test), in 1.47 s; `bin/tool vectors` 253 checks, 253 passed;
+  `PBS_ION_LIVE=1 endpoint-python/run_tests.sh` 319 passed in 51.08 s. That
+  live run wrote to a pytest temporary directory that was not kept; the
+  details below are from runs 1 and 2.
+- Before the round-2 changes: `endpoint-python/run_tests.sh` 294 passed, 1
+  skipped, in 1.13 s; `bin/tool vectors` 237 checks, 237 passed. From a
+  fresh `git clone` with ION not built, the script fetched PBS_LINK, created
   `build/venv-endpoint-python`, and gave 292 passed, 3 skipped (the live
   test and the two ION library tests).
 - `PBS_ION_LIVE=1`: the live test passed in two runs. Run 1 ran the live
@@ -330,17 +346,17 @@ conformance claim and not a certification.
 |---|---|
 | PBS-CONFORMANCE-01 4.1 to 4.3, 5.1 (header, receive order, CRC-32) | ENV and RX vectors; `test_envelope.py` |
 | PBS-CONFORMANCE-01 7 (Sequence) | ENV-11, ENV-12; Sequence wrap test |
-| PBS-CONFORMANCE-01 8, statements 1 and 2 (TTL 30, TTL 0) | RX-01 to RX-05 with an injected clock |
+| PBS-CONFORMANCE-01 8, receiver side of statements 1 and 2 (TTL 30, TTL 0; no relay steps) | RX-01, RX-02, RX-04, RX-05 with an injected clock |
 | PBS-CONFORMANCE-01 9 (discard and continue) | receiver cases; live run (rejections followed by acceptances) |
-| PBS-CONFORMANCE-02 T002 (header unchanged over BPv7) | live run: 11 of 11 byte-identical |
-| PBS-CONFORMANCE-02 T004 (expiry) | RX-03, RX-04, RX-06, SB-11; live `TTL_EXPIRED` |
-| PBS-CONFORMANCE-02 T006 (tamper) | CMD-03 to CMD-06, bit-flip test; live tampered command |
-| PBS-CONFORMANCE-02 T007 (replay) | SB-10, SB-21; live replay |
-| PBS-CONFORMANCE-02 T008 (authorization) | SB-12 to SB-14; live `AUTHZ_DENIED` |
-| PBS-CONFORMANCE-02 T010 (one class per priority) | class-of-service table; `class_of_service` in every `send` record |
-| PBS-CONFORMANCE-02 T014 (unknown frame skipped) | RX-21, CMD-16 |
-| PBS-CONFORMANCE-02 T015 (traceable dispositions) | `recv` and `exec` records |
-| PBS-CONFORMANCE-02 T016 (TTL 0, no-expiry lifetime) | LT-08; live TTL 0 envelopes delivered |
+| PBS-C02-T002 (header unchanged over BPv7) | live run: 11 of 11 byte-identical |
+| PBS-C02-T004 (expiry) | RX-03, RX-04, RX-06, SB-11; live `TTL_EXPIRED` |
+| PBS-C02-T006 (tamper) | CMD-03 to CMD-06, CMD-19, CMD-20, bit-flip test; live tampered command |
+| PBS-C02-T007 (replay) | SB-10, SB-21; live replay |
+| PBS-C02-T008 (authorization) | SB-12 to SB-14; live `AUTHZ_DENIED` |
+| PBS-C02-T010 (one class per priority; partial) | class-of-service table; `class_of_service` in every `send` record |
+| PBS-C02-T014 (unknown frame skipped) | RX-21, CMD-16 |
+| PBS-C02-T015 (traceable dispositions) | `recv` and `exec` records |
+| PBS-C02-T016 (TTL 0, no-expiry lifetime) | LT-08; live TTL 0 envelopes delivered |
 
 ## Limits
 

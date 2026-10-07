@@ -207,6 +207,10 @@ def parse_header(env):
 # Reference receiver (SPEC-DIGEST.md Section 6.6)
 # ---------------------------------------------------------------------------
 
+# Source IDs (16 raw bytes) bound to a provisioned key (R8a, A38).
+BOUND_SOURCES = {src16(v[2]) for v in KEYS.values() if v[2]}
+
+
 class Receiver:
     def __init__(self):
         self.replay = {}   # (source16, key_id) -> [highest, set of accepted within window]
@@ -271,15 +275,19 @@ class Receiver:
         types = [t for t, _, _ in frames]
         has_cmd = FT_COMMAND in types
         secs = [fr for fr in frames if fr[0] == FT_SEC]
-        # R8: unprotected data
-        if not secs and not has_cmd:
+        # R8, R8a, R8b: no Security frame. A Command frame (R8), an Authority
+        # Context frame, padding, or a Source ID bound to a provisioned key
+        # (R8a, A38) requires one; otherwise unprotected data (R8b).
+        if not secs:
+            if has_cmd:
+                return dict(result="REJECT", reason="SEC_MISSING")
+            if FT_AUTH in types or padding or bytes(env[8:24]) in BOUND_SOURCES:
+                return dict(result="REJECT", reason="SEC_MISSING")
             return dict(result="ACCEPT", reason="OK",
                         frames=[[t, h(v)] for t, _, v in frames],
                         skipped_frame_types=[t for t in types if t not in (
                             FT_TELEMETRY, FT_STATUS, FT_EVENT)],
                         padding=padding)
-        if has_cmd and not secs:
-            return dict(result="REJECT", reason="SEC_MISSING")
         # R9: SEC frame position and structure
         if len(secs) != 1 or frames[-1][0] != FT_SEC or padding != 0:
             return dict(result="REJECT", reason="SEC_MALFORMED")
@@ -530,14 +538,20 @@ def main():
     rcase("RX-19", "frame_count 2 with one frame present",
           ["PBS-MUX-01 4.2"], tlm_env(mux([(FT_TELEMETRY, b"OK")], count=2)), T + 1 * SEC,
           ("REJECT", "MUX_MALFORMED"))
-    rcase("RX-20", "Two padding bytes after the last frame of an unprotected container: accepted, padding ignored",
+    rcase("RX-20", "Two padding bytes after the last frame of a container without a Security frame: "
+          "rejected, padding requires a Security frame (R8a, A38)",
           ["PBS-MUX-01 4.3"], tlm_env(mux([(FT_TELEMETRY, b"OK")], padding=b"\xff\xff")), T + 1 * SEC,
-          ("ACCEPT", "OK"))
+          ("REJECT", "SEC_MISSING"))
     rcase("RX-21", "Unknown frame type 0x55 before a Telemetry frame: accepted, 0x55 skipped",
-          ["PBS-MUX-01 4.2", "PBS-MUX-01 10", "PBS-CONFORMANCE-02 T014"],
+          ["PBS-MUX-01 4.2", "PBS-MUX-01 10", "PBS-C02-T014"],
           tlm_env(mux([(0x55, b"\x00\x01\x02"), (FT_TELEMETRY, b"OK")])), T + 1 * SEC, ("ACCEPT", "OK"))
     rcase("RX-22", "MUX container with frame_count 0 (2-byte payload): accepted, no frames",
           ["PBS-MUX-01 4.1"], tlm_env(mux([])), T + 1 * SEC, ("ACCEPT", "OK"))
+    rcase("RX-23", "Authority Context frame and a Telemetry frame, no Security frame, Source ID Rover-Alpha: "
+          "rejected (R8a, A38)",
+          ["PBS-AUTH-01 2", "PBS-SEC-B-01 5"],
+          tlm_env(mux([(FT_AUTH, auth_value()), (FT_TELEMETRY, b"OK")])), T + 1 * SEC,
+          ("REJECT", "SEC_MISSING"))
 
     # ---------------------------------------------------------------------
     # PBS-SEC-B-01 protected commands
@@ -554,7 +568,8 @@ def main():
         if with_auth:
             frames.append((FT_AUTH, auth_value(role=role, epoch=epoch)))
         frames.extend(extra_frames_before)
-        frames.append((FT_COMMAND, cmd))
+        if cmd is not None:
+            frames.append((FT_COMMAND, cmd))
         al = auth_len if auth_len is not None else SUITE_AUTH_LEN.get(suite, 32)
         if signer_secret is None:
             signer_secret = KEYS[key_id][1] if key_id in KEYS else ROGUE[key_id][1]
@@ -599,24 +614,24 @@ def main():
         sec_msgs[mid] = (m, bytes(env))
         return bytes(env)
 
-    R_AUTH = ["PBS-SEC-B-01 4", "PBS-SEC-B-01 5", "PBS-SEC-B-01 6 (REQ-001, REQ-002)"]
+    R_AUTH = ["PBS-SEC-B-01 4", "PBS-SEC-B-01 5", "PBS-SECB-REQ-001", "PBS-SECB-REQ-002"]
     command("CMD-01", "Valid command, suite 0xFF02 (Ed25519), role FLIGHT-OPS, DRIVE 10", secseq=1,
-            refs=R_AUTH + ["PBS-AUTH-01 2", "PBS-SEC-B-01 6 (REQ-005, REQ-006)"])
+            refs=R_AUTH + ["PBS-AUTH-01 2", "PBS-SECB-REQ-005", "PBS-SECB-REQ-006"])
     command("CMD-02", "Valid command, suite 0xFF01 (HMAC-SHA-256), SET_HEATER ON", cmd=b"SET_HEATER ON",
             suite=SUITE_HMAC, key_id=b"TEST-HMAC-01", secseq=1, refs=R_AUTH + ["PBS-AUTH-01 2"])
     off_cmd = 44 + 2 + 3 + len(auth_value()) + 3   # start of the COMMAND frame value in CMD-01
     tamper("CMD-03", "CMD-01 with command byte changed (DRIVE 10 -> DRIVE 90); header and CRC32 unchanged",
-           "CMD-01", lambda b: (b.__setitem__(off_cmd + 6, ord("9")), b)[1], R_AUTH + ["PBS-CONFORMANCE-02 T006"])
+           "CMD-01", lambda b: (b.__setitem__(off_cmd + 6, ord("9")), b)[1], R_AUTH + ["PBS-C02-T006"])
     tamper("CMD-04", "CMD-01 with Priority raised 1 -> 0 and CRC32 recomputed",
            "CMD-01", lambda b: bytearray(recrc(bytes((b.__setitem__(1, 0), b)[1]))),
-           R_AUTH + ["PBS-SEC-B-01 6 (REQ-004)", "PBS-PRIO-01 10"])
+           R_AUTH + ["PBS-SECB-REQ-004", "PBS-PRIO-01 10"])
     tamper("CMD-05", "CMD-01 with TTL raised 30 -> 3600 and CRC32 recomputed",
            "CMD-01", lambda b: bytearray(recrc(bytes((b.__setitem__(slice(36, 40), (3600).to_bytes(4, "big")), b)[1]))),
            R_AUTH + ["PBS-SEC-B-01 5"])
     sseq_off = len(sec_msgs["CMD-01"][1]) - 64 - len(b"TEST-ED25519-01") - 8
     tamper("CMD-06", "CMD-01 with security_sequence changed 1 -> 2 (replay evasion attempt)",
            "CMD-01", lambda b: (b.__setitem__(slice(sseq_off, sseq_off + 8), (2).to_bytes(8, "big")), b)[1],
-           R_AUTH + ["PBS-SEC-B-01 6 (REQ-003)"])
+           R_AUTH + ["PBS-SECB-REQ-003"])
     command("CMD-07", "Signed with a key not provisioned at the rover (TEST-ED25519-ROGUE seed) but labelled key_id TEST-ED25519-01",
             signer_secret=ROGUE[b"TEST-ED25519-ROGUE"][1], secseq=1, refs=R_AUTH)
     command("CMD-08", "Suite 0xFF01, signed with TEST-HMAC-ROGUE key but labelled key_id TEST-HMAC-01",
@@ -625,31 +640,48 @@ def main():
     command("CMD-09", "key_id TEST-ED25519-ROGUE, not provisioned at the rover",
             key_id=b"TEST-ED25519-ROGUE", secseq=1, refs=["PBS-SEC-B-01 7"])
     command("CMD-10", "Role SCIENCE-OPS issuing DRIVE 10 (operation not permitted for the role)",
-            role=b"SCIENCE-OPS", secseq=1, refs=["PBS-AUTH-01 3 (REQ-003, REQ-006)", "PBS-CONFORMANCE-02 T008"])
+            role=b"SCIENCE-OPS", secseq=1, refs=["PBS-AUTH-REQ-003", "PBS-AUTH-REQ-006", "PBS-C02-T008"])
     command("CMD-11", "Role SCIENCE-OPS issuing CAPTURE_IMAGE NAVCAM (permitted)", cmd=b"CAPTURE_IMAGE NAVCAM",
-            role=b"SCIENCE-OPS", secseq=1, refs=["PBS-AUTH-01 3", "PBS-CONFORMANCE-02 T008"])
+            role=b"SCIENCE-OPS", secseq=1, refs=["PBS-AUTH-01 3", "PBS-C02-T008"])
     command("CMD-12", "policy_epoch 2 (rover policy epoch is 1)", epoch=2, secseq=1,
-            refs=["PBS-AUTH-01 3 (REQ-005)", "PBS-CONFORMANCE-02 T008"])
+            refs=["PBS-AUTH-REQ-005", "PBS-C02-T008"])
     command("CMD-13", "Command with Authority Context and no Security frame", with_sec=False,
-            refs=["PBS-SEC-B-01 6 (REQ-005)"])
+            refs=["PBS-SECB-REQ-005"])
     command("CMD-14", "Signed command with no Authority Context frame", with_auth=False, secseq=1,
-            refs=["PBS-SEC-B-01 6 (REQ-005)", "PBS-AUTH-01 3 (REQ-002)"])
+            refs=["PBS-SECB-REQ-005", "PBS-AUTH-REQ-002"])
     command("CMD-15", "suite_id 0xFF7F (not defined in the demo profile), HMAC tag",
             suite=0xFF7F, key_id=b"TEST-HMAC-01", auth_len=32, secseq=1, refs=["PBS-SEC-B-01 3"])
     command("CMD-16", "Valid command carrying an application-defined frame 0x80 before the command frame",
             extra_frames_before=((0x80, b"\xde\xad\xbe\xef"),), cmd=b"PING", secseq=1,
-            refs=R_AUTH + ["PBS-MUX-01 5.9", "PBS-CONFORMANCE-02 T014"])
+            refs=R_AUTH + ["PBS-MUX-01 5.9", "PBS-C02-T014"])
     command("CMD-17", "Validly signed with the Earth key, Source ID Rover-Alpha (key bound to Earth-MCC)",
-            source=ROVER, secseq=1, refs=["PBS-AUTH-01 3 (REQ-003)"])
+            source=ROVER, secseq=1, refs=["PBS-AUTH-REQ-003"])
     tamper("CMD-18", "CMD-01 with two 0x00 padding bytes appended and Size and CRC32 updated (Security frame no longer ends the payload)",
            "CMD-01", lambda b: bytearray(recrc(bytes((b.__setitem__(slice(32, 36), (len(b) - 44 + 2).to_bytes(4, "big")), b)[1]) + b"\0\0")),
            ["PBS-SEC-B-01 5", "PBS-MUX-01 4.3"])
+    tamper("CMD-19", "CMD-01 with frame_count lowered 3 -> 1 (payload byte 1); header and CRC32 unchanged. "
+           "The Command and Security frames become padding (PBS-MUX-01 4.3)",
+           "CMD-01", lambda b: (b.__setitem__(45, 1), b)[1],
+           ["PBS-MUX-01 4.3", "PBS-SECB-REQ-001", "PBS-SECB-REQ-002", "PBS-C02-T006"])
+    tamper("CMD-20", "CMD-01 with frame_count lowered 3 -> 0 (payload byte 1); header and CRC32 unchanged. "
+           "All frames become padding (PBS-MUX-01 4.3)",
+           "CMD-01", lambda b: (b.__setitem__(45, 0), b)[1],
+           ["PBS-MUX-01 4.3", "PBS-SECB-REQ-001", "PBS-SECB-REQ-002", "PBS-C02-T006"])
     # Replay-window sequence (Ed25519)
     for s in (5, 3, 70, 7, 6):
         command("CMD-W%02d" % s, "Valid command, security_sequence %d (replay-window case)" % s,
-                cmd=b"PING", secseq=s, refs=["PBS-SEC-B-01 4", "PBS-SEC-B-01 6 (REQ-003)"])
+                cmd=b"PING", secseq=s, refs=["PBS-SEC-B-01 4", "PBS-SECB-REQ-003"])
     command("CMD-W00", "Valid signature, security_sequence 0", cmd=b"PING", secseq=0,
-            refs=["PBS-SEC-B-01 6 (REQ-003)"])
+            refs=["PBS-SECB-REQ-003"])
+    # Messages without a Command frame (R8a and R11a, A38)
+    command("CMD-21", "Unsigned telemetry from Earth-MCC (Source ID bound to the test keys): one Telemetry frame, "
+            "no Security frame", cmd=None, with_auth=False, with_sec=False, priority=2, ttl=60,
+            extra_frames_before=((FT_TELEMETRY, b"TLM MCC CLOCK SYNC"),),
+            refs=["PBS-SEC-B-01 2", "PBS-SECB-REQ-001"])
+    command("CMD-22", "Signed telemetry from Earth-MCC (protected data, no Command frame), suite 0xFF02",
+            cmd=None, with_auth=False, secseq=1, priority=2, ttl=60,
+            extra_frames_before=((FT_TELEMETRY, b"TLM MCC CLOCK SYNC"),),
+            refs=R_AUTH)
 
     NOW = T + 2 * SEC
     case_defs = [
@@ -675,6 +707,13 @@ def main():
         ("SB-18", "Unknown application-defined frame inside a protected command", [("CMD-16", NOW, "ACCEPT", "OK")]),
         ("SB-19", "Source ID not bound to the key", [("CMD-17", NOW, "REJECT", "AUTHZ_DENIED")]),
         ("SB-20", "Padding after the Security frame", [("CMD-18", NOW, "REJECT", "SEC_MALFORMED")]),
+        ("SB-22", "frame_count lowered to 1: Command and Security frames read as padding (A38)",
+         [("CMD-19", NOW, "REJECT", "SEC_MISSING")]),
+        ("SB-23", "frame_count lowered to 0: all frames read as padding (A38)",
+         [("CMD-20", NOW, "REJECT", "SEC_MISSING")]),
+        ("SB-24", "Unsigned telemetry from a Source ID bound to a provisioned key (A38)",
+         [("CMD-21", NOW, "REJECT", "SEC_MISSING")]),
+        ("SB-25", "Signed telemetry from Earth-MCC (protected data)", [("CMD-22", NOW, "ACCEPT", "OK")]),
         ("SB-21", "Replay window of 64 (deliveries in order, one receiver state)",
          [("CMD-W05", NOW, "ACCEPT", "OK"), ("CMD-W03", NOW, "ACCEPT", "OK"),
           ("CMD-W03", NOW, "REJECT", "SEC_REPLAY"), ("CMD-W70", NOW, "ACCEPT", "OK"),
@@ -777,7 +816,9 @@ def main():
         envelopes=vectors,
         receiver_cases=rcases,
         ttl_note=("Expired iff TTL > 0 and now_us - Timestamp > TTL * 1000000 (SPEC-DIGEST.md 2.4). "
-                  "RX-01..RX-06 cover PBS-ENV-01 12.5 and PBS-CONFORMANCE-01 Section 8."),
+                  "RX-01..RX-06 cover PBS-ENV-01 12.5. RX-01, RX-02, RX-04 and RX-05 are the receiver-side "
+                  "TTL checks at the clock values of PBS-CONFORMANCE-01 Section 8 statements 1 and 2; the "
+                  "relay store-and-forward steps of those statements are not covered."),
         lifetime_cases=life,
         cos_map=[dict(priority=p, name=n, dtn_class=c, ion_class_of_service=ion, ion_ordinal=0)
                  for p, n, c, ion in [(0, "CRITICAL", "Expedited", 2), (1, "HIGH", "Expedited", 2),
@@ -813,7 +854,12 @@ def main():
                               policy_epoch=POLICY_EPOCH,
                               roles={k.decode(): v for k, v in ROLE_PERMS.items()},
                               replay_window=REPLAY_WINDOW,
-                              replay_state_key="(Source ID 16 raw bytes, key_id)"),
+                              replay_state_key="(Source ID 16 raw bytes, key_id)",
+                              security_frame_required=(
+                                  "a Command frame; an Authority Context frame; padding after the last "
+                                  "frame; a Source ID bound to a provisioned key (SPEC-DIGEST.md 6.6 R8 and "
+                                  "R8a, A38). A header-only envelope (Size 0) is accepted at R6a."),
+                              bound_source_ids=sorted({v[2] for v in KEYS.values() if v[2]})),
             messages=[m for m, _ in sec_msgs.values()],
             cases=sb_cases),
     )

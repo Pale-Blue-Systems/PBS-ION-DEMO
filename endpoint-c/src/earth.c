@@ -396,6 +396,17 @@ static int apply_tamper(earth_item_t *o, const char *mode, char *err, size_t eca
     } else if (strcmp(mode, "crc") == 0) {
         env[0x2B] ^= 0x01;
         rc = 0;
+    } else if (strcmp(mode, "frame_count") == 0 || strcmp(mode, "frame_count_0") == 0) {
+        /* Lower the MUX frame_count (payload byte 1) to 1 or 0; the frames
+         * after it become padding (PBS-MUX-01 4.3). Header and CRC32
+         * unchanged (digest A38, vectors CMD-19 and CMD-20). */
+        if (o->len >= PBS_HEADER_SIZE + 2u) {
+            uint8_t want = strcmp(mode, "frame_count") == 0 ? 1 : 0;
+            if (env[PBS_HEADER_SIZE + 1] > want) {
+                env[PBS_HEADER_SIZE + 1] = want;
+                rc = 0;
+            }
+        }
     } else {
         seterr(err, ecap, "unknown tamper mode \"%s\"", mode);
         free(m);
@@ -940,6 +951,18 @@ static void log_suite(jw_t *w, uint16_t suite)
     jw_kstr(w, "suite_id", s);
 }
 
+static size_t g_hex_max = EARTH_HEX_MAX;
+
+void earth_log_set_hex_max(size_t n)
+{
+    g_hex_max = n;
+}
+
+size_t earth_log_hex_max(void)
+{
+    return g_hex_max;
+}
+
 /* Section 4 fields except frame_types. */
 static void log_env_core(jw_t *w, const uint8_t *buf, size_t avail, size_t total,
                          const uint8_t *sha, int have_hdr, const pbs_header_t *h)
@@ -974,7 +997,7 @@ static void log_env_core(jw_t *w, const uint8_t *buf, size_t avail, size_t total
         jw_khex(w, "envelope_sha256", sha, 32);
     else
         jw_knull(w, "envelope_sha256");
-    if (avail == total && total <= EARTH_HEX_MAX)
+    if (avail == total && total <= g_hex_max)
         jw_khex(w, "envelope_hex", buf, total);
     else
         jw_knull(w, "envelope_hex");
@@ -1105,7 +1128,7 @@ static void log_send_record(jw_t *w, const earth_logctx_t *lc, const earth_item_
         jw_kint(w, "x_lifetime_bound_ms", it->lt.bound_ms);
     else
         jw_knull(w, "x_lifetime_bound_ms");
-    if (plan)   /* the dry run also gives the bytes above EARTH_HEX_MAX */
+    if (plan)   /* the dry run also gives the bytes above the hex limit */
         jw_khex(w, "x_envelope_hex", it->env, it->len);
     jw_obj_end(w);
 }
@@ -1192,8 +1215,12 @@ void earth_log_recv(jw_t *w, const earth_logctx_t *lc, const pbs_rx_t *rx, const
         jw_kbool(w, "eid_match", strcmp(exp, meta->bundle_source_eid) == 0);
     else
         jw_knull(w, "eid_match");
-    if (rx->have_header)
-        jw_kint(w, "latency_us", recv_us - (int64_t)rx->hdr.timestamp_us);
+    /* latency_us = t_us - Timestamp, null when the difference is outside
+     * the signed 64-bit range (a Timestamp of 2^63 or more). Computed in
+     * 128 bits: the 64-bit subtraction would overflow. */
+    __int128 lat = (__int128)recv_us - (__int128)rx->hdr.timestamp_us;
+    if (rx->have_header && lat >= INT64_MIN && lat <= INT64_MAX)
+        jw_kint(w, "latency_us", (int64_t)lat);
     else
         jw_knull(w, "latency_us");
     const uint8_t *payload = buf + PBS_HEADER_SIZE;

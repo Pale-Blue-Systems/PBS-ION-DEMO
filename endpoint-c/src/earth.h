@@ -112,7 +112,12 @@ uint32_t earth_idset_add(earth_idset_t *s, const pbs_header_t *h);
 
 #define EARTH_LOG_SCHEMA "pbs-ion-demo-log/1"
 #define EARTH_IMPL       "endpoint-c 0.1.0"
-#define EARTH_HEX_MAX    4096           /* envelope_hex up to this length */
+#define EARTH_HEX_MAX    4096           /* default: envelope_hex up to this length */
+
+/* envelope_hex is logged for envelopes of at most n bytes (default
+ * EARTH_HEX_MAX; pbs_earth --log-hex-max). */
+void   earth_log_set_hex_max(size_t n);
+size_t earth_log_hex_max(void);
 
 typedef struct {
     const char *endpoint;               /* "B" */

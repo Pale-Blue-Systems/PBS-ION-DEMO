@@ -94,13 +94,19 @@ def cmd_crosscheck(args):
     """For every ``send`` record of the peer log that carries ``envelope_hex``:
     decode it with Endpoint A and compare with the peer's own fields. With
     ``--own-log``: for every envelope Endpoint A sent, find the peer's ``recv``
-    record with the same identity and compare the bytes (SHA-256, header)."""
+    record with the same identity and compare the bytes (SHA-256, header).
+
+    Exit status 0 only when every peer send record was decoded (a record
+    without ``envelope_hex`` counts as a failure) with no field mismatch and,
+    with ``--own-log``, every envelope Endpoint A sent was delivered
+    byte-identical."""
     peer = _read_jsonl(args.peer_log)
-    report = {"peer_log": args.peer_log, "decoded": 0, "decode_mismatch": [],
-              "no_hex": 0}
+    report = {"peer_log": args.peer_log, "peer_send_records": 0, "decoded": 0,
+              "decode_mismatch": [], "no_hex": 0}
     for r in peer:
         if r.get("event") != "send":
             continue
+        report["peer_send_records"] += 1
         if not r.get("envelope_hex"):
             report["no_hex"] += 1
             continue
@@ -130,7 +136,13 @@ def cmd_crosscheck(args):
                 report["byte_identical"] += 1
             else:
                 report["byte_mismatch"].append({"sequence": s["sequence"]})
-    ok = not report["decode_mismatch"] and not report.get("byte_mismatch")
+    # Every peer send record decoded (none without envelope_hex), no field
+    # differs, and with --own-log every envelope Endpoint A sent was found in
+    # the peer's recv records with the same bytes.
+    ok = (not report["decode_mismatch"] and report["no_hex"] == 0
+          and report["decoded"] == report["peer_send_records"])
+    if args.own_log:
+        ok = ok and not report["byte_mismatch"] and report["delivered"] == report["own_sent"]
     report["ok"] = ok
     text = json.dumps(report, indent=1)
     if args.out:
