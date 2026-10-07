@@ -269,7 +269,7 @@ Host: 4 vCPU Intel Xeon 2.80 GHz, Ubuntu 24.04, Python 3.13.16, pytest
 - `endpoint-python/run_tests.sh`: 294 passed, 1 skipped (the live test), in
   1.13 s. `bin/tool vectors`: 237 checks, 237 passed. From a fresh `git
   clone` with ION not built, the script fetched PBS_LINK, created
-  `build/venv-endpoint-python`, and gave 291 passed, 3 skipped (the live
+  `build/venv-endpoint-python`, and gave 292 passed, 3 skipped (the live
   test and the two ION library tests).
 - `PBS_ION_LIVE=1`: the live test passed in two runs. Run 1 ran the live
   test alone (49.0 s), before the pre-attach node check was added. Run 2
