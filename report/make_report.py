@@ -25,6 +25,7 @@ import datetime
 import hashlib
 import json
 import os
+import re
 import statistics
 import sys
 
@@ -48,8 +49,12 @@ def sha256_file(path):
 
 
 def q(values, p):
+    """Quantile by nearest rank; the median (p = 0.5) is statistics.median,
+    as in scenarios/evaluate.py, so both give the same median."""
     if not values:
         return None
+    if p == 0.5:
+        return statistics.median(values)
     v = sorted(values)
     k = max(0, min(len(v) - 1, int(round(p * (len(v) - 1)))))
     return v[k]
@@ -577,6 +582,12 @@ def main(argv=None):
     L.append(table(["Item", "Value"], env_rows))
     L.append("")
     ck = os.path.join(res, "selfcheck", "checks.json")
+    run_root = ROOT
+    rl = os.path.join(res, "run_demo.log")
+    if os.path.exists(rl):
+        m = re.search(r"run_demo: repository (\S+), results", open(rl, errors="replace").read())
+        if m:
+            run_root = m.group(1)
     if os.path.exists(ck):
         checks = json.load(open(ck))
         summary["selfchecks"] = checks
@@ -584,7 +595,7 @@ def main(argv=None):
                  % results_rel)
         L.append("")
         L.append(table(["Check", "Command", "Result", "Duration (s)", "Last output line"],
-                       [[c["name"], "`%s`" % c["command"].replace(ROOT + "/", ""),
+                       [[c["name"], "`%s`" % c["command"].replace(run_root + "/", "").replace(ROOT + "/", ""),
                          "pass" if c["exit"] == 0 else "FAIL (exit %d)" % c["exit"],
                          "%.1f" % c["duration_s"], c["last_line"][:120]] for c in checks]))
         L.append("")
@@ -605,7 +616,6 @@ def main(argv=None):
         import compare_runs
         others = [compare_runs.Run(*compare_runs.parse_run_arg(c)) for c in args.compare]
         L.append(compare_runs.render([compare_runs.Run(args.name, res)] + others))
-        L.append("")
     L.append("## Not exercised")
     L.append("")
     L.append("PBS-CONFORMANCE-02 T001 (IP carriage), T003 (provider or path transition), T005 "
@@ -618,7 +628,9 @@ def main(argv=None):
     L.append("")
     L.append("`./run_demo.sh` from a clean checkout builds ION at the pinned commit into "
              "`build/`, builds both endpoints, runs S1 to S7, and rewrites `results/` and this "
-             "file. `./run_demo.sh S4` runs one scenario. See README.md.")
+             "file. `./run_demo.sh S4` runs one scenario. See README.md. Every run made of this "
+             "demo, with its result, is listed in scenarios/README.md; every change to a pass/fail "
+             "criterion made after a run is listed, with its reason, in docs/CRITERIA-CHANGES.md.")
     L.append("")
     with open(args.out, "w") as fh:
         fh.write("\n".join(L))

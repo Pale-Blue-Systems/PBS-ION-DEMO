@@ -23,6 +23,7 @@ import argparse
 import json
 import os
 import re
+import statistics
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -34,8 +35,12 @@ PRIO = collect.PRIO_NAME
 
 
 def q(values, p):
+    """Quantile by nearest rank; the median (p = 0.5) is statistics.median,
+    as in scenarios/evaluate.py, so both give the same median."""
     if not values:
         return None
+    if p == 0.5:
+        return statistics.median(values)
     v = sorted(values)
     k = max(0, min(len(v) - 1, int(round(p * (len(v) - 1)))))
     return v[k]
@@ -183,7 +188,9 @@ def render(runs, heading_level=2):
 
     L.append("%s# Latency per direction and priority" % H)
     L.append("")
-    L.append("Latency is the receive time minus the envelope Timestamp (host clock), in seconds.")
+    L.append("Latency is the receive time minus the Timestamp in the received envelope (host "
+             "clock), in seconds. An envelope whose Timestamp was altered after signing (S6 "
+             "tamper case S6-06, rejected) shows a shifted, possibly negative, latency.")
     L.append("")
     rows = []
     for s in common:
