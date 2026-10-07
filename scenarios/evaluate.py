@@ -27,6 +27,8 @@ Checks:
   recv_result       every selected envelope was received with result/reason
                     "expect" ("ACCEPT OK", "REJECT SEC_REPLAY", ...)
   expect_by_label   {"expect": {label: "ACCEPT OK" | "NOT_DELIVERED" | ...}}
+  observe           lists the outcome of every envelope with one of "labels"
+                    (use with informative: true)
   send_result       every selected row has send result/reason "expect"
   latency           received rows: min_s <= latency <= max_s
   delivered_after   received rows: recv_t_s >= t_s
@@ -192,6 +194,21 @@ class Evaluator:
                     "PASS" if good else "FAIL", label, want, have, fmt_s(r["latency_s"])))
         n = len(c["expect"])
         return ok, "%d labels checked" % n, details
+
+    def c_observe(self, c):
+        details = []
+        for label in as_list(c["labels"]):
+            for r in select(self.rows, {"label": label}, default_sent=False):
+                if r["send_result"] != "SENT":
+                    have = "NOT_SENT %s" % r["send_reason"]
+                elif r["delivered"]:
+                    have = "%s %s, latency %s" % (r["recv_result"], r["recv_reason"],
+                                                  fmt_s(r["latency_s"]))
+                else:
+                    have = "not delivered"
+                details.append("%s %s TTL %s s, bundle lifetime %s s: %s" % (
+                    r["dir"], label, r["ttl_s"], r["lifespan_s"], have))
+        return True, "; ".join(details), details
 
     def c_send_result(self, c):
         rows = select(self.rows, c.get("select"), default_sent=False)

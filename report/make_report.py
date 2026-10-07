@@ -223,7 +223,9 @@ def s5_rows(run):
                 else:
                     k = "not delivered"
                 res[k] = res.get(k, 0) + 1
-            out.append([lab, direction, r0["ttl_s"], ", ".join(sorted({str(r["lifespan_s"]) for r in sel})),
+            out.append([lab, direction, r0["ttl_s"],
+                        ", ".join(sorted({"not sent" if r["lifespan_s"] is None else str(r["lifespan_s"])
+                                          for r in sel})),
                         r0["lifespan_rule"] or "", len(sel), "; ".join("%s x%d" % kv for kv in res.items())])
     return out
 

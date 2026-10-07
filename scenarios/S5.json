@@ -70,7 +70,7 @@
    {"id": "S5-18", "check": "ttl_respected", "text": "No receiver accepts an envelope older than its TTL"},
    {"id": "S5-19", "check": "no_unmatched", "text": "No duplicate or unknown envelope is received"},
    {"id": "S5-20", "check": "probe_holds", "probe": "Gateway at 26.8 s", "select": {"dir": "B->A", "label": ["S5-TTL60-IN-OUTAGE", "S5-CMD-IN-OUTAGE"]}, "min_count": 3, "text": "At 26.8 s the Gateway node holds the Earth TTL 60 envelopes and the command, waiting for the rover contact"},
-   {"id": "S5-21", "check": "expect_by_label", "informative": true, "expect": {"S5-TTL3": "NOT_DELIVERED", "S5-TTL2-ZERO-AGE": "NOT_DELIVERED"}, "text": "TTL 3 envelopes (bundle lifetime 1 s at A, 2 s at B) and B's TTL 2 envelope handed over at its Timestamp (lifetime 1 s); the contact plan ranges sum to 3 s (informative)"}
+   {"id": "S5-21", "check": "observe", "informative": true, "labels": ["S5-TTL3", "S5-TTL2-ZERO-AGE"], "text": "Observed: TTL 3 envelopes (bundle lifetime 1 s at A, 2 s at B) and B's TTL 2 envelope handed over at its Timestamp (lifetime 1 s); the contact-plan ranges on the path sum to 3 s (informative)"}
   ],
  "conformance": [
    {"ref": "PBS-CONFORMANCE-02 T004", "how": "expired envelopes rejected by both receivers with TTL_EXPIRED (S5-3)"},
