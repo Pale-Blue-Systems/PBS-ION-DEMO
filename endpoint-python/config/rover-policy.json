@@ -1,0 +1,18 @@
+{
+ "description": "Rover authorization policy (docs/SPEC-DIGEST.md Section 5; docs/test-vectors.json sec_b.rover_policy).",
+ "authority_id_type": 3,
+ "authority_id": "PBS-DEMO-MCC",
+ "policy_epoch": 1,
+ "roles": {
+  "FLIGHT-OPS": [
+   "PING",
+   "SET_HEATER",
+   "DRIVE",
+   "CAPTURE_IMAGE",
+   "SET_MODE"
+  ],
+  "SCIENCE-OPS": [
+   "CAPTURE_IMAGE"
+  ]
+ }
+}

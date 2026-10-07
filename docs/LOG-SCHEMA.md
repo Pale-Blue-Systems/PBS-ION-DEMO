@@ -37,7 +37,7 @@ on one host and read the same clock (SPEC-DIGEST.md A37).
 | `schema` | string | `pbs-ion-demo-log/1` |
 | `event` | string | `run_start`, `send`, `recv`, `exec` or `run_end` (Sections 4 to 8) |
 | `t_us` | int | time of the event (defined per event type below) |
-| `endpoint` | string | `A` (rover) or `B` (Earth) |
+| `endpoint` | string | `A` (rover) or `B` (Earth); `H` for Endpoint A's test harness (`endpoint-python/pbs_endpoint_a/harness.py`, an Earth-side stand-in and fault injector, not Endpoint B) |
 | `node_eid` | string | EID the endpoint opened: `ipn:99.1` (A) or `ipn:23.1` (B) |
 | `scenario` | string or null | scenario label given on the command line, e.g. `S1` |
 
@@ -80,7 +80,7 @@ Envelope fields (Section 4), plus:
 | `result` | string | `SENT` (`bp_send()` returned 1) or `NOT_SENT` |
 | `reason` | string | `OK`, or why it was not sent (Section 9) |
 | `dest_eid` | string | destination EID passed to `bp_send()` |
-| `lifespan_s` | int or null | lifetime in seconds passed to `bp_send()`; `null` when not sent |
+| `lifespan_s` | int or null | lifetime in seconds passed to `bp_send()`; `null` when `bp_send()` was not called |
 | `lifespan_rule` | string | `DTN-MAP-01-6.1` (computed per SPEC-DIGEST.md 7.4) or `OVERRIDE` (fault injection: a lifetime chosen by the operator, not conformant to PBS-DTN-MAP-01 6.1) |
 | `class_of_service` | int | ION class of service passed to `bp_send()` (SPEC-DIGEST.md 7.5) |
 | `ordinal` | int | ION ordinal (0) |

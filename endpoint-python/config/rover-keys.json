@@ -1,0 +1,22 @@
+{
+ "warning": "TEST KEYS. Derived from public labels (SHA-256 of the label below). Anyone can recompute them. Not for operational use.",
+ "description": "Verification keys provisioned at the rover (Endpoint A). The Ed25519 entry is a public key only; the rover holds no Ed25519 signing key. HMAC-SHA-256 is symmetric, so the rover holds the HMAC secret. Values equal docs/test-vectors.json sec_b.test_keys.",
+ "keys": [
+  {
+   "key_id": "TEST-ED25519-01",
+   "suite": "0xFF02",
+   "public_key_hex": "462d874ceff2700bf1e04fc01405357c2980f342b26665c3755f5d016677f01f",
+   "derivation": "public key of seed = SHA-256(\"PBS-ION-DEMO TEST KEY TEST-ED25519-01 (NOT FOR OPERATIONAL USE)\")",
+   "bound_source_id": "Earth-MCC",
+   "bound_authority": "PBS-DEMO-MCC"
+  },
+  {
+   "key_id": "TEST-HMAC-01",
+   "suite": "0xFF01",
+   "key_hex": "18153f8a4d36b10546eb14d5a06da99ed25f6c51f86a8c00ece7ffb8c5a842e6",
+   "derivation": "SHA-256(\"PBS-ION-DEMO TEST KEY TEST-HMAC-01 (NOT FOR OPERATIONAL USE)\")",
+   "bound_source_id": "Earth-MCC",
+   "bound_authority": "PBS-DEMO-MCC"
+  }
+ ]
+}

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Run pbs_endpoint_a.harness with PBS_LINK 0.1.4 on the path (fetched on first use).
+set -euo pipefail
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -z "${PBS_LINK_DIR:-}" && ! -f "$HERE/../build/pbs-link/PBS_LINK/core.py" ]]; then
+  "$HERE/fetch_pbs_link.sh" >/dev/null
+fi
+export PYTHONPATH="$HERE${PYTHONPATH:+:$PYTHONPATH}"
+exec "${PYTHON:-python3}" -m pbs_endpoint_a.harness "$@"

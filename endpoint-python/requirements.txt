@@ -1,0 +1,4 @@
+# Endpoint A (endpoint-python) Python dependencies.
+# PBS_LINK 0.1.4 is not listed here: fetch_pbs_link.sh clones it at a pinned commit.
+cryptography>=41      # Ed25519 (suite 0xFF02); HMAC-SHA-256 uses the standard library
+pytest>=7             # unit tests only

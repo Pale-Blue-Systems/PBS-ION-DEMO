@@ -1,0 +1,12 @@
+{
+ "description": "Example telemetry plan for the rover (format: pbs_endpoint_a/plan.py). One envelope per priority at 1 s spacing, then a 10-envelope BULK burst of 4000-byte envelopes, then three short-TTL envelopes.",
+ "items": [
+  {"at_s": 0.0, "priority": 0, "frame": "event", "text": "EVT MOTOR_STALL WHEEL=3", "ttl_s": 0, "label": "CRITICAL"},
+  {"at_s": 1.0, "priority": 1, "text": "TLM POWER BATT=27.9V SOC=81%", "ttl_s": 60, "label": "HIGH"},
+  {"at_s": 2.0, "priority": 2, "text": "TLM THERMAL CPU=-12.5C", "ttl_s": 60, "label": "NORMAL"},
+  {"at_s": 3.0, "priority": 3, "text": "TLM ENV DUST=0.02", "ttl_s": 3600, "label": "LOW"},
+  {"at_s": 4.0, "priority": 4, "text": "TLM IMAGE-CHUNK", "ttl_s": 86400, "label": "BULK"},
+  {"at_s": 5.0, "count": 10, "interval_s": 0.1, "priority": 4, "text": "TLM IMAGE-CHUNK", "payload_bytes": 4000, "label": "BULK-BURST"},
+  {"at_s": 7.0, "count": 3, "interval_s": 0.5, "priority": 2, "text": "TLM SHORT-LIVED", "ttl_s": 5, "label": "SHORT-TTL"}
+ ]
+}
